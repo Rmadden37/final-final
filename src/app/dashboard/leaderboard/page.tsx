@@ -42,7 +42,9 @@ interface SetterData {
 }
 
 export default function LeaderboardPage() {
-  const { user } = useAuth()
+  const { user } = useAuth();
+  const isManagerOrAdmin = user?.role === "manager" || user?.role === "admin";
+
   const [closers, setClosers] = useState<CloserData[]>([])
   const [setters, setSetters] = useState<SetterData[]>([])
   const [loading, setLoading] = useState(true)
@@ -323,7 +325,7 @@ export default function LeaderboardPage() {
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
             <div className="flex items-center gap-2 shrink-0">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="font-medium text-sm text-muted-foreground">Date Range:</span>
+              <span className="text-sm font-medium">Date Range:</span>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -348,38 +350,40 @@ export default function LeaderboardPage() {
         </CardContent>
       </Card>
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Setters</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">{setters.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Closers</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">{closers.length}</div>
-          </CardContent>
-        </Card>
-        <Card className="sm:col-span-2 lg:col-span-1">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total kW (Net Deals)</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">
-              {formatKW(closers.reduce((sum, c) => sum + c.totalKW, 0))} kW
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Summary Stats - Only for Manager/Admin */}
+      {isManagerOrAdmin && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Setters</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl sm:text-2xl font-bold">{setters.length}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Closers</CardTitle>
+              <Target className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl sm:text-2xl font-bold">{closers.length}</div>
+            </CardContent>
+          </Card>
+          <Card className="sm:col-span-2 lg:col-span-1">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total kW (Net Deals)</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl sm:text-2xl font-bold">
+                {formatKW(closers.reduce((sum, c) => sum + c.totalKW, 0))} kW
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Leaderboard Tabs */}
       <Tabs defaultValue="closers" className="w-full">
