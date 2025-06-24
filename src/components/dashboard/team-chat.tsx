@@ -23,7 +23,9 @@ import {
   Smile,
   Paperclip,
   X,
-  Globe
+  Globe,
+  ArrowLeft,
+  Menu
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -100,20 +102,18 @@ function MessageItem({ message, isOwn, onEdit, onDelete, onReply }: MessageItemP
       console.error('Error formatting timestamp:', error);
       return "just now";
     }
-  };
-
-  return (
-    <div className={`flex gap-3 group ${isOwn ? 'justify-end' : 'justify-start'}`}>
+  };  return (
+    <div className={`chat-message-mobile flex gap-3 group ${isOwn ? 'justify-end' : 'justify-start'}`}>
       {!isOwn && (
-        <Avatar className="h-8 w-8 mt-1">
+        <Avatar className="avatar-mobile h-8 w-8 mt-1">
           <AvatarImage src={message.senderAvatar} alt={message.senderName} />
           <AvatarFallback className="text-xs">
             {message.senderName?.substring(0, 2).toUpperCase() || "?"}
           </AvatarFallback>
         </Avatar>
       )}
-      
-      <div className={`max-w-[70%] ${isOwn ? 'flex flex-col items-end' : ''}`}>
+
+      <div className={`message-bubble-mobile max-w-[70%] ${isOwn ? 'flex flex-col items-end' : ''}`}>
         {!isOwn && (
           <div className="flex items-center gap-2 mb-1">
             <span className="text-sm font-medium">{message.senderName || "Unknown"}</span>
@@ -144,8 +144,8 @@ function MessageItem({ message, isOwn, onEdit, onDelete, onReply }: MessageItemP
                         message.messageType === "sticker" ? "max-h-24" : "max-h-64"
                       } object-contain`}
                       style={{
-                        width: message.mediaMetadata?.width ? Math.min(message.mediaMetadata.width, 300) : "auto",
-                        height: message.mediaMetadata?.height ? Math.min(message.mediaMetadata.height, 256) : "auto"
+                        inlineSize: message.mediaMetadata?.width ? Math.min(message.mediaMetadata.width, 300) : "auto",
+                        blockSize: message.mediaMetadata?.height ? Math.min(message.mediaMetadata.height, 256) : "auto"
                       }}
                     />
                   )}
@@ -203,7 +203,7 @@ function MessageItem({ message, isOwn, onEdit, onDelete, onReply }: MessageItemP
       </div>
 
       {isOwn && (
-        <Avatar className="h-8 w-8 mt-1">
+        <Avatar className="avatar-mobile h-8 w-8 mt-1">
           <AvatarImage src={message.senderAvatar} alt={message.senderName} />
           <AvatarFallback className="text-xs">
             {message.senderName?.substring(0, 2).toUpperCase() || "?"}
@@ -223,6 +223,7 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(true);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -234,6 +235,9 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
 
   useEffect(() => {
     if (!isOpen || !user) return;
+    
+    // Reset mobile sidebar state when dialog opens
+    setShowMobileSidebar(true);
     
     const initializeChannels = async () => {
       try {
@@ -285,6 +289,7 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
   const selectChannel = async (channel: ChatChannel) => {
     setActiveChannel(channel);
     setMessages([]);
+    setShowMobileSidebar(false); // Hide sidebar on mobile when channel is selected
     
     try {
       const channelMessages = await ChatService.getChannelMessages(channel.id);
@@ -470,12 +475,12 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl h-[85vh] p-0 flex flex-col">
-        <div className="flex h-full min-h-0">
+      <DialogContent className="chat-dialog-mobile max-w-6xl md:max-w-6xl h-[85vh] md:h-[85vh] h-screen md:h-[85vh] p-0 flex flex-col">
+        <div className="chat-layout-mobile flex md:flex-row h-full min-h-0">
           {/* Sidebar - Channel List */}
-          <div className="w-80 border-r bg-muted/30 flex flex-col">
-            <DialogHeader className="p-4 border-b shrink-0">
-              <DialogTitle className="flex items-center gap-2">
+          <div className={`chat-sidebar-mobile w-full md:w-80 border-r md:border-r bg-muted/30 flex flex-col ${!showMobileSidebar && activeChannel ? 'hidden md:flex' : 'flex'}`}>
+            <DialogHeader className="chat-header-mobile p-4 border-b shrink-0">
+              <DialogTitle className="chat-title-mobile flex items-center gap-2">
                 <MessageCircle className="h-5 w-5" />
                 Group Conversations
               </DialogTitle>
@@ -485,7 +490,7 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
             </DialogHeader>
             
             <ScrollArea className="flex-1 min-h-0">
-              <div className="p-3 space-y-3">
+              <div className="channel-list-mobile p-3 space-y-3">
                 {channels.length === 0 && (
                   <div className="text-center py-4">
                     <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
@@ -512,7 +517,7 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
                     
                     <Button
                       variant={activeChannel?.id === channel.id ? "secondary" : "ghost"}
-                      className="w-full justify-start h-auto p-3"
+                      className="channel-item-mobile w-full justify-start h-auto p-3"
                       onClick={() => selectChannel(channel)}
                     >
                       <div className="flex items-center gap-3 w-full">
@@ -552,12 +557,21 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
           </div>
 
           {/* Main Chat Area */}
-          <div className="flex-1 flex flex-col min-h-0">
+          <div className={`chat-main-mobile flex-1 flex flex-col min-h-0 ${showMobileSidebar && activeChannel ? 'hidden md:flex' : 'flex'}`}>
             {activeChannel ? (
               <>
                 {/* Chat Header */}
-                <div className="p-4 border-b bg-background shrink-0">
+                <div className="chat-header-mobile p-4 border-b bg-background shrink-0">
                   <div className="flex items-center gap-3">
+                    {/* Mobile Back Button */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="back-button-mobile md:hidden"
+                      onClick={() => setShowMobileSidebar(true)}
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
                     {getChannelIcon(activeChannel)}
                     <div>
                       <h3 className="font-semibold">{activeChannel.name}</h3>
@@ -630,7 +644,7 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      className="shrink-0"
+                      className="chat-button-mobile shrink-0"
                     >
                       <Smile className="h-4 w-4" />
                     </Button>
@@ -640,7 +654,7 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
                       variant="ghost"
                       size="sm"
                       onClick={() => fileInputRef.current?.click()}
-                      className="shrink-0"
+                      className="chat-button-mobile shrink-0"
                       disabled={isLoading}
                     >
                       <Paperclip className="h-4 w-4" />
@@ -659,9 +673,9 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
                       onKeyDown={handleKeyPress}
                       placeholder="Type a message..."
                       disabled={isLoading}
-                      className="flex-1"
+                      className="chat-input-mobile flex-1"
                     />
-                    <Button onClick={sendMessage} disabled={!newMessage.trim() || isLoading}>
+                    <Button onClick={sendMessage} disabled={!newMessage.trim() || isLoading} className="chat-button-mobile">
                       <Send className="h-4 w-4" />
                     </Button>
                   </div>
@@ -670,7 +684,7 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
                   {showEmojiPicker && (
                     <div 
                       ref={emojiPickerRef}
-                      className="absolute bottom-14 left-3 bg-background border border-border rounded-lg p-3 shadow-lg z-50 w-80"
+                      className="emoji-picker-mobile absolute bottom-14 left-3 md:bottom-14 md:left-3 bg-background border border-border rounded-lg p-3 shadow-lg z-50 w-80 md:w-80"
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium">Emojis</span>
@@ -702,6 +716,17 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
             ) : (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
+                  {/* Mobile Menu Button when no channel selected */}
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="md:hidden mb-4"
+                    onClick={() => setShowMobileSidebar(true)}
+                  >
+                    <Menu className="h-4 w-4 mr-2" />
+                    Select Conversation
+                  </Button>
+                  
                   <div className="flex justify-center gap-4 mb-4">
                     <Globe className="h-8 w-8 text-blue-500" />
                     <MessageCircle className="h-8 w-8 text-green-500" />

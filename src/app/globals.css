@@ -950,3 +950,159 @@
     }
   }
 }
+
+/* Mobile Chat Interface Optimizations */
+@media (max-inline-size: 768px) {
+  /* Mobile Chat Dialog - Full Screen */
+  [data-radix-dialog-content] .chat-dialog-mobile {
+    max-inline-size: 100vw !important;
+    max-block-size: 100vh !important;
+    inline-size: 100vw !important;
+    block-size: 100vh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+  }
+  
+  /* Mobile Chat Layout - Stack vertically on small screens */
+  .chat-layout-mobile {
+    flex-direction: column !important;
+  }
+  
+  /* Chat Sidebar - Full width on mobile when active */
+  .chat-sidebar-mobile {
+    inline-size: 100% !important;
+    border-inline-end: none !important;
+    border-block-end: 1px solid hsl(var(--border)) !important;
+  }
+  
+  /* Chat Main Area - Hide sidebar on mobile when chat is selected */
+  .chat-main-mobile {
+    flex: 1 !important;
+    min-block-size: 0 !important;
+  }
+  
+  /* Mobile Chat Header - Compact */
+  .chat-header-mobile {
+    padding: 0.75rem !important;
+  }
+  
+  /* Mobile Chat Messages - Better touch targets */
+  .chat-message-mobile {
+    padding: 0.75rem !important;
+    margin-block-end: 0.5rem !important;
+  }
+  
+  /* Mobile Chat Input - Larger touch targets */
+  .chat-input-mobile {
+    min-block-size: 44px !important;
+    font-size: 16px !important; /* Prevent zoom on iOS */
+    padding: 0.75rem !important;
+  }
+  
+  /* Mobile Chat Buttons - Better accessibility */
+  .chat-button-mobile {
+    min-block-size: 44px !important;
+    min-inline-size: 44px !important;
+    padding: 0.75rem !important;
+  }
+  
+  /* Mobile Emoji Picker - Full width */
+  .emoji-picker-mobile {
+    position: fixed !important;
+    inset-block-end: 0 !important;
+    inset-inline-start: 0 !important;
+    inset-inline-end: 0 !important;
+    inline-size: 100% !important;
+    max-inline-size: 100% !important;
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+    border-block-end: none !important;
+  }
+  
+  /* Mobile Channel List - Better spacing */
+  .channel-list-mobile {
+    padding: 0.5rem !important;
+  }
+  
+  .channel-item-mobile {
+    min-block-size: 48px !important;
+    padding: 0.75rem !important;
+    margin-block-end: 0.25rem !important;
+  }
+  
+  /* Mobile Chat Title - Responsive text */
+  .chat-title-mobile {
+    font-size: 1rem !important;
+    line-height: 1.25 !important;
+  }
+  
+  /* Mobile Message Bubbles - Better readability */
+  .message-bubble-mobile {
+    max-inline-size: 85% !important;
+    padding: 0.75rem !important;
+    margin-block-end: 0.5rem !important;
+    border-radius: 1rem !important;
+  }
+  
+  /* Mobile Avatar - Consistent sizing */
+  .avatar-mobile {
+    inline-size: 32px !important;
+    block-size: 32px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Mobile Back Button - For navigation */
+  .back-button-mobile {
+    min-block-size: 44px !important;
+    min-inline-size: 44px !important;
+    margin-inline-end: 0.5rem !important;
+  }
+}
+
+@media (max-inline-size: 480px) {
+  /* Extra small mobile devices */
+  .chat-dialog-mobile {
+    padding: 0 !important;
+  }
+  
+  .chat-header-mobile {
+    padding: 0.5rem !important;
+  }
+  
+  .channel-item-mobile {
+    padding: 0.5rem !important;
+  }
+  
+  .message-bubble-mobile {
+    max-inline-size: 90% !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+  
+  /* Smaller text for very small screens */
+  .chat-title-mobile {
+    font-size: 0.875rem !important;
+  }
+  
+  /* Better emoji picker sizing */
+  .emoji-picker-mobile {
+    max-block-size: 40vh !important;
+  }
+}
+
+/* Hide mobile-specific elements on desktop */
+@media (min-inline-size: 769px) {
+  .mobile-only {
+    display: none !important;
+  }
+  
+  .back-button-mobile {
+    display: none !important;
+  }
+}
+
+/* Show mobile elements only on mobile */
+@media (max-inline-size: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+}
