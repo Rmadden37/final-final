@@ -7,6 +7,7 @@ import {ThemeProvider} from "@/components/theme-provider";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { BadgeServiceInitializer } from "@/components/badge-service-initializer";
+import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -95,7 +96,7 @@ export default function RootLayout({
   return (
     <ErrorBoundary>
       <html lang="en" suppressHydrationWarning>
-        <head>
+        <Head>
           {/* PWA Manifest */}
           <link rel="manifest" href="/manifest.json" />
           
@@ -118,6 +119,7 @@ export default function RootLayout({
           <link rel="apple-touch-icon" sizes="152x152" href="/app-icon.svg" />
           <link rel="apple-touch-icon" sizes="120x120" href="/app-icon.svg" />
           <link rel="apple-touch-icon" sizes="76x76" href="/app-icon.svg" />
+          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
           
           {/* Standard Favicon */}
           <link rel="icon" type="image/svg+xml" href="/app-icon.svg" />
@@ -131,7 +133,7 @@ export default function RootLayout({
           
           {/* PWA App Name */}
           <meta name="application-name" content="LeadFlow" />
-        </head>
+        </Head>
         <body className={`${inter.className} font-body antialiased bg-background text-foreground min-h-screen`}>
           <div
             className="min-h-screen flex flex-col"
