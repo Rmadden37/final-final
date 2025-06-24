@@ -1,5 +1,5 @@
 import type {Metadata} from "next";
-import React from "react";
+import React, { useEffect } from "react";
 import {AuthProvider} from "@/hooks/use-auth";
 import {Toaster} from "@/components/ui/toaster";
 import {ThemeProvider} from "@/components/theme-provider";
@@ -29,12 +29,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  useEffect(() => {
+    const setHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+    setHeight();
+    window.addEventListener('resize', setHeight);
+    return () => window.removeEventListener('resize', setHeight);
+  }, []);
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#3B82F6" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -64,6 +73,9 @@ export default function RootLayout({
           >
             <AuthProvider>
               <BadgeServiceInitializer />
+              <div className="w-full fixed inset-0 z-[100] bg-white overflow-hidden" style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
+                {/* New Lead Form goes here */}
+              </div>
               {children}
               <Toaster />
             </AuthProvider>
