@@ -59,21 +59,7 @@ export default function RootLayout({
           >
             <AuthProvider>
               <BadgeServiceInitializer />
-              <div className="fixed inset-0 flex items-center justify-center bg-white overflow-hidden z-[100]" style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
-                <div className="w-full max-w-md p-4 relative">
-                  {/* Your lead form with date input here */}
-                  <input type="date" className="block w-full border rounded p-2 mb-4" />
-                  {/* Example calendar popup (should be conditionally rendered in real use) */}
-                  <div className="absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white shadow-lg rounded-lg p-4 w-80">
-                    {/* Calendar month UI */}
-                    <div className="text-center font-semibold mb-2">June 2025</div>
-                    <div className="grid grid-cols-7 gap-1 text-xs">
-                      <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
-                      {/* ...days... */}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Overlay and calendar popup removed. Place in a page or component as needed. */}
               {children}
               <Toaster />
             </AuthProvider>
