@@ -1,0 +1,31 @@
+{
+  "name": "LeadFlow",
+  "short_name": "LeadFlow",
+  "description": "Lead history and assignment system",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "https://imgur.com/oujPvCe",
+      "type": "image/png",
+      "sizes": "any"
+    },
+    {
+      "src": "https://imgur.com/oujPvCe",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://imgur.com/oujPvCe",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}

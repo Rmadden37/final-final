@@ -1,0 +1,130 @@
+{
+    "IDX.aI.enableInlineCompletion": false,
+    "IDX.aI.enableCodebaseIndexing": false,
+    "IDX.aI.enableAutoGeneration": false,
+    "IDX.aI.enableChatCodeGeneration": false,
+    "css.validate": false,
+    "scss.validate": false,
+    "less.validate": false,
+    "css.customData": [".vscode/css_custom_data.json"],
+    "css.lint.unknownAtRules": "ignore",
+    "css.lint.validProperties": [],
+    "tailwindCSS.includeLanguages": {
+        "html": "html",
+        "javascript": "javascript",
+        "typescript": "typescript",
+        "javascriptreact": "javascriptreact",
+        "typescriptreact": "typescriptreact"
+    },
+    "tailwindCSS.experimental.classRegex": [
+        ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+        ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+    ],
+    "files.associations": {
+        "*.css": "tailwindcss"
+    },
+    "css.completion.completePropertyWithSemicolon": false,
+    "css.completion.triggerPropertyValueCompletion": false,
+    "emmet.includeLanguages": {
+        "javascript": "javascriptreact",
+        "typescript": "typescriptreact"
+    },
+    "typescript.preferences.includePackageJsonAutoImports": "off",
+    "typescript.suggest.autoImports": false,
+    "typescript.preferences.excludePackageJsonAutoImports": "on",
+    "files.exclude": {
+        "node_modules": true,
+        ".next": true,
+        ".genkit": true,
+        "coverage": true,
+        "test-results": true,
+        "playwright-report": true,
+        ".cache": true,
+        ".temp": true,
+        ".tmp": true,
+        "*.log": true,
+        "*.tsbuildinfo": true,
+        ".vercel": true,
+        ".firebase": true,
+        "**/*.map": true,
+        "**/*.min.js": true,
+        "**/*.bundle.js": true,
+        "**/build": true,
+        "**/dist": true,
+        "**/out": true
+    },
+    "search.exclude": {
+        "node_modules": true,
+        ".next": true,
+        ".genkit": true,
+        "coverage": true,
+        "test-results": true,
+        "playwright-report": true,
+        ".cache": true,
+        ".temp": true,
+        ".tmp": true,
+        "*.log": true,
+        "*.tsbuildinfo": true,
+        ".vercel": true,
+        ".firebase": true,
+        "**/*.map": true,
+        "**/*.min.js": true,
+        "**/*.bundle.js": true,
+        "docs": true,
+        "*.md": true,
+        "**/build": true,
+        "**/dist": true,
+        "**/out": true
+    },
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "**/.next/**": true,
+        "**/coverage/**": true,
+        "**/test-results/**": true,
+        "**/playwright-report/**": true,
+        "**/.cache/**": true,
+        "**/.temp/**": true,
+        "**/.tmp/**": true,
+        "**/build/**": true,
+        "**/dist/**": true,
+        "**/out/**": true
+    },
+    "editor.quickSuggestions": {
+        "strings": true
+    },
+    "css.hover.documentation": false,
+    "css.hover.references": false,
+    "typescript.inlayHints.enumMemberValues.enabled": false,
+    "typescript.inlayHints.functionLikeReturnTypes.enabled": false,
+    "typescript.inlayHints.parameterNames.enabled": "none",
+    "typescript.inlayHints.parameterTypes.enabled": false,
+    "typescript.inlayHints.propertyDeclarationTypes.enabled": false,
+    "typescript.inlayHints.variableTypes.enabled": false,
+    "javascript.inlayHints.enumMemberValues.enabled": false,
+    "javascript.inlayHints.functionLikeReturnTypes.enabled": false,
+    "javascript.inlayHints.parameterNames.enabled": "none",
+    "javascript.inlayHints.parameterTypes.enabled": false,
+    "javascript.inlayHints.propertyDeclarationTypes.enabled": false,
+    "javascript.inlayHints.variableTypes.enabled": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "never"
+    },
+    "editor.suggest.showInlineDetails": false,
+    "editor.parameterHints.enabled": false,
+    "editor.inlineSuggest.enabled": false,
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": false,
+        "markdown": false,
+        "css": false
+    },
+    
+    // Performance optimizations
+    "typescript.disableAutomaticTypeAcquisition": true,
+    "typescript.preferences.useLabelDetailsInCompletionEntries": true,
+    "typescript.suggest.completeFunctionCalls": false,
+    "typescript.suggest.paths": false,
+    "editor.suggest.snippetsPreventQuickSuggestions": false
+}

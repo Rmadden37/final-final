@@ -1,0 +1,74 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Premium Purple to Teal Gradient -->
+    <linearGradient id="premiumGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#BB86FC;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9C66FB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#03DAC6;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Drop shadow -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="rgba(187,134,252,0.3)"/>
+    </filter>
+  </defs>
+  
+  <!-- Modern gear shape with premium styling -->
+  <g transform="translate(256, 256)" filter="url(#shadow)">
+    
+    <!-- Outer gear teeth - sleek modern design -->
+    <!-- Top tooth -->
+    <path d="M-24 -220 L24 -220 Q36 -220 36 -208 L36 -132 Q36 -120 24 -120 L-24 -120 Q-36 -120 -36 -132 L-36 -208 Q-36 -220 -24 -220 Z" 
+          fill="url(#premiumGradient)" filter="url(#glow)"/>
+    
+    <!-- Top-right tooth -->
+    <path d="M-24 -220 L24 -220 Q36 -220 36 -208 L36 -132 Q36 -120 24 -120 L-24 -120 Q-36 -120 -36 -132 L-36 -208 Q-36 -220 -24 -220 Z" 
+          fill="url(#premiumGradient)" filter="url(#glow)" transform="rotate(45)"/>
+    
+    <!-- Right tooth -->
+    <path d="M-24 -220 L24 -220 Q36 -220 36 -208 L36 -132 Q36 -120 24 -120 L-24 -120 Q-36 -120 -36 -132 L-36 -208 Q-36 -220 -24 -220 Z" 
+          fill="url(#premiumGradient)" filter="url(#glow)" transform="rotate(90)"/>
+    
+    <!-- Bottom-right tooth -->
+    <path d="M-24 -220 L24 -220 Q36 -220 36 -208 L36 -132 Q36 -120 24 -120 L-24 -120 Q-36 -120 -36 -132 L-36 -208 Q-36 -220 -24 -220 Z" 
+          fill="url(#premiumGradient)" filter="url(#glow)" transform="rotate(135)"/>
+    
+    <!-- Bottom tooth -->
+    <path d="M-24 -220 L24 -220 Q36 -220 36 -208 L36 -132 Q36 -120 24 -120 L-24 -120 Q-36 -120 -36 -132 L-36 -208 Q-36 -220 -24 -220 Z" 
+          fill="url(#premiumGradient)" filter="url(#glow)" transform="rotate(180)"/>
+    
+    <!-- Bottom-left tooth -->
+    <path d="M-24 -220 L24 -220 Q36 -220 36 -208 L36 -132 Q36 -120 24 -120 L-24 -120 Q-36 -120 -36 -132 L-36 -208 Q-36 -220 -24 -220 Z" 
+          fill="url(#premiumGradient)" filter="url(#glow)" transform="rotate(225)"/>
+    
+    <!-- Left tooth -->
+    <path d="M-24 -220 L24 -220 Q36 -220 36 -208 L36 -132 Q36 -120 24 -120 L-24 -120 Q-36 -120 -36 -132 L-36 -208 Q-36 -220 -24 -220 Z" 
+          fill="url(#premiumGradient)" filter="url(#glow)" transform="rotate(270)"/>
+    
+    <!-- Top-left tooth -->
+    <path d="M-24 -220 L24 -220 Q36 -220 36 -208 L36 -132 Q36 -120 24 -120 L-24 -120 Q-36 -120 -36 -132 L-36 -208 Q-36 -220 -24 -220 Z" 
+          fill="url(#premiumGradient)" filter="url(#glow)" transform="rotate(315)"/>
+    
+    <!-- Main circular body with premium gradient -->
+    <circle r="140" fill="url(#premiumGradient)" filter="url(#glow)"/>
+    
+    <!-- Inner ring with subtle teal accent -->
+    <circle r="80" fill="none" stroke="#03DAC6" stroke-width="4" opacity="0.6"/>
+    
+    <!-- Center circle - glass morphism style -->
+    <circle r="50" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+    
+    <!-- Central accent dot -->
+    <circle r="16" fill="#03DAC6" filter="url(#glow)"/>
+    
+  </g>
+</svg>
