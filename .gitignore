@@ -4,3 +4,4 @@ dist/
 .next/
 .next/
 firestore-debug.log
+tsconfig.tsbuildinfo
