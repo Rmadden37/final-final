@@ -54,6 +54,13 @@ export const onMessageListener = () =>
     
     onMessage(messaging, (payload: any) => {
       console.log('Message received. ', payload);
+      
+      // NOTIFICATION FILTERING: Only allow 'lead_assigned' notifications
+      if (payload.data?.type !== 'lead_assigned') {
+        console.log(`Notification type '${payload.data?.type}' blocked - only lead_assigned notifications allowed`);
+        return; // Don't process the notification
+      }
+      
       resolve(payload);
     });
   });
@@ -173,13 +180,8 @@ export const refreshAndStoreToken = async (userId: string): Promise<string | nul
   }
 };
 
-// Notification types for LeadFlow
-export type LeadNotificationType = 
-  | 'new_lead'
-  | 'lead_assigned' 
-  | 'appointment_reminder'
-  | 'lead_updated'
-  | 'follow_up_due';
+// Notification types for LeadFlow - ONLY lead_assigned is enabled
+export type LeadNotificationType = 'lead_assigned'; // All other types disabled
 
 export interface LeadNotificationData {
   type: LeadNotificationType;
@@ -190,20 +192,18 @@ export interface LeadNotificationData {
 }
 
 export const sendLeadNotification = (data: LeadNotificationData) => {
-  const titles = {
-    new_lead: '🔥 New Lead!',
-    lead_assigned: '📋 Lead Assigned',
-    appointment_reminder: '📅 Appointment Reminder',
-    lead_updated: '📝 Lead Updated',
-    follow_up_due: '⏰ Follow-up Due'
-  };
+  // Only allow lead_assigned notifications
+  if (data.type !== 'lead_assigned') {
+    console.log(`Notification type '${data.type}' blocked - only lead_assigned notifications allowed`);
+    return;
+  }
 
-  const title = titles[data.type];
+  const title = '📋 New Lead Assigned';
   
   showNotification(title, {
     body: data.message,
     tag: `lead-${data.leadId}`,
-    requireInteraction: data.type === 'appointment_reminder',
+    requireInteraction: false,
     data: data
   });
 };

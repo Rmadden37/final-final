@@ -3,6 +3,33 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+/* Mobile-optimized scrolling and touch targets */
+@layer base {
+  /* Smooth scrolling for better mobile experience */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better touch targets for mobile */
+  button, [role="button"] {
+    min-height: 44px; /* iOS/Android recommended minimum touch target */
+  }
+  
+  @media (max-width: 640px) {
+    /* Ensure minimum touch target size on mobile */
+    button, [role="button"], [role="tab"] {
+      min-height: 48px;
+      min-width: 48px;
+    }
+    
+    /* Better text readability on mobile */
+    body {
+      font-size: 16px; /* Prevent zoom on iOS */
+    }
+  }
+}
+
 @layer base {
   :root {
     --background: 213 33% 95%; /* #F0F4F8 */

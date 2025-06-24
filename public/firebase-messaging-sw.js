@@ -23,6 +23,12 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message:', payload);
   
+  // NOTIFICATION FILTERING: Only allow 'lead_assigned' notifications
+  if (payload.data?.type !== 'lead_assigned') {
+    console.log(`[firebase-messaging-sw.js] Notification type '${payload.data?.type}' blocked - only lead_assigned notifications allowed`);
+    return; // Don't show the notification
+  }
+  
   const notificationTitle = payload.notification?.title || 'LeadFlow Notification';
   const notificationOptions = {
     body: payload.notification?.body || 'You have a new notification',

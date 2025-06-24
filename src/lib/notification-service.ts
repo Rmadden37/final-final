@@ -1,4 +1,6 @@
 // Notification service for LeadFlow app
+// CONFIGURATION: Only "New lead assigned" notifications are enabled
+// All other notification types have been disabled to reduce notification noise
 import { collection, getDocs, query, where, DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Lead } from '@/types';
@@ -87,26 +89,17 @@ export async function sendPushNotification(
 
 // Notification triggers for different lead events
 export const LeadNotifications = {
-  // When a new lead is created
+  // When a new lead is created - DISABLED
   newLead: async (lead: Lead, assignedUserId?: string) => {
-    const userIds = assignedUserId ? [assignedUserId] : [];
-    
-    await sendPushNotification(userIds, {
-      title: '🔥 New Lead!',
-      body: `${lead.customerName} from ${lead.address} - ${lead.customerPhone}`,
-      tag: `new-lead-${lead.id}`,
-      data: {
-        type: 'new_lead',
-        leadId: lead.id,
-        actionUrl: `/dashboard/leads/${lead.id}`
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('newLead notification disabled - only lead assignment notifications allowed');
+    return;
   },
 
-  // When a lead is assigned to someone
+  // When a lead is assigned to someone - ENABLED (This is the only allowed notification)
   leadAssigned: async (lead: Lead, assignedUserId: string) => {
     await sendPushNotification([assignedUserId], {
-      title: '📋 Lead Assigned to You',
+      title: '📋 New Lead Assigned',
       body: `${lead.customerName} has been assigned to you`,
       tag: `assigned-${lead.id}`,
       data: {
@@ -117,196 +110,95 @@ export const LeadNotifications = {
     });
   },
 
-  // Appointment reminder (30 minutes before)
+  // Appointment reminder (30 minutes before) - DISABLED
   appointmentReminder: async (lead: Lead, assignedUserId: string, appointmentTime: Date) => {
-    const timeStr = appointmentTime.toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-    
-    await sendPushNotification([assignedUserId], {
-      title: '📅 Appointment Reminder',
-      body: `Meeting with ${lead.customerName} in 30 minutes (${timeStr})`,
-      tag: `reminder-${lead.id}`,
-      data: {
-        type: 'appointment_reminder',
-        leadId: lead.id,
-        appointmentTime: appointmentTime.toISOString(),
-        actionUrl: `/dashboard/schedule`
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('appointmentReminder notification disabled - only lead assignment notifications allowed');
+    return;
   },
 
-  // When lead status changes
+  // When lead status changes - DISABLED
   leadUpdated: async (lead: Lead, assignedUserId: string, updateType: string) => {
-    const messages = {
-      'status_change': `Status changed to ${lead.status}`,
-      'contact_attempt': 'New contact attempt logged',
-      'notes_added': 'New notes added',
-      'rescheduled': 'Appointment rescheduled'
-    };
-
-    await sendPushNotification([assignedUserId], {
-      title: '📝 Lead Updated',
-      body: `${lead.customerName}: ${messages[updateType as keyof typeof messages] || 'Lead information updated'}`,
-      tag: `update-${lead.id}`,
-      data: {
-        type: 'lead_updated',
-        leadId: lead.id,
-        updateType,
-        actionUrl: `/dashboard/leads/${lead.id}`
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('leadUpdated notification disabled - only lead assignment notifications allowed');
+    return;
   },
 
-  // Follow-up reminder
+  // Follow-up reminder - DISABLED
   followUpDue: async (lead: Lead, assignedUserId: string) => {
-    await sendPushNotification([assignedUserId], {
-      title: '⏰ Follow-up Due',
-      body: `Time to follow up with ${lead.customerName}`,
-      tag: `followup-${lead.id}`,
-      data: {
-        type: 'follow_up_due',
-        leadId: lead.id,
-        actionUrl: `/dashboard/leads/${lead.id}`
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('followUpDue notification disabled - only lead assignment notifications allowed');
+    return;
   },
 
-  // Team management notifications
+  // Team management notifications - DISABLED
   closerStatusChange: async (closerName: string, newStatus: 'On Duty' | 'Off Duty', teamUserIds: string[]) => {
-    await sendPushNotification(teamUserIds, {
-      title: '👥 Team Update',
-      body: `${closerName} is now ${newStatus}`,
-      tag: `status-change-${closerName}`,
-      data: {
-        type: 'team_update',
-        actionUrl: '/dashboard'
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('closerStatusChange notification disabled - only lead assignment notifications allowed');
+    return;
   },
 
-  // Lead queue alerts
+  // Lead queue alerts - DISABLED
   queueBacklog: async (queueCount: number, managerIds: string[]) => {
-    await sendPushNotification(managerIds, {
-      title: '⚠️ Queue Alert',
-      body: `${queueCount} leads waiting for assignment`,
-      tag: 'queue-backlog',
-      data: {
-        type: 'queue_alert',
-        actionUrl: '/dashboard',
-        priority: 'high'
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('queueBacklog notification disabled - only lead assignment notifications allowed');
+    return;
   },
 
-  // Performance alerts
+  // Performance alerts - DISABLED
   dailyGoalReached: async (closerName: string, salesCount: number, teamUserIds: string[]) => {
-    await sendPushNotification(teamUserIds, {
-      title: '🎉 Goal Achieved!',
-      body: `${closerName} reached daily goal with ${salesCount} sales!`,
-      tag: `goal-${closerName}`,
-      data: {
-        type: 'performance_milestone',
-        actionUrl: '/dashboard/analytics'
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('dailyGoalReached notification disabled - only lead assignment notifications allowed');
+    return;
   },
 
-  // Verification reminders
+  // Verification reminders - DISABLED
   verificationRequired: async (leadCount: number, setterIds: string[]) => {
-    await sendPushNotification(setterIds, {
-      title: '✅ Verification Needed',
-      body: `${leadCount} lead${leadCount > 1 ? 's' : ''} require verification`,
-      tag: 'verification-reminder',
-      data: {
-        type: 'verification_reminder',
-        actionUrl: '/dashboard/lead-history'
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('verificationRequired notification disabled - only lead assignment notifications allowed');
+    return;
   },
 
-  // System maintenance
+  // System maintenance - DISABLED
   systemMaintenance: async (message: string, allUserIds: string[]) => {
-    await sendPushNotification(allUserIds, {
-      title: '🔧 System Notice',
-      body: message,
-      tag: 'system-maintenance',
-      data: {
-        type: 'system_alert',
-        actionUrl: '/dashboard'
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('systemMaintenance notification disabled - only lead assignment notifications allowed');
+    return;
   },
 
-  // Critical lead alerts
+  // Critical lead alerts - DISABLED
   highPriorityLead: async (lead: Lead, assignedUserId: string) => {
-    await sendPushNotification([assignedUserId], {
-      title: '🚨 Priority Lead!',
-      body: `${lead.customerName} - High-value lead assigned`,
-      tag: `priority-${lead.id}`,
-      data: {
-        type: 'priority_lead',
-        leadId: lead.id,
-        actionUrl: `/dashboard/leads/${lead.id}`,
-        priority: 'high'
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('highPriorityLead notification disabled - only lead assignment notifications allowed');
+    return;
   },
 
-  // Photo uploaded notification
+  // Photo uploaded notification - DISABLED
   photoUploaded: async (lead: Lead, uploaderName: string, assignedUserId: string) => {
-    await sendPushNotification([assignedUserId], {
-      title: '📸 Photos Added',
-      body: `${uploaderName} added photos for ${lead.customerName}`,
-      tag: `photos-${lead.id}`,
-      data: {
-        type: 'photo_uploaded',
-        leadId: lead.id,
-        actionUrl: `/dashboard/leads/${lead.id}`
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('photoUploaded notification disabled - only lead assignment notifications allowed');
+    return;
   },
 
-  // Closer rotation updates
+  // Closer rotation updates - DISABLED
   rotationUpdate: async (nextCloserName: string, teamUserIds: string[]) => {
-    await sendPushNotification(teamUserIds, {
-      title: '🔄 Rotation Update',
-      body: `${nextCloserName} is next in line for assignments`,
-      tag: 'rotation-update',
-      data: {
-        type: 'rotation_update',
-        actionUrl: '/dashboard'
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('rotationUpdate notification disabled - only lead assignment notifications allowed');
+    return;
   },
 
-  // Chat mentions
+  // Chat mentions - DISABLED
   chatMention: async (mentionerName: string, message: string, mentionedUserId: string) => {
-    await sendPushNotification([mentionedUserId], {
-      title: `💬 ${mentionerName} mentioned you`,
-      body: message.substring(0, 100) + (message.length > 100 ? '...' : ''),
-      tag: `chat-mention-${Date.now()}`,
-      data: {
-        type: 'chat_mention',
-        actionUrl: '/dashboard/chat'
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('chatMention notification disabled - only lead assignment notifications allowed');
+    return;
   },
 
-  // Overdue follow-ups
+  // Overdue follow-ups - DISABLED
   overdueFollowUp: async (lead: Lead, assignedUserId: string, daysPastDue: number) => {
-    await sendPushNotification([assignedUserId], {
-      title: '⏰ Follow-up Overdue',
-      body: `${lead.customerName} - ${daysPastDue} days overdue`,
-      tag: `overdue-${lead.id}`,
-      data: {
-        type: 'overdue_followup',
-        leadId: lead.id,
-        actionUrl: `/dashboard/leads/${lead.id}`,
-        priority: 'high'
-      }
-    });
+    // DISABLED: Only lead assignment notifications are allowed
+    console.log('overdueFollowUp notification disabled - only lead assignment notifications allowed');
+    return;
   }
 };
 
