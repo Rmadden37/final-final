@@ -871,4 +871,82 @@
       0 6px 20px rgba(3, 218, 198, 0.12),
       inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
   }
+
+  /* Mobile Dashboard Card Optimization - 75% phone screen height */
+  @media (max-inline-size: 768px) {
+    /* Dashboard main grid - single column layout on mobile */
+    .dashboard-grid-mobile {
+      grid-template-columns: 1fr !important;
+      gap: 1rem !important;
+      block-size: auto !important;
+    }
+    
+    /* Dashboard cards - 75% of viewport height */
+    .dashboard-card-mobile,
+    [data-dashboard-card],
+    .mobile-75vh {
+      min-block-size: 75vh !important;
+      block-size: 75vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+      margin-block-end: 1rem !important;
+    }
+    
+    /* Card headers - fixed size */
+    .dashboard-card-mobile .card-header,
+    [data-dashboard-card] .card-header {
+      flex-shrink: 0 !important;
+      padding: 1rem !important;
+    }
+    
+    /* Card content - scrollable area */
+    .dashboard-card-mobile .card-content,
+    [data-dashboard-card] .card-content {
+      flex: 1 !important;
+      overflow-y: auto !important;
+      padding: 0.5rem 1rem 1rem !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+    
+    /* Mobile scrollable content areas with proper height calculation */
+    .mobile-scroll-area {
+      max-block-size: calc(75vh - 8rem) !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+    
+    /* Force dashboard page grid to mobile layout */
+    .dashboard-page-grid {
+      grid-template-columns: 1fr !important;
+      gap: 1rem !important;
+      block-size: auto !important;
+    }
+    
+    /* Individual dashboard components on mobile */
+    .dashboard-page-grid > div {
+      min-block-size: 75vh !important;
+    }
+  }
+  
+  @media (max-inline-size: 480px) {
+    /* Extra small mobile devices - maintain 75% height but optimize spacing */
+    .dashboard-card-mobile,
+    [data-dashboard-card],
+    .mobile-75vh {
+      min-block-size: 75vh !important;
+      block-size: 75vh !important;
+      margin-block-end: 1rem !important;
+    }
+    
+    /* Tighter spacing for small screens */
+    .dashboard-card-mobile .card-header,
+    [data-dashboard-card] .card-header {
+      padding: 0.75rem !important;
+    }
+    
+    .dashboard-card-mobile .card-content,
+    [data-dashboard-card] .card-content {
+      padding: 0.25rem 0.75rem 0.75rem !important;
+    }
+  }
 }
