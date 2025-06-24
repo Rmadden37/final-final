@@ -155,7 +155,7 @@ function DashboardSidebarContent() {
                   onClick={() => setIsCreateLeadModalOpen(true)}
                   className="nav-item shadow-sm"
                 >
-                  <PlusCircle className="h-5 w-5" />
+                  <PlusCircle className="h-6 w-6 text-green-500 dark:text-green-400" />
                   <span className="font-semibold">Create New Lead</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
