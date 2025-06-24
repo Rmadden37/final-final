@@ -133,17 +133,15 @@ function DashboardSidebarContent() {
   return (
     <>
       <Sidebar collapsible="icon" className="border-r">
-        <SidebarHeader className="px-4 pt-1 pb-1 flex items-center gap-2 min-h-0 h-2">
-          {/* Sidebar header intentionally left empty for minimalism */}
-        </SidebarHeader>
+        <SidebarHeader className="px-4 pt-1 pb-1 flex items-center gap-2 min-h-0 h-2" />
         
         <SidebarContent className="mb-10">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild className={`nav-item shadow-sm text-lg text-sidebar-primary${pathname === "/dashboard" ? " active" : ""}`} onClick={handleNav}>
+              <SidebarMenuButton asChild className={`nav-item shadow-sm text-lg text-sidebar-primary group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto${pathname === "/dashboard" ? " active" : ""}`} onClick={handleNav}>
                 <Link href="/dashboard">
-                  <Home className="h-6 w-6" />
-                  <span className="font-semibold">Dashboard</span>
+                  <Home className="h-6 w-6 mx-auto group-data-[collapsible=icon]:block" />
+                  <span className="font-semibold group-data-[collapsible=icon]:hidden">Dashboard</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -153,20 +151,20 @@ function DashboardSidebarContent() {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => setIsCreateLeadModalOpen(true)}
-                  className="nav-item shadow-sm"
+                  className="nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto"
                 >
-                  <PlusCircle className="h-6 w-6 text-green-500 dark:text-green-400" />
-                  <span className="font-semibold">Create New Lead</span>
+                  <PlusCircle className="h-6 w-6 text-green-500 dark:text-green-400 mx-auto group-data-[collapsible=icon]:block" />
+                  <span className="font-semibold group-data-[collapsible=icon]:hidden">Create New Lead</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             )}
 
             {/* Leaderboard */}
             <SidebarMenuItem>
-              <SidebarMenuButton asChild className={`nav-item shadow-sm${pathname === "/dashboard/leaderboard" ? " active" : ""}`} onClick={handleNav}>
+              <SidebarMenuButton asChild className={`nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto${pathname === "/dashboard/leaderboard" ? " active" : ""}`} onClick={handleNav}>
                 <Link href="/dashboard/leaderboard">
-                  <Trophy className="h-5 w-5 text-yellow-500" />
-                  <span className="font-semibold">Leaderboard</span>
+                  <Trophy className="h-6 w-6 text-yellow-500 mx-auto group-data-[collapsible=icon]:block" />
+                  <span className="font-semibold group-data-[collapsible=icon]:hidden">Leaderboard</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
