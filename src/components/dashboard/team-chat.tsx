@@ -25,7 +25,8 @@ import {
   X,
   Globe,
   ArrowLeft,
-  Menu
+  Menu,
+  Home
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -480,13 +481,28 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
           {/* Sidebar - Channel List */}
           <div className={`chat-sidebar-mobile w-full md:w-80 border-r md:border-r bg-muted/30 flex flex-col ${!showMobileSidebar && activeChannel ? 'hidden md:flex' : 'flex'}`}>
             <DialogHeader className="chat-header-mobile p-4 border-b shrink-0">
-              <DialogTitle className="chat-title-mobile flex items-center gap-2">
-                <MessageCircle className="h-5 w-5" />
-                Group Conversations
-              </DialogTitle>
-              <p className="text-sm text-muted-foreground mt-1">
-                Regional and team group chats
-              </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5" />
+                  <div>
+                    <DialogTitle className="chat-title-mobile">
+                      Group Conversations
+                    </DialogTitle>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Regional and team group chats
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onClose}
+                  className="flex items-center gap-2 hover:bg-blue-50 dark:hover:bg-blue-950/20 border-blue-200 dark:border-blue-800"
+                >
+                  <Home className="h-4 w-4" />
+                  <span className="hidden sm:inline">Dashboard</span>
+                </Button>
+              </div>
             </DialogHeader>
             
             <ScrollArea className="flex-1 min-h-0">
@@ -517,8 +533,14 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
                     
                     <Button
                       variant={activeChannel?.id === channel.id ? "secondary" : "ghost"}
-                      className="channel-item-mobile w-full justify-start h-auto p-3"
-                      onClick={() => selectChannel(channel)}
+                      className="channel-item-mobile w-full justify-start h-auto p-3 cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        selectChannel(channel);
+                      }}
+                      onMouseDown={(e) => e.preventDefault()}
+                      tabIndex={0}
                     >
                       <div className="flex items-center gap-3 w-full">
                         {getChannelIcon(channel)}
@@ -562,26 +584,37 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
               <>
                 {/* Chat Header */}
                 <div className="chat-header-mobile p-4 border-b bg-background shrink-0">
-                  <div className="flex items-center gap-3">
-                    {/* Mobile Back Button */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="back-button-mobile md:hidden"
-                      onClick={() => setShowMobileSidebar(true)}
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                    {getChannelIcon(activeChannel)}
-                    <div>
-                      <h3 className="font-semibold">{activeChannel.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {activeChannel.type === "region" 
-                          ? "Regional group conversation" 
-                          : "Team group conversation"
-                        } • {activeChannel.memberCount || 0} member{(activeChannel.memberCount || 0) !== 1 ? 's' : ''}
-                      </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      {/* Mobile Back Button */}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="back-button-mobile md:hidden"
+                        onClick={() => setShowMobileSidebar(true)}
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                      </Button>
+                      {getChannelIcon(activeChannel)}
+                      <div>
+                        <h3 className="font-semibold">{activeChannel.name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {activeChannel.type === "region" 
+                            ? "Regional group conversation" 
+                            : "Team group conversation"
+                          } • {activeChannel.memberCount || 0} member{(activeChannel.memberCount || 0) !== 1 ? 's' : ''}
+                        </p>
+                      </div>
                     </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={onClose}
+                      className="flex items-center gap-2 hover:bg-blue-50 dark:hover:bg-blue-950/20 border-blue-200 dark:border-blue-800"
+                    >
+                      <Home className="h-4 w-4" />
+                      <span className="hidden lg:inline">Dashboard</span>
+                    </Button>
                   </div>
                 </div>
 

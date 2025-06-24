@@ -1045,6 +1045,32 @@
     min-height: 44px !important;
     min-width: 44px !important;
     padding: 0.75rem !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  
+  /* Channel Item - Enhanced for single-click */
+  .channel-item-mobile {
+    min-height: 48px !important;
+    padding: 0.75rem !important;
+    margin-bottom: 0.25rem !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .channel-item-mobile:hover,
+  .channel-item-mobile:active {
+    background-color: hsl(var(--accent)) !important;
+    transform: translateY(-1px) !important;
+  }
+  
+  .channel-item-mobile:focus-visible {
+    outline: 2px solid hsl(var(--ring)) !important;
+    outline-offset: 2px !important;
   }
   
   /* Mobile Emoji Picker - Full width */
@@ -1062,12 +1088,6 @@
   /* Mobile Channel List - Better spacing */
   .channel-list-mobile {
     padding: 0.5rem !important;
-  }
-  
-  .channel-item-mobile {
-    min-height: 48px !important;
-    padding: 0.75rem !important;
-    margin-bottom: 0.25rem !important;
   }
   
   /* Mobile Chat Title - Responsive text */
