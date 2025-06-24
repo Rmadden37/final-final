@@ -134,11 +134,7 @@ function DashboardSidebarContent() {
     <>
       <Sidebar collapsible="icon" className="border-r">
         <SidebarHeader className="px-4 pt-1 pb-1 flex items-center gap-2">
-          <Link href="/dashboard" className="flex items-center gap-2 group focus:outline-none">
-            <span className="text-xl md:text-2xl font-extrabold font-headline bg-gradient-to-r from-blue-400 to-fuchsia-500 bg-clip-text text-transparent tracking-tight select-none">
-              LeadFlow
-            </span>
-          </Link>
+          {/* Removed LeadFlow text logo for minimal header */}
         </SidebarHeader>
         
         <SidebarContent className="mb-10">
