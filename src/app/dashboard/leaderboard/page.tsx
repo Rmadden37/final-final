@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -72,8 +72,7 @@ export default function LeaderboardPage() {
     { label: 'LW (Last Week)', value: 'lw', start: startOfLastWeek, end: new Date(startOfWeek.getTime() - 1) },
     { label: 'WTD', value: 'wtd', start: startOfWeek },
     { label: 'MTD', value: 'mtd', start: startOfMonth },
-    { label: 'YTD', value: 'ytd', start: startOfYTD },
-  ]
+    { label: 'YTD', value: 'ytd', start: startOfYTD },  ]
 
   // Fetch users for photo matching
   useEffect(() => {
@@ -92,13 +91,12 @@ export default function LeaderboardPage() {
     fetchUsers()
   }, [])
 
-  // Load leaderboard data initially and whenever users change
-  useEffect(() => {
-    loadData()
-  }, [dateFilter, allUsers]) // Re-run when users are loaded or date filter changes
+  // Memoize dateFilters to prevent unnecessary re-renders
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const memoizedDateFilters = useMemo(() => dateFilters, [])
 
   // Simple name matching - find user photo by matching names
-  function findUserPhoto(leaderboardName: string): { displayName: string; photoURL?: string } | undefined {
+  const findUserPhoto = useCallback((leaderboardName: string): { displayName: string; photoURL?: string } | undefined => {
     if (!leaderboardName || !allUsers.length) return undefined
     
     const name = leaderboardName.trim()
@@ -134,10 +132,29 @@ export default function LeaderboardPage() {
     
     console.log(`❌ No match found for: "${name}"`)
     return undefined
-  }
+  }, [allUsers])
+
+  // Check if a date is in the selected range
+  const isInDateRange = useCallback((dateStr: string): boolean => {
+    const filter = memoizedDateFilters.find(f => f.value === dateFilter)
+    if (!filter) return true
+    
+    const [month, day, year] = dateStr.split('/')
+    if (!month || !day || !year) return false
+    
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    
+    // Handle specific date ranges with end dates
+    if (filter.end) {
+      return date >= filter.start && date <= filter.end
+    }
+    
+    // Handle ranges that go until today
+    return date >= filter.start
+  }, [dateFilter, memoizedDateFilters])
 
   // Load data from API
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -223,26 +240,14 @@ export default function LeaderboardPage() {
     } finally {
       setLoading(false)
     }
-  }
-  
-  // Check if a date is in the selected range
-  const isInDateRange = (dateStr: string): boolean => {
-    const filter = dateFilters.find(f => f.value === dateFilter)
-    if (!filter) return true
-    
-    const [month, day, year] = dateStr.split('/')
-    if (!month || !day || !year) return false
-    
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
-    
-    // Handle specific date ranges with end dates
-    if (filter.end) {
-      return date >= filter.start && date <= filter.end
-    }
-    
-    // Handle ranges that go until today
-    return date >= filter.start
-  }
+  }, [findUserPhoto, isInDateRange]) // Dependencies: functions used
+
+  // Load leaderboard data initially and whenever users change
+  useEffect(() => {
+    loadData()
+  }, [loadData]) // Re-run when loadData changes
+
+  // Check if a date is in the selected range (formatting functions)
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {

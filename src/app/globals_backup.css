@@ -25,9 +25,13 @@
   
   body {
     /* Safe area padding for iPhone X and later */
+    padding-block-start: constant(safe-area-inset-top);
     padding-block-start: env(safe-area-inset-top);
+    padding-inline-start: constant(safe-area-inset-left);
     padding-inline-start: env(safe-area-inset-left);
+    padding-inline-end: constant(safe-area-inset-right);
     padding-inline-end: env(safe-area-inset-right);
+    padding-block-end: constant(safe-area-inset-bottom);
     padding-block-end: env(safe-area-inset-bottom);
     
     /* Prevent horizontal scrolling */
@@ -43,6 +47,39 @@
     /* Better touch feedback */
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Mobile-specific chat optimizations */
+  @media (max-inline-size: 480px) {
+    /* Chat dialog mobile improvements */
+    [data-radix-dialog-content] {
+      margin: 0.5rem !important;
+      max-inline-size: calc(100vw - 1rem) !important;
+      max-block-size: calc(100vh - 1rem) !important;
+      inline-size: calc(100vw - 1rem) !important;
+      block-size: calc(100vh - 1rem) !important;
+    }
+    
+    /* Better chat input styling */
+    .chat-input-mobile {
+      font-size: 16px !important; /* Prevent zoom on iOS */
+      min-block-size: 44px;
+    }
+    
+    /* Chat button improvements */
+    .chat-button-mobile {
+      min-block-size: 44px;
+      min-inline-size: 44px;
+      padding: 0.75rem;
+    }
+    
+    /* Emoji picker mobile optimization */
+    .emoji-picker-mobile {
+      max-inline-size: calc(100vw - 2rem);
+      inset-inline-start: 1rem !important;
+      inset-inline-end: 1rem !important;
+      inline-size: auto !important;
+    }
   }
   
   /* Enhanced mobile-first responsive design */
@@ -62,14 +99,16 @@
     
     /* Optimize spacing for mobile */
     .container {
-      padding-inline-start: 1rem;
-      padding-inline-end: 1rem;
+      padding-inline-start: 0.75rem;
+      padding-inline-end: 0.75rem;
+      max-width: 100%;
     }
     
     /* Make cards more mobile-friendly */
     [class*="card"] {
-      margin: 0.5rem 0;
+      margin: 0.25rem 0;
       border-radius: 0.75rem;
+      padding: 0.75rem;
     }
     
     /* Better input handling on mobile */
@@ -77,14 +116,51 @@
       font-size: 16px; /* Prevent zoom on iOS */
       padding: 0.75rem;
       border-radius: 0.5rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    /* Prevent text from being too large on mobile */
+    h1 { font-size: 1.5rem; line-height: 1.4; }
+    h2 { font-size: 1.25rem; line-height: 1.4; }
+    h3 { font-size: 1.125rem; line-height: 1.4; }
+    
+    /* Better table responsiveness */
+    table {
+      display: table;
+      overflow-x: auto;
+      white-space: nowrap;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    /* Ensure grids don't overflow */
+    [class*="grid"] {
+      gap: 0.5rem;
+      grid-auto-rows: min-content;
+    }
+    
+    /* Better modal sizing */
+    [role="dialog"], [data-radix-dialog-content] {
+      margin: 0.5rem;
+      max-width: calc(100vw - 1rem);
+      max-height: calc(100vh - 1rem);
+      overflow: auto;
+    }
+    
+    /* Prevent fixed height issues on mobile */
+    [class*="h-[calc(100vh"] {
+      min-height: 300px;
+      max-height: calc(100vh - 8rem);
     }
   }
   
-  @media (max-inline-size: 768px) {
+  @media (max-width: 768px) {
     /* Tablet and medium mobile devices */
     .container {
-      padding-inline-start: 1.5rem;
-      padding-inline-end: 1.5rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      max-width: 100%;
     }
     
     /* Optimize navigation for tablet */
@@ -93,9 +169,32 @@
     }
     
     /* Better modal sizing for tablets */
-    [role="dialog"] {
-      margin: 1rem;
-      max-inline-size: calc(100vw - 2rem);
+    [role="dialog"], [data-radix-dialog-content] {
+      margin: 0.75rem;
+      max-width: calc(100vw - 1.5rem);
+      max-height: calc(100vh - 1.5rem);
+    }
+    
+    /* Responsive grid adjustments */
+    [class*="grid-cols-2"] {
+      grid-template-columns: 1fr;
+    }
+    
+    [class*="grid-cols-3"] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    [class*="grid-cols-4"], [class*="grid-cols-5"] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Better spacing for cards */
+    [class*="space-y-6"] > * + * {
+      margin-top: 1rem;
+    }
+    
+    [class*="space-y-8"] > * + * {
+      margin-top: 1.5rem;
     }
   }
   
@@ -106,10 +205,64 @@
   }
   
   /* Hide elements that shouldn't be visible on very small screens */
-  @media (max-inline-size: 320px) {
+  @media (max-width: 320px) {
     .hidden-xs {
       display: none !important;
     }
+  }
+  
+  /* Additional mobile optimization utilities */
+  .mobile-optimized {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+  .mobile-padding {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  .mobile-text {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem;
+  }
+  
+  /* Ensure tables are scrollable on mobile */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better scroll areas for mobile */
+  .scroll-mobile {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* Ensure minimum touch targets */
+  .min-h-touch {
+    min-height: 44px;
+  }
+  
+  .min-w-touch {
+    min-width: 44px;
+  }
+  
+  /* Prevent text selection issues on mobile */
+  .no-select {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 }
 

@@ -47,7 +47,6 @@ const nextConfig = {
     }
     
     // Ignore problematic modules completely
-    config.externals = config.externals || [];
     if (isServer) {
       config.externals.push(
         '@grpc/grpc-js',
@@ -55,6 +54,57 @@ const nextConfig = {
         'protobufjs'
       );
     }
+
+    // Fix OpenTelemetry warnings by adding missing optional dependencies
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@opentelemetry/exporter-jaeger': false,
+      '@opentelemetry/exporter-zipkin': false,
+      '@opentelemetry/exporter-collector': false,
+    };
+
+    // Ignore handlebars warnings in webpack
+    config.module = config.module || {};
+    config.module.rules = config.module.rules || [];
+    
+    // Handle handlebars require.extensions warnings
+    config.module.rules.push({
+      test: /node_modules\/handlebars\/lib\/index\.js$/,
+      use: {
+        loader: 'string-replace-loader',
+        options: {
+          search: 'require.extensions',
+          replace: '(typeof require !== "undefined" && require.extensions)',
+          flags: 'g'
+        }
+      }
+    });
+
+    // Suppress specific webpack warnings for optional dependencies
+    config.ignoreWarnings = [
+      /Module not found: Can't resolve '@opentelemetry\/exporter-jaeger'/,
+      /Module not found: Can't resolve '@opentelemetry\/exporter-zipkin'/,
+      /Module not found: Can't resolve '@opentelemetry\/exporter-collector'/,
+      /require\.extensions is not supported by webpack/,
+    ];
+
+    // Add NormalModuleReplacementPlugin to handle optional dependencies
+    const webpack = require('webpack');
+    config.plugins = config.plugins || [];
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /@opentelemetry\/exporter-jaeger/,
+        'data:text/javascript,module.exports = {}'
+      ),
+      new webpack.NormalModuleReplacementPlugin(
+        /@opentelemetry\/exporter-zipkin/,
+        'data:text/javascript,module.exports = {}'
+      ),
+      new webpack.NormalModuleReplacementPlugin(
+        /@opentelemetry\/exporter-collector/,
+        'data:text/javascript,module.exports = {}'
+      )
+    );
     
     return config;
   },
