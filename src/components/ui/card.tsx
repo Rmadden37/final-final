@@ -16,6 +16,9 @@ const Card = React.forwardRef<
       "rounded-xl border border-slate-200 bg-white text-card-foreground",
       "shadow-lg shadow-slate-200/50 hover:shadow-xl hover:shadow-slate-300/50",
       "transition-all duration-200 ease-in-out",
+      // Mobile optimizations
+      "mobile:rounded-lg mobile:mx-2 mobile:shadow-md",
+      "mobile:border-slate-300/50",
       className
     )}
     {...props}
@@ -29,7 +32,11 @@ const CardHeader = React.forwardRef<
 >(({className, ...props}, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    className={cn(
+      "flex flex-col space-y-1.5 p-6",
+      "mobile:p-4 mobile:space-y-1",
+      className
+    )}
     {...props}
   />
 ));
@@ -43,6 +50,8 @@ const CardTitle = React.forwardRef<
     ref={ref}
     className={cn(
       "text-3xl font-bold font-headline leading-tight tracking-tight text-center",
+      "mobile:text-xl mobile:leading-snug",
+      "tablet:text-2xl",
       className
     )}
     {...props}
@@ -56,7 +65,11 @@ const CardDescription = React.forwardRef<
 >(({className, ...props}, ref) => (
   <p // Changed from div for semantic correctness
     ref={ref}
-    className={cn("text-sm text-muted-foreground text-center", className)} // Added text-center for consistency if needed
+    className={cn(
+      "text-sm text-muted-foreground text-center",
+      "mobile:text-xs mobile:leading-relaxed",
+      className
+    )} // Added text-center for consistency if needed
     {...props}
   />
 ));

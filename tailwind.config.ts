@@ -11,10 +11,32 @@ const config: Config = {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: {
+        DEFAULT: "1rem",
+        sm: "1.5rem",
+        lg: "2rem",
+        xl: "2rem",
+        "2xl": "2rem",
+      },
       screens: {
         "2xl": "1400px",
       },
+    },
+    screens: {
+      'xs': '320px',
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+      // Custom breakpoints for mobile optimization
+      'mobile': {'max': '480px'},
+      'tablet': {'min': '481px', 'max': '768px'},
+      'desktop': {'min': '769px'},
+      // iPhone specific breakpoints
+      'iphone-se': {'max': '375px'},
+      'iphone': {'min': '376px', 'max': '414px'},
+      'iphone-plus': {'min': '415px', 'max': '480px'},
     },
     extend: {
       fontFamily: {
@@ -110,6 +132,21 @@ const config: Config = {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+      },
+      spacing: {
+        'safe-top': 'env(safe-area-inset-top)',
+        'safe-bottom': 'env(safe-area-inset-bottom)',
+        'safe-left': 'env(safe-area-inset-left)',
+        'safe-right': 'env(safe-area-inset-right)',
+      },
+      minHeight: {
+        'touch': '44px',
+        'touch-lg': '48px',
+        'screen-safe': 'calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom))',
+      },
+      minWidth: {
+        'touch': '44px',
+        'touch-lg': '48px',
       },
     },
   },

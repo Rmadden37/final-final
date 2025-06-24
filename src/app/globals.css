@@ -5,27 +5,114 @@
 
 /* Mobile-optimized scrolling and touch targets */
 @layer base {
+  /* iOS Safe Area Support */
+  :root {
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-right: env(safe-area-inset-right);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    --safe-area-inset-left: env(safe-area-inset-left);
+  }
+
   /* Smooth scrolling for better mobile experience */
   html {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    /* Prevent horizontal scrolling on mobile */
+    overflow-x: hidden;
+    /* Prevent zoom on iOS when focusing inputs */
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  body {
+    /* Safe area padding for iPhone X and later */
+    padding-top: constant(safe-area-inset-top);
+    padding-top: env(safe-area-inset-top);
+    padding-left: constant(safe-area-inset-left);
+    padding-left: env(safe-area-inset-left);
+    padding-right: constant(safe-area-inset-right);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
+    
+    /* Prevent horizontal scrolling */
+    overflow-x: hidden;
+    width: 100%;
+    min-width: 320px; /* Minimum width for very small screens */
   }
   
   /* Better touch targets for mobile */
-  button, [role="button"] {
+  button, [role="button"], [role="tab"], [role="menuitem"] {
     min-height: 44px; /* iOS/Android recommended minimum touch target */
+    min-width: 44px;
+    /* Better touch feedback */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   
-  @media (max-width: 640px) {
-    /* Ensure minimum touch target size on mobile */
-    button, [role="button"], [role="tab"] {
+  /* Enhanced mobile-first responsive design */
+  @media (max-width: 480px) {
+    /* iPhone and small mobile devices */
+    button, [role="button"], [role="tab"], [role="menuitem"] {
       min-height: 48px;
       min-width: 48px;
+      padding: 0.75rem 1rem;
     }
     
     /* Better text readability on mobile */
     body {
       font-size: 16px; /* Prevent zoom on iOS */
+      line-height: 1.5;
+    }
+    
+    /* Optimize spacing for mobile */
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    
+    /* Make cards more mobile-friendly */
+    [class*="card"] {
+      margin: 0.5rem 0;
+      border-radius: 0.75rem;
+    }
+    
+    /* Better input handling on mobile */
+    input, textarea, select {
+      font-size: 16px; /* Prevent zoom on iOS */
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    /* Tablet and medium mobile devices */
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    
+    /* Optimize navigation for tablet */
+    nav {
+      padding: 0.5rem 1rem;
+    }
+    
+    /* Better modal sizing for tablets */
+    [role="dialog"] {
+      margin: 1rem;
+      max-width: calc(100vw - 2rem);
+    }
+  }
+  
+  /* Improved focus styles for keyboard navigation on mobile */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  
+  /* Hide elements that shouldn't be visible on very small screens */
+  @media (max-width: 320px) {
+    .hidden-xs {
+      display: none !important;
     }
   }
 }
