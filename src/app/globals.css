@@ -1301,3 +1301,12 @@ body.dialog-scroll-locked {
   border-color: #2552a3 !important;
   box-shadow: 0 8px 32px 0 rgba(53,116,242,0.32), 0 2px 8px 0 rgba(53,116,242,0.22) !important;
 }
+
+/* Remove gradient and use purple tint for selected day */
+.scheduled-calendar-day.selected, .scheduled-calendar-day[data-selected="true"], .scheduled-calendar-day.selected:focus, .scheduled-calendar-day.selected:active {
+  background: #6C47F5 !important; /* Purple tint */
+  color: #fff !important;
+  border: 2px solid #A084F7 !important;
+  box-shadow: 0 2px 8px 0 rgba(108,71,245,0.12) !important;
+  font-weight: 700;
+}
