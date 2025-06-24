@@ -133,16 +133,16 @@ function DashboardSidebarContent() {
   return (
     <>
       <Sidebar collapsible="icon" className="border-r">
-        <SidebarHeader className="px-4 pt-1 pb-1 flex items-center gap-2">
-          {/* Removed LeadFlow text logo for minimal header */}
+        <SidebarHeader className="px-4 pt-1 pb-1 flex items-center gap-2 min-h-0 h-2">
+          {/* Sidebar header intentionally left empty for minimalism */}
         </SidebarHeader>
         
         <SidebarContent className="mb-10">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild className={`nav-item shadow-sm${pathname === "/dashboard" ? " active" : ""}`} onClick={handleNav}>
+              <SidebarMenuButton asChild className={`nav-item shadow-sm text-lg text-sidebar-primary${pathname === "/dashboard" ? " active" : ""}`} onClick={handleNav}>
                 <Link href="/dashboard">
-                  <Home className="h-5 w-5" />
+                  <Home className="h-6 w-6" />
                   <span className="font-semibold">Dashboard</span>
                 </Link>
               </SidebarMenuButton>
