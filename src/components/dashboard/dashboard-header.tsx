@@ -29,8 +29,24 @@ export default function DashboardHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-border/20 bg-white/95 dark:bg-slate-950/95 dark:card-glass dark:glow-turquoise backdrop-blur-md supports-[backdrop-filter]:bg-white/95 dark:supports-[backdrop-filter]:bg-slate-950/95 shadow-sm">
-        <div className="container flex h-16 sm:h-18 max-w-7xl mx-auto items-center px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-40 w-full border-b border-border/20 bg-white/95 dark:bg-slate-950/95 dark:card-glass dark:glow-turquoise premium:card-glass premium:glow-premium backdrop-blur-md supports-[backdrop-filter]:bg-white/95 dark:supports-[backdrop-filter]:bg-slate-950/95 premium:supports-[backdrop-filter]:bg-transparent shadow-sm">
+        <div className="flex h-16 items-center px-4">
+          {/* Sidebar Toggle Button for mobile */}
+          <button
+            className="block lg:hidden p-2 mr-2"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                const event = new CustomEvent('sidebar-toggle');
+                window.dispatchEvent(event);
+              }
+            }}
+            aria-label="Open sidebar"
+          >
+            <svg width="24" height="24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
           <Link href="/dashboard" className="mr-6 sm:mr-8 flex items-center space-x-3 text-[#3574F2] dark:text-turquoise premium:text-premium-purple group">
             <div className="p-3 bg-gradient-to-br from-[#3574F2]/20 to-[#5096F2]/10 dark:from-turquoise/20 dark:to-cyan/10 premium:from-premium-purple/20 premium:to-premium-teal/10 rounded-xl group-hover:from-[#3574F2]/30 group-hover:to-[#5096F2]/20 dark:group-hover:from-turquoise/30 dark:group-hover:to-cyan/20 premium:group-hover:from-premium-purple/30 premium:group-hover:to-premium-teal/30 transition-all duration-300 shadow-sm dark:glow-turquoise premium:glow-premium premium:icon-hover-glow">
               {/* Light mode: Use new light logo */}

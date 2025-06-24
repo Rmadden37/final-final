@@ -12,34 +12,14 @@
   "categories": ["business", "productivity"],
   "icons": [
     {
-      "src": "/app-icon.svg",
-      "type": "image/svg+xml",
-      "sizes": "any",
-      "purpose": "any"
-    },
-    {
-      "src": "/app-icon.svg",
-      "type": "image/svg+xml", 
+      "src": "/icons/leadflow.png",
       "sizes": "192x192",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
-      "src": "/app-icon.svg",
-      "type": "image/svg+xml",
-      "sizes": "512x512", 
-      "purpose": "any"
-    },
-    {
-      "src": "/app-icon.svg",
-      "type": "image/svg+xml",
-      "sizes": "180x180",
-      "purpose": "any"
-    },
-    {
-      "src": "/app-icon.svg",
-      "type": "image/svg+xml",
-      "sizes": "any",
-      "purpose": "maskable"
+      "src": "/icons/leadflow.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }

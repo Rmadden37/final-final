@@ -168,57 +168,49 @@
   }
 
   .dark {
-    /* Warm, sophisticated dark theme with masculine earth tones */
-    --background: 210 20% 6%; /* Deep charcoal with subtle blue undertone */
-    --foreground: 210 8% 88%;   /* Warm off-white for better eye comfort */
+    /* Flutter-inspired dark mode: black bg, dark grey cards, blue accents */
+    --background: 220 13% 7%; /* #11131a, nearly black */
+    --foreground: 220 10% 92%; /* #e6e8ef, off-white */
 
-    --background-gradient-from: 210 20% 6%; /* Consistent dark base */
-    --background-gradient-to: 210 18% 8%;   /* Slightly lighter with warmth */
+    --background-gradient-from: 220 13% 7%;
+    --background-gradient-to: 220 13% 10%;
 
-    --muted: 210 15% 12%; /* Muted backgrounds with blue undertone */
-    --muted-foreground: 210 8% 62%; /* Softer muted text for less strain */
+    --muted: 220 10% 18%; /* #232532, dark muted */
+    --muted-foreground: 220 8% 60%;
 
-    --popover: 210 18% 9%; /* Dark popover background */
-    --popover-foreground: 210 8% 88%;
+    --popover: 220 13% 10%;
+    --popover-foreground: 220 10% 92%;
 
-    --card: 210 18% 9%; /* Warm dark card background */
-    --card-foreground: 210 8% 88%; /* Consistent foreground */
+    --card: 220 10% 16%; /* #232532, dark grey card */
+    --card-foreground: 220 10% 92%;
 
-    --border: 210 12% 22%; /* Warmer, more visible borders */
-    --input: 210 16% 11%; /* Slightly warmer input backgrounds */
+    --border: 220 10% 22%;
+    --input: 220 10% 18%;
 
-    --primary: 185 85% 45%; /* Deep teal - masculine and calming */
-    --primary-foreground: 210 8% 95%; /* Clean white text */
-    --primary-gradient-from: 185 85% 45%; 
-    --primary-gradient-to: 185 85% 38%; 
+    --primary: 217 91% 60%; /* Flutter blue */
+    --primary-foreground: 0 0% 100%;
+    --primary-gradient-from: 217 91% 60%; 
+    --primary-gradient-to: 217 91% 50%; 
 
-    --secondary: 210 15% 14%; /* Consistent secondary background */
-    --secondary-foreground: 210 8% 88%;
+    --secondary: 220 10% 18%;
+    --secondary-foreground: 220 10% 92%;
 
-    --accent: 200 80% 48%; /* Complementary blue-green */
-    --accent-foreground: 210 8% 95%;
+    --accent: 217 91% 60%; /* Flutter blue */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 358 75% 58%; /* Warmer red for errors */
-    --destructive-foreground: 210 8% 95%; 
+    --destructive: 358 75% 58%;
+    --destructive-foreground: 0 0% 100%;
 
-    --ring: 185 85% 45%; /* Consistent teal focus ring */
+    --ring: 217 91% 60%; /* Flutter blue for focus ring */
 
-    /* Chart colors - cohesive masculine palette */
-    --chart-1: 185 85% 45%; /* Primary teal */
-    --chart-2: 200 80% 48%; /* Blue-green */
-    --chart-3: 220 85% 55%; /* Deeper blue */
-    --chart-4: 210 8% 55%; /* Neutral grey */
-    --chart-5: 210 8% 42%; /* Darker neutral */
-
-    /* Sidebar with consistent theming */
-    --sidebar-background: 210 20% 7%; /* Slightly lighter than main bg */
-    --sidebar-foreground: 210 8% 88%;
-    --sidebar-primary: 185 85% 45%; /* Consistent teal */
-    --sidebar-primary-foreground: 210 8% 95%;
-    --sidebar-accent: 210 15% 14%; /* Subtle accent areas */
-    --sidebar-accent-foreground: 210 8% 88%;
-    --sidebar-border: 210 12% 22%; /* Consistent border color */
-    --sidebar-ring: 185 85% 45%; /* Consistent teal focus ring */
+    --sidebar-background: 220 13% 7%;
+    --sidebar-foreground: 220 10% 92%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 10% 18%;
+    --sidebar-accent-foreground: 217 91% 60%;
+    --sidebar-border: 220 10% 22%;
+    --sidebar-ring: 217 91% 60%;
   }
 
   .premium {
@@ -359,17 +351,17 @@
   .dark [class*="Card"]:not(.bg-transparent),
   .dark .rounded-xl.bg-white,
   .dark .bg-white:not(.bg-transparent) {
-    background: hsl(210 18% 9%) !important; /* Warm dark card background */
-    color: hsl(210 8% 88%) !important; /* Consistent warm text */
-    border: 1px solid hsl(210 12% 22%) !important; /* Warmer borders */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important; /* Subtle depth */
+    background: linear-gradient(135deg, #232532 60%, #1a233a 100%) !important;
+    color: hsl(220 10% 92%) !important;
+    border: 1px solid hsl(220 10% 22%) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.45) !important;
   }
 
   /* Card content text styling - consistent and readable */
   .dark .bg-card *:not(.text-muted-foreground),
   .dark [class*="card"]:not(.bg-transparent) *:not(.text-muted-foreground),
   .dark [class*="Card"]:not(.bg-transparent) *:not(.text-muted-foreground) {
-    color: hsl(210 8% 88%) !important; /* Consistent warm text */
+    color: hsl(220 10% 92%) !important; /* Consistent warm text */
   }
 
   /* Card headers with masculine hierarchy */
@@ -377,86 +369,86 @@
   .dark .bg-card h4, .dark .bg-card h5, .dark .bg-card h6,
   .dark [class*="card"] h1, .dark [class*="card"] h2, .dark [class*="card"] h3,
   .dark [class*="card"] h4, .dark [class*="card"] h5, .dark [class*="card"] h6 {
-    color: hsl(210 8% 95%) !important; /* Clean white for headers */
-    font-weight: 600 !important; /* Professional weight */
+    color: hsl(220 10% 98%) !important;
+    font-weight: 600 !important;
   }
 
   /* Muted text with proper contrast */
   .dark .bg-card .text-muted-foreground,
   .dark [class*="card"] .text-muted-foreground {
-    color: hsl(210 8% 62%) !important; /* Softer muted text */
+    color: hsl(220 8% 60%) !important;
   }
 
   /* Refined hover effects */
   .dark .bg-card:hover,
   .dark [class*="card"]:not(.bg-transparent):hover,
   .dark [class*="Card"]:not(.bg-transparent):hover {
-    background: hsl(210 18% 11%) !important;
-    border-color: hsl(210 12% 28%) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+    background: linear-gradient(135deg, #232532 40%, #2542a3 100%) !important;
+    border-color: hsl(217 91% 60%) !important;
+    /* Remove glowing box-shadow, keep only subtle elevation or none */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.45) !important;
     transform: translateY(-1px) !important;
     transition: all 0.2s ease-in-out !important;
   }
 
   /* Masculine Dark Mode Button Styling */
   .dark button:not(.bg-transparent) {
-    background: hsl(185 85% 45%) !important; /* Deep teal primary */
-    color: hsl(210 8% 95%) !important; /* Clean white text */
+    background: hsl(217 91% 60%) !important;
+    color: #fff !important;
     border: none !important;
     font-weight: 500 !important;
   }
 
   .dark button:not(.bg-transparent):hover {
-    background: hsl(185 85% 50%) !important; /* Slightly lighter teal */
-    transform: translateY(-1px) !important;
-    box-shadow: 0 3px 12px hsla(185 85% 45% / 0.4) !important;
+    background: hsl(217 91% 65%) !important;
+    box-shadow: 0 3px 12px hsla(217, 91%, 60%, 0.25) !important;
   }
 
   /* Secondary buttons with masculine styling */
   .dark .bg-secondary {
-    background: hsl(210 15% 14%) !important;
-    color: hsl(210 8% 88%) !important;
-    border: 1px solid hsl(210 12% 22%) !important;
+    background: hsl(220 10% 18%) !important;
+    color: hsl(220 10% 92%) !important;
+    border: 1px solid hsl(220 10% 22%) !important;
   }
 
   .dark .bg-secondary:hover {
-    background: hsl(210 15% 18%) !important;
-    border-color: hsl(210 12% 30%) !important;
+    background: hsl(220 10% 22%) !important;
+    border-color: hsl(217 91% 60%) !important;
   }
 
   /* Masculine form input styling */
   .dark input, .dark textarea, .dark select {
-    background: hsl(210 16% 11%) !important;
-    border: 1px solid hsl(210 12% 22%) !important;
-    color: hsl(210 8% 88%) !important;
+    background: hsl(220 10% 18%) !important;
+    border: 1px solid hsl(220 10% 22%) !important;
+    color: hsl(220 10% 92%) !important;
   }
 
   .dark input:focus, .dark textarea:focus, .dark select:focus {
-    border-color: hsl(185 85% 45%) !important; /* Teal focus */
-    box-shadow: 0 0 0 2px hsla(185 85% 45% / 0.2) !important;
+    border-color: hsl(217 91% 60%) !important; /* Teal focus */
+    box-shadow: 0 0 0 2px hsla(217 91% 60% / 0.2) !important;
     outline: none !important;
   }
 
   /* Masculine table styling */
   .dark table {
-    background: hsl(210 20% 6%) !important;
-    border: 1px solid hsl(210 12% 22%) !important;
+    background: hsl(220 13% 7%) !important;
+    border: 1px solid hsl(220 10% 22%) !important;
   }
 
   .dark th {
-    background: hsl(210 18% 9%) !important;
-    color: hsl(210 8% 95%) !important;
-    border-block-end: 1px solid hsl(210 12% 22%) !important;
+    background: hsl(220 10% 16%) !important;
+    color: hsl(220 10% 98%) !important;
+    border-block-end: 1px solid hsl(220 10% 22%) !important;
     font-weight: 600 !important;
   }
 
   .dark td {
-    border-block-end: 1px solid hsl(210 12% 18%) !important;
-    color: hsl(210 8% 88%) !important;
+    border-block-end: 1px solid hsl(220 10% 18%) !important;
+    color: hsl(220 10% 92%) !important;
   }
 
   .dark tr:hover {
-    background: hsl(210 18% 9%) !important;
+    background: hsl(220 10% 16%) !important;
   }
 
   /* Refined scrollbar styling */
@@ -466,16 +458,16 @@
   }
 
   .dark ::-webkit-scrollbar-track {
-    background: hsl(210 20% 6%);
+    background: hsl(220 13% 7%);
   }
 
   .dark ::-webkit-scrollbar-thumb {
-    background: hsl(210 12% 25%);
+    background: hsl(220 10% 25%);
     border-radius: 3px;
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    background: hsl(185 85% 45%); /* Teal on hover */
+    background: hsl(217 91% 60%); /* Teal on hover */
   }
 
   /* Premium theme animations */
@@ -1165,4 +1157,147 @@
   .desktop-only {
     display: none !important;
   }
+}
+
+/* --- Sidebar Navigation Item Styles --- */
+.dark .nav-item {
+  color: hsl(220, 8%, 62%) !important; /* Muted gray for inactive */
+  background: transparent !important;
+  border-left: 3px solid transparent !important;
+  font-weight: 500;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+.dark .nav-item.active,
+.dark .nav-item[aria-current="page"],
+.dark .nav-item[data-active="true"] {
+  color: #e6f0ff !important; /* Soft blue-white text */
+  background: linear-gradient(90deg, #1a2640 80%, #223a6b 100%) !important; /* Deep blue gradient */
+  border-left: 3px solid #3574F2 !important; /* Subtle blue accent border */
+  box-shadow: 0 2px 8px 0 rgba(53,116,242,0.08) !important; /* Soft blue shadow */
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+
+/* Light mode for reference (optional, can be adjusted as needed) */
+.nav-item {
+  color: hsl(215, 25%, 17%) !important;
+  background: transparent !important;
+  font-weight: 500;
+  transition: background 0.18s, color 0.18s;
+}
+.nav-item.active,
+.nav-item[aria-current="page"],
+.nav-item[data-active="true"] {
+  color: hsl(215, 100%, 50%) !important;
+  background: hsla(215, 100%, 50%, 0.08) !important;
+  font-weight: 600;
+}
+/* --- End Sidebar Navigation Item Styles --- */
+
+/* Team Management Mobile Styles */
+@media (max-width: 600px) {
+  /* Team Management Card/Container */
+  .team-management-card,
+  .team-management-container,
+  .team-management-section {
+    padding: 1.25rem 0.75rem !important;
+    border-radius: 1.25rem !important;
+    margin: 0.5rem 0 !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10) !important;
+    min-width: 0 !important;
+  }
+  /* Headings and text */
+  .team-management-card h1,
+  .team-management-card h2,
+  .team-management-card h3,
+  .team-management-card h4,
+  .team-management-card h5,
+  .team-management-card h6,
+  .team-management-container h1,
+  .team-management-container h2,
+  .team-management-container h3 {
+    font-size: 1.1rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.5rem !important;
+  }
+  /* Inputs, selects, and buttons stack and fill width */
+  .team-management-card input,
+  .team-management-card select,
+  .team-management-card button,
+  .team-management-container input,
+  .team-management-container select,
+  .team-management-container button {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin-bottom: 0.75rem !important;
+    font-size: 1rem !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 0.75rem !important;
+    box-sizing: border-box !important;
+  }
+  /* Search bar and filters */
+  .team-management-search {
+    width: 100% !important;
+    margin-bottom: 1rem !important;
+    font-size: 1rem !important;
+  }
+  /* Team member list spacing */
+  .team-member-list {
+    margin-top: 1rem !important;
+    gap: 0.75rem !important;
+  }
+  .team-member-list > * {
+    margin-bottom: 0.5rem !important;
+    border-radius: 0.75rem !important;
+    padding: 0.75rem !important;
+  }
+  /* Buttons in a row stack vertically */
+  .team-management-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  /* Prevent horizontal scroll */
+  .team-management-card,
+  .team-management-container {
+    overflow-x: hidden !important;
+  }
+}
+
+/* Prevent background scroll and reserve space for scrollbar */
+body.dialog-scroll-locked {
+  overflow: hidden !important;
+  /* padding-right is set dynamically via JS to match scrollbar width */
+}
+
+/* Visually prominent blue gradient button for Invite New User */
+.invite-user-prominent-btn {
+  background: linear-gradient(90deg, #3574F2 0%, #5096F2 100%) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border: 2px solid #3574F2 !important;
+  box-shadow: 0 4px 24px 0 rgba(53,116,242,0.18), 0 1.5px 6px 0 rgba(53,116,242,0.10) !important;
+  padding: 0.85rem 2.25rem !important;
+  font-size: 1.1rem !important;
+  border-radius: 1rem !important;
+  letter-spacing: 0.01em;
+  transition: all 0.18s cubic-bezier(.4,0,.2,1);
+}
+.invite-user-prominent-btn:hover, .invite-user-prominent-btn:focus {
+  background: linear-gradient(90deg, #2552a3 0%, #3574F2 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 32px 0 rgba(53,116,242,0.28), 0 2px 8px 0 rgba(53,116,242,0.18) !important;
+  border-color: #2552a3 !important;
+}
+.dark .invite-user-prominent-btn {
+  background: linear-gradient(90deg, #0a2240 0%, #3574F2 100%) !important;
+  color: #e0eaff !important;
+  border-color: #3574F2 !important;
+  box-shadow: 0 4px 24px 0 rgba(53,116,242,0.22), 0 1.5px 6px 0 rgba(53,116,242,0.14) !important;
+}
+.dark .invite-user-prominent-btn:hover, .dark .invite-user-prominent-btn:focus {
+  background: linear-gradient(90deg, #183a6d 0%, #2552a3 100%) !important;
+  color: #fff !important;
+  border-color: #2552a3 !important;
+  box-shadow: 0 8px 32px 0 rgba(53,116,242,0.32), 0 2px 8px 0 rgba(53,116,242,0.22) !important;
 }

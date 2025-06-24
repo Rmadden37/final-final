@@ -36,6 +36,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 
@@ -46,8 +47,37 @@ const CreateLeadForm = dynamic(() => import("./create-lead-form"), {
 });
 
 function DashboardSidebarContent() {
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
   const [isCreateLeadModalOpen, setIsCreateLeadModalOpen] = useState(false);
+  const pathname = usePathname();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  // Show loading state if auth is still loading
+  if (loading) {
+    return (
+      <Sidebar collapsible="icon" className="border-r">
+        <SidebarHeader className="premium:hidden">
+          <div className="flex items-center justify-center p-4">
+            <div className="h-16 w-16 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-md" />
+          </div>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarMenu>
+            {[...Array(6)].map((_, i) => (
+              <SidebarMenuItem key={i}>
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-md mx-2 my-1" />
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarContent>
+      </Sidebar>
+    );
+  }
+
+  // Don't render if no user (will be redirected)
+  if (!user) {
+    return null;
+  }
 
   // Debug logging for user role
   React.useEffect(() => {
@@ -95,36 +125,26 @@ function DashboardSidebarContent() {
     });
   }, [user?.role, isManager, isAdmin, isManagerOrAdmin, isAdminOnly]);
 
+  // Helper to close sidebar on mobile after navigation
+  const handleNav = () => {
+    if (isMobile) setOpenMobile(false);
+  };
+
   return (
     <>
-      <Sidebar>
-        <SidebarHeader className="premium:hidden">
-          <div className="flex items-center justify-center p-4 group-data-[collapsible=icon]:p-2">
-            {/* Light mode logo */}
-            <img 
-              src="https://imgur.com/BQs5krw.png" 
-              alt="LeadFlow Logo" 
-              className="h-16 w-auto max-w-full object-contain dark:hidden premium:hidden group-data-[collapsible=icon]:h-8"
-            />
-            {/* Dark mode - Bold text logo */}
-            <div className="hidden dark:block group-data-[collapsible=icon]:hidden">
-              <h1 className="text-xl font-bold text-center">
-                LeadFlow
-              </h1>
-            </div>
-            {/* Collapsed logo for dark mode */}
-            <div className="hidden dark:group-data-[collapsible=icon]:block">
-              <h1 className="text-lg font-bold text-center">
-                LF
-              </h1>
-            </div>
-          </div>
+      <Sidebar collapsible="icon" className="border-r">
+        <SidebarHeader className="px-4 pt-1 pb-1 flex items-center gap-2">
+          <Link href="/dashboard" className="flex items-center gap-2 group focus:outline-none">
+            <span className="text-xl md:text-2xl font-extrabold font-headline bg-gradient-to-r from-blue-400 to-fuchsia-500 bg-clip-text text-transparent tracking-tight select-none">
+              LeadFlow
+            </span>
+          </Link>
         </SidebarHeader>
-
-        <SidebarContent>
+        
+        <SidebarContent className="mb-10">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild className="shadow-sm">
+              <SidebarMenuButton asChild className={`nav-item shadow-sm${pathname === "/dashboard" ? " active" : ""}`} onClick={handleNav}>
                 <Link href="/dashboard">
                   <Home className="h-5 w-5" />
                   <span className="font-semibold">Dashboard</span>
@@ -137,7 +157,7 @@ function DashboardSidebarContent() {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => setIsCreateLeadModalOpen(true)}
-                  className="shadow-sm"
+                  className="nav-item shadow-sm"
                 >
                   <PlusCircle className="h-5 w-5" />
                   <span className="font-semibold">Create New Lead</span>
@@ -147,7 +167,7 @@ function DashboardSidebarContent() {
 
             {/* Leaderboard */}
             <SidebarMenuItem>
-              <SidebarMenuButton asChild className="shadow-sm">
+              <SidebarMenuButton asChild className={`nav-item shadow-sm${pathname === "/dashboard/leaderboard" ? " active" : ""}`} onClick={handleNav}>
                 <Link href="/dashboard/leaderboard">
                   <Trophy className="h-5 w-5 text-yellow-500" />
                   <span className="font-semibold">Leaderboard</span>
@@ -164,7 +184,7 @@ function DashboardSidebarContent() {
                 {isManager && !isAdmin && (
                   <>
                     <SidebarMenuItem>
-                      <SidebarMenuButton asChild className="shadow-sm">
+                      <SidebarMenuButton asChild className={`nav-item shadow-sm${pathname === "/dashboard/lead-history" ? " active" : ""}`} onClick={handleNav}>
                         <Link href="/dashboard/lead-history">
                           <ClipboardList className="h-5 w-5" />
                           <span className="font-semibold">Lead History</span>
@@ -173,7 +193,7 @@ function DashboardSidebarContent() {
                     </SidebarMenuItem>
 
                     <SidebarMenuItem>
-                      <SidebarMenuButton asChild className="shadow-sm">
+                      <SidebarMenuButton asChild className={`nav-item shadow-sm${pathname === "/dashboard/performance-analytics" ? " active" : ""}`} onClick={handleNav}>
                         <Link href="/dashboard/performance-analytics">
                           <Brain className="h-5 w-5" />
                           <span className="font-semibold">Analytics</span>
@@ -186,7 +206,6 @@ function DashboardSidebarContent() {
                 {/* For Admins: Show both Manager Tools and Admin Tools sections */}
                 {isAdminOnly && (
                   <>
-                    {/* Manager Tools Section for Admins */}
                     <SidebarMenuItem>
                       <div className="flex items-center space-x-3 px-2 py-1 text-sm font-medium text-muted-foreground group-data-[collapsible=icon]:hidden shadow-sm rounded-md">
                         <Users className="h-4 w-4" />
@@ -195,7 +214,7 @@ function DashboardSidebarContent() {
                     </SidebarMenuItem>
 
                     <SidebarMenuItem>
-                      <SidebarMenuButton asChild className="ml-4 shadow-sm">
+                      <SidebarMenuButton asChild className={`nav-item ml-4 shadow-sm${pathname === "/dashboard/lead-history" ? " active" : ""}`} onClick={handleNav}>
                         <Link href="/dashboard/lead-history">
                           <ClipboardList className="h-4 w-4" />
                           <span className="font-semibold">Lead History</span>
@@ -204,7 +223,7 @@ function DashboardSidebarContent() {
                     </SidebarMenuItem>
 
                     <SidebarMenuItem>
-                      <SidebarMenuButton asChild className="ml-4 shadow-sm">
+                      <SidebarMenuButton asChild className={`nav-item ml-4 shadow-sm${pathname === "/dashboard/manage-teams" ? " active" : ""}`} onClick={handleNav}>
                         <Link href="/dashboard/manage-teams">
                           <Users className="h-4 w-4" />
                           <span className="font-semibold">Manage Teams</span>
@@ -213,7 +232,7 @@ function DashboardSidebarContent() {
                     </SidebarMenuItem>
 
                     <SidebarMenuItem>
-                      <SidebarMenuButton asChild className="ml-4 shadow-sm">
+                      <SidebarMenuButton asChild className={`nav-item ml-4 shadow-sm${pathname === "/dashboard/performance-analytics" ? " active" : ""}`} onClick={handleNav}>
                         <Link href="/dashboard/performance-analytics">
                           <Brain className="h-4 w-4" />
                           <span className="font-semibold">Analytics</span>
@@ -225,7 +244,7 @@ function DashboardSidebarContent() {
 
                     {/* Admin Tools */}
                     <SidebarMenuItem>
-                      <SidebarMenuButton asChild className="shadow-sm">
+                      <SidebarMenuButton asChild className={`nav-item shadow-sm${pathname === "/dashboard/admin-tools" ? " active" : ""}`} onClick={handleNav}>
                         <Link href="/dashboard/admin-tools">
                           <Settings className="h-5 w-5" />
                           <span className="font-semibold">Admin Tools</span>
@@ -247,14 +266,10 @@ function DashboardSidebarContent() {
                 </div>
               </SidebarMenuItem>
             )}
-          </SidebarMenu>
-        </SidebarContent>
 
-        <SidebarFooter>
-          <SidebarMenu>
             {/* User Profile */}
             <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg" className="shadow-sm">
+              <SidebarMenuButton asChild size="lg" className={`nav-item shadow-sm${pathname === "/dashboard/profile" ? " active" : ""}`}>
                 <Link href="/dashboard/profile">
                   <Avatar className="h-8 w-8">
                     <AvatarImage 
@@ -274,7 +289,11 @@ function DashboardSidebarContent() {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarContent>
 
+        <SidebarFooter>
+          <SidebarMenu>
             {/* Theme Toggle */}
             <SidebarMenuItem>
               <div className="flex items-center justify-between px-2 py-1.5 group-data-[collapsible=icon]:justify-center">
@@ -313,8 +332,25 @@ function DashboardSidebarContent() {
 }
 
 export default function DashboardSidebar({ children }: { children?: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const pathname = usePathname();
+
+  // Show loading screen while auth is loading
+  if (loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="text-center">
+          <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-md mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if no user (auth hook will handle redirect)
+  if (!user) {
+    return null;
+  }
 
   return (
     <SidebarProvider>
@@ -325,16 +361,6 @@ export default function DashboardSidebar({ children }: { children?: React.ReactN
           <header className="sticky top-0 z-40 w-full border-b border-border/20 bg-white/95 dark:bg-slate-950/95 dark:card-glass dark:glow-turquoise premium:card-glass premium:glow-premium backdrop-blur-md supports-[backdrop-filter]:bg-white/95 dark:supports-[backdrop-filter]:bg-slate-950/95 premium:supports-[backdrop-filter]:bg-transparent shadow-sm">
             <div className="flex h-16 items-center px-4">
               <SidebarTrigger className="mr-3 dark:text-turquoise dark:hover:bg-slate-800/50 dark:hover:glow-cyan premium:text-premium-purple premium:hover:bg-premium-glass/50 premium:hover:glow-premium" />
-              {/* Team Logo */}
-              {user?.teamId === "takeover-pros" && (
-                <div className="flex items-center mr-4">
-                  <img 
-                    src="https://imgur.com/l5eskR4.png" 
-                    alt="Takeoverpros Logo" 
-                    className="h-16 w-auto object-contain"
-                  />
-                </div>
-              )}
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-medium">
                   {pathname === "/dashboard" ? "Dashboard" :

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Users } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import TeamChat from "./team-chat";
 
 export default function FloatingChatButton() {
@@ -19,7 +19,6 @@ export default function FloatingChatButton() {
         >
           <div className="relative">
             <MessageCircle className="h-6 w-6 text-white dark:text-slate-900 premium:text-white premium:nav-icon premium:icon-glow-white transition-all duration-300" />
-            <Users className="h-3 w-3 text-green-100 dark:text-emerald-100 premium:text-premium-teal absolute -top-1 -right-1 animate-pulse premium:nav-icon" />
           </div>
         </Button>
       </div>

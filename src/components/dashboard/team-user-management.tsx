@@ -244,8 +244,8 @@ export default function TeamUserManagement() {
           {/* Invite New User Button */}
           <div className="flex justify-start">
             <InviteNewUserButton 
-              variant="outline" 
-              className="border-emerald-500/60 bg-gradient-to-r from-emerald-50/80 to-green-50/80 text-emerald-700 hover:from-emerald-100/90 hover:to-green-100/90 hover:text-emerald-800 hover:border-emerald-500 dark:border-emerald-400/60 dark:from-emerald-950/40 dark:to-green-950/40 dark:text-emerald-300 dark:hover:from-emerald-900/60 dark:hover:to-green-900/60 dark:hover:text-emerald-200 shadow-sm shadow-emerald-200/20 hover:shadow-md hover:shadow-emerald-200/30 transition-all duration-300" 
+              variant="primary-solid"
+              className="invite-user-prominent-btn border-2 border-blue-600 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold shadow-lg hover:from-blue-600 hover:to-blue-800 hover:shadow-xl focus:ring-4 focus:ring-blue-400 dark:from-blue-900 dark:to-blue-700 dark:text-blue-100 dark:hover:from-blue-800 dark:hover:to-blue-900 dark:focus:ring-blue-800 transition-all duration-300 rounded-xl px-6 py-3 text-base"
             />
           </div>
         </div>
@@ -282,9 +282,12 @@ export default function TeamUserManagement() {
                 {searchQuery.trim() !== '' ? "No matching team members found." : "No team members found."}
               </p>
             ) : (
-              <ul className="divide-y divide-border">
+              <ul className="divide-y divide-border team-member-list">
                 {filteredUsers.map((teamMember) => (
-                  <li key={teamMember.uid} className={`py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${teamMember.uid === managerUser?.uid ? 'bg-blue-50 dark:bg-blue-900/20 rounded-lg px-3' : ''}`}>
+                  <li
+                    key={teamMember.uid}
+                    className={`py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${teamMember.uid === managerUser?.uid ? 'bg-blue-50 dark:bg-blue-900/20 rounded-lg px-3' : ''}`}
+                  >
                     <div className="flex items-center space-x-3">
                       <div className="relative group">
                         <Avatar 
@@ -322,8 +325,8 @@ export default function TeamUserManagement() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex space-x-2 mt-2 sm:mt-0 self-end sm:self-center">
-                      {/* Team Selection Dropdown */}
+                    {/* Responsive action buttons: stack vertically on mobile, row on desktop */}
+                    <div className="flex flex-col xs:flex-row gap-2 w-full xs:w-auto team-management-actions">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button 
@@ -357,7 +360,6 @@ export default function TeamUserManagement() {
                           ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
-                      
                       <Button variant="outline" size="sm" onClick={() => setSelectedUserForRoleChange(teamMember)}>
                         <UserCog className="mr-1.5 h-4 w-4" /> Change Role
                       </Button>
