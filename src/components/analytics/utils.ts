@@ -240,12 +240,9 @@ export const generateTrendData = (leads: Lead[]): TrendData[] => {
 
       trendData.push({
         date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        leads: dayLeads.length,
-        sits: dayLeads.filter(lead => ['sold', 'no_sale', 'credit_fail'].includes(lead.status)).length,
-        sales: dayLeads.filter(lead => lead.status === 'sold').length,
-        revenue: 0, // Would need saleAmount property
-        setters: new Set(dayLeads.map(lead => lead.setterId).filter(Boolean)).size,
-        closers: new Set(dayLeads.map(lead => lead.assignedCloserId).filter(Boolean)).size
+        totalLeads: dayLeads.length,
+        sitRate: dayLeads.length > 0 ? dayLeads.filter(lead => ['sold', 'no_sale', 'credit_fail'].includes(lead.status)).length / dayLeads.length : 0,
+        closeRate: dayLeads.length > 0 ? dayLeads.filter(lead => lead.status === 'sold').length / dayLeads.length : 0
       });
     }
 
