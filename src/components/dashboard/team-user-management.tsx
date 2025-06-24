@@ -38,6 +38,8 @@ export default function TeamUserManagement() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState<string>("");
+  const [teamFilter, setTeamFilter] = useState<string>("");
   const [selectedUserForRoleChange, setSelectedUserForRoleChange] = useState<AppUser | null>(null);
   const [selectedUserForDelete, setSelectedUserForDelete] = useState<AppUser | null>(null);
   const [selectedUserForAvatar, setSelectedUserForAvatar] = useState<AppUser | null>(null);
@@ -210,21 +212,23 @@ export default function TeamUserManagement() {
     return null;
   }
 
-  // Filter users based on search query
-  const filteredUsers = searchQuery.trim() === '' 
-    ? teamUsers 
-    : teamUsers.filter(user => {
-        const searchLower = searchQuery.toLowerCase();
-        const displayName = (user.displayName || '').toLowerCase();
-        const email = (user.email || '').toLowerCase();
-        const role = (user.role || '').toLowerCase();
-        const teamName = (teams.find(t => t.id === user.teamId)?.name || '').toLowerCase();
-        
-        return displayName.includes(searchLower) || 
-               email.includes(searchLower) || 
-               role.includes(searchLower) || 
-               teamName.includes(searchLower);
-      });
+  // Filter users based on search query and selected filters
+  const filteredUsers = teamUsers.filter(user => {
+    const searchLower = searchQuery.toLowerCase();
+    const displayName = (user.displayName || '').toLowerCase();
+    const email = (user.email || '').toLowerCase();
+    const role = (user.role || '').toLowerCase();
+    const teamName = (teams.find(t => t.id === user.teamId)?.name || '').toLowerCase();
+    const matchesSearch =
+      searchLower === '' ||
+      displayName.includes(searchLower) ||
+      email.includes(searchLower) ||
+      role.includes(searchLower) ||
+      teamName.includes(searchLower);
+    const matchesRole = !roleFilter || user.role === roleFilter;
+    const matchesTeam = !teamFilter || user.teamId === teamFilter;
+    return matchesSearch && matchesRole && matchesTeam;
+  });
   
   return (
     <>
@@ -261,9 +265,9 @@ export default function TeamUserManagement() {
                   <CardDescription>Manage roles, teams, and access for your team members.</CardDescription>
                 </div>
               </div>
-              {/* Search Filter */}
-              <div className="w-full sm:max-w-xs">
-                <div className="relative">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 w-full sm:w-auto">
+                {/* Search Filter */}
+                <div className="relative w-full sm:w-48">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="search"
@@ -271,8 +275,34 @@ export default function TeamUserManagement() {
                     className="w-full pl-9 bg-background"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    aria-label="Search team members"
                   />
                 </div>
+                {/* Role Filter */}
+                <select
+                  className="border rounded px-2 py-1 text-sm bg-background"
+                  value={roleFilter}
+                  onChange={e => setRoleFilter(e.target.value)}
+                  aria-label="Filter by role"
+                >
+                  <option value="">All Roles</option>
+                  <option value="admin">Admin</option>
+                  <option value="manager">Manager</option>
+                  <option value="closer">Closer</option>
+                  <option value="user">User</option>
+                </select>
+                {/* Team Filter */}
+                <select
+                  className="border rounded px-2 py-1 text-sm bg-background"
+                  value={teamFilter}
+                  onChange={e => setTeamFilter(e.target.value)}
+                  aria-label="Filter by team"
+                >
+                  <option value="">All Teams</option>
+                  {teams.map(team => (
+                    <option key={team.id} value={team.id}>{team.name}</option>
+                  ))}
+                </select>
               </div>
             </div>
           </CardHeader>
@@ -286,13 +316,15 @@ export default function TeamUserManagement() {
                 {filteredUsers.map((teamMember) => (
                   <li
                     key={teamMember.uid}
-                    className={`py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${teamMember.uid === managerUser?.uid ? 'bg-blue-50 dark:bg-blue-900/20 rounded-lg px-3' : ''}`}
+                    className={`py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full ${teamMember.uid === managerUser?.uid ? 'bg-blue-50 dark:bg-blue-900/20 rounded-lg px-3' : ''}`}
                   >
                     <div className="flex items-center space-x-3">
                       <div className="relative group">
                         <Avatar 
                           className={`h-10 w-10 border cursor-pointer transition-all duration-200 hover:ring-2 hover:ring-primary hover:ring-offset-2 ${teamMember.uid === managerUser?.uid ? 'ring-2 ring-primary ring-offset-2' : ''}`}
                           onClick={() => setSelectedUserForAvatar(teamMember)}
+                          tabIndex={0}
+                          aria-label={`Edit avatar for ${teamMember.displayName || teamMember.email}`}
                         >
                           <AvatarImage src={teamMember.avatarUrl || undefined} alt={teamMember.displayName || teamMember.email || "User"} />
                           <AvatarFallback>
@@ -313,15 +345,11 @@ export default function TeamUserManagement() {
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground">{teamMember.email}</p>
-                        <div className="flex flex-col xs:flex-row xs:gap-3">
-                          <p className="text-xs text-muted-foreground capitalize flex items-center">
-                            {(teamMember.role === "manager" || teamMember.role === "admin") ? <ShieldCheck className="mr-1 h-3 w-3 text-primary" /> : <UserCog className="mr-1 h-3 w-3" />}
-                            Role: {teamMember.role}
-                          </p>
-                          <p className="text-xs text-muted-foreground flex items-center">
-                            <Building2 className="mr-1 h-3 w-3" />
-                            Team: {teams.find(t => t.id === teamMember.teamId)?.name || 'Unknown'}
-                          </p>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${teamMember.role === 'admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' : teamMember.role === 'manager' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : teamMember.role === 'closer' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'}`}>{teamMember.role}</span>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-200">
+                            <Building2 className="mr-1 h-3 w-3" />{teams.find(t => t.id === teamMember.teamId)?.name || 'Unknown'}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -329,58 +357,25 @@ export default function TeamUserManagement() {
                     <div className="flex flex-col xs:flex-row gap-2 w-full xs:w-auto team-management-actions">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button 
-                            variant="secondary" 
-                            size="sm" 
-                            className={
-                              teamMember.teamId === "empire" 
-                                ? "bg-indigo-100/80 hover:bg-indigo-200/80 text-indigo-700 dark:bg-indigo-900/30 dark:hover:bg-indigo-800/40 dark:text-indigo-400 premium:bg-transparent premium:border-premium-purple/30 premium:text-white premium:hover:bg-premium-glass/30" 
-                                : "bg-slate-100/80 dark:bg-slate-800/80 premium:bg-transparent premium:border-white/20 premium:text-white premium:hover:bg-white/10"
-                            }
-                          >
-                            <Building2 className="mr-1.5 h-4 w-4" />
-                            Team: {teams.find(t => t.id === teamMember.teamId)?.name || 'Unknown'}
-                            <ChevronDown className="ml-1.5 h-4 w-4" />
+                          <Button variant="outline" size="sm" aria-label="User actions">
+                            Actions <ChevronDown className="ml-1.5 h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="!bg-white/95 !backdrop-blur-md !border-border/20 dark:!bg-slate-950/95 dark:!border-slate-700/50 premium:!bg-slate-900/90 premium:!backdrop-blur-md premium:!border-premium-purple/20 premium:!shadow-lg">
-                          {teams.filter(team => team.isActive).map((team) => (
-                            <DropdownMenuItem
-                              key={team.id}
-                              onClick={() => handleChangeUserTeam(teamMember, team.id)}
-                              disabled={teamMember.teamId === team.id}
-                              className={`!bg-transparent hover:!bg-slate-100/50 dark:hover:!bg-slate-800/50 premium:hover:!bg-white/10 premium:!text-white ${team.id === "empire" ? "text-indigo-700 dark:text-indigo-400 font-medium" : ""}`}
-                            >
-                              <Building2 className={`mr-2 h-4 w-4 ${team.id === "empire" ? "text-indigo-600 dark:text-indigo-400" : ""}`} />
-                              {team.name}
-                              {teamMember.teamId === team.id && (
-                                <ShieldCheck className="ml-auto h-4 w-4 text-primary" />
-                              )}
-                            </DropdownMenuItem>
-                          ))}
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setSelectedUserForRoleChange(teamMember)} aria-label="Change role">
+                            <UserCog className="mr-2 h-4 w-4" /> Change Role
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setSelectedUserForDelete(teamMember)} disabled={(teamMember.role === "manager" || teamMember.role === "admin") || teamMember.uid === managerUser?.uid} aria-label="Delete user">
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild disabled>
+                            <span className="flex items-center text-xs text-muted-foreground">
+                              <Building2 className="mr-2 h-4 w-4" />
+                              Change Team (use badge above)
+                            </span>
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                      <Button variant="outline" size="sm" onClick={() => setSelectedUserForRoleChange(teamMember)}>
-                        <UserCog className="mr-1.5 h-4 w-4" /> Change Role
-                      </Button>
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
-                        onClick={() => setSelectedUserForDelete(teamMember)} 
-                        disabled={(teamMember.role === "manager" || teamMember.role === "admin") || teamMember.uid === managerUser?.uid}
-                      >
-                        <Trash2 className="mr-1.5 h-4 w-4" /> Delete
-                      </Button>
-                      {(teamMember.role === "manager" || teamMember.role === "admin") && teamMember.uid !== managerUser?.uid && (
-                        <p className="text-xs text-muted-foreground flex items-center ml-2">
-                          <ShieldAlert className="h-3 w-3 mr-1 text-orange-500"/> Cannot delete other managers/admins.
-                        </p>
-                      )}
-                      {teamMember.uid === managerUser?.uid && (
-                        <p className="text-xs text-muted-foreground flex items-center ml-2">
-                          <ShieldAlert className="h-3 w-3 mr-1 text-orange-500"/> Cannot delete yourself.
-                        </p>
-                      )}
                     </div>
                   </li>
                 ))}
