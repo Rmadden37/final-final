@@ -871,8 +871,9 @@
       0 6px 20px rgba(3, 218, 198, 0.12),
       inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
   }
+}
 
-  /* Mobile Dashboard Card Optimization - 75% phone screen height */
+/* Mobile Dashboard Card Optimization - 75% phone screen height */
   @media (max-width: 768px) {
     /* Dashboard main grid - single column layout on mobile */
     .dashboard-grid-mobile,
@@ -989,7 +990,6 @@
       padding: 0.25rem 0.75rem 0.75rem !important;
     }
   }
-}
 
 /* Mobile Chat Interface Optimizations */
 @media (max-width: 768px) {
