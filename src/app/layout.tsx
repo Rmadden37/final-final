@@ -96,17 +96,41 @@ export default function RootLayout({
     <ErrorBoundary>
       <html lang="en" suppressHydrationWarning>
         <head>
+          {/* PWA Manifest */}
           <link rel="manifest" href="/manifest.json" />
-          <meta name="theme-color" content="#3B82F6" />
+          
+          {/* Viewport and Mobile Optimization */}
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
           <meta name="mobile-web-app-capable" content="yes" />
+          
+          {/* Theme Colors */}
+          <meta name="theme-color" content="#2DD4BF" />
+          <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0F1419" />
+          
+          {/* Apple iOS App Icon Configuration */}
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="default" />
           <meta name="apple-mobile-web-app-title" content="LeadFlow" />
           
-          {/* MS Tile Icons */}
-          <meta name="msapplication-TileImage" content="https://imgur.com/oujPvCe" />
-          <meta name="msapplication-TileColor" content="#3B82F6" />
+          {/* Apple Touch Icons for all iOS devices */}
+          <link rel="apple-touch-icon" href="/app-icon.svg" />
+          <link rel="apple-touch-icon" sizes="180x180" href="/app-icon.svg" />
+          <link rel="apple-touch-icon" sizes="152x152" href="/app-icon.svg" />
+          <link rel="apple-touch-icon" sizes="120x120" href="/app-icon.svg" />
+          <link rel="apple-touch-icon" sizes="76x76" href="/app-icon.svg" />
+          
+          {/* Standard Favicon */}
+          <link rel="icon" type="image/svg+xml" href="/app-icon.svg" />
+          <link rel="icon" type="image/svg+xml" sizes="32x32" href="/app-icon.svg" />
+          <link rel="icon" type="image/svg+xml" sizes="16x16" href="/app-icon.svg" />
+          
+          {/* MS Tile Icons for Windows */}
+          <meta name="msapplication-TileImage" content="/app-icon.svg" />
+          <meta name="msapplication-TileColor" content="#2DD4BF" />
+          <meta name="msapplication-config" content="/browserconfig.xml" />
+          
+          {/* PWA App Name */}
+          <meta name="application-name" content="LeadFlow" />
         </head>
         <body className={`${inter.className} font-body antialiased bg-background text-foreground min-h-screen`}>
           <div

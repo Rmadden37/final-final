@@ -1,31 +1,45 @@
 {
   "name": "LeadFlow",
   "short_name": "LeadFlow",
-  "description": "Lead history and assignment system",
+  "description": "Lead history and assignment system for sales teams",
   "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#3B82F6",
+  "background_color": "#0F1419",
+  "theme_color": "#2DD4BF",
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en-US",
+  "categories": ["business", "productivity"],
   "icons": [
     {
-      "src": "https://imgur.com/oujPvCe",
-      "type": "image/png",
-      "sizes": "any"
+      "src": "/app-icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
     },
     {
-      "src": "https://imgur.com/oujPvCe",
-      "type": "image/png",
+      "src": "/app-icon.svg",
+      "type": "image/svg+xml", 
       "sizes": "192x192",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "https://imgur.com/oujPvCe",
-      "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any maskable"
+      "src": "/app-icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512", 
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "180x180",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "maskable"
     }
   ]
 }
