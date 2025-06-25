@@ -417,34 +417,34 @@ export default function LeaderboardPage() {
                     return (
                       <div
                         key={closer.name}
-                        className="flex items-center justify-between p-6 sm:p-9 border rounded-xl bg-gradient-to-r from-background to-muted/20 hover:shadow-lg active:scale-[0.98] transition-all duration-200 cursor-pointer touch-manipulation scale-[1.5]"
+                        className="flex items-center justify-between p-4 sm:p-6 border rounded-xl bg-gradient-to-r from-background to-muted/20 hover:shadow-lg active:scale-[0.98] transition-all duration-200 cursor-pointer touch-manipulation"
                         style={{ zIndex: 2 }}
                       >
-                        <div className="flex items-center space-x-4 sm:space-x-9 flex-1 min-w-0">
+                        <div className="flex items-center space-x-3 sm:space-x-6 flex-1 min-w-0">
                           <div className="shrink-0">
                             {getRankBadge(1)}
                           </div>
-                          <Avatar className="h-18 w-18 sm:h-24 sm:w-24 ring-4 ring-border shrink-0">
+                          <Avatar className="h-12 w-12 sm:h-16 sm:w-16 ring-2 ring-border shrink-0">
                             <AvatarImage src={avatarUrl || undefined} alt={displayName} />
-                            <AvatarFallback className="text-2xl sm:text-4xl font-semibold">
+                            <AvatarFallback className="text-sm sm:text-lg font-semibold">
                               {displayName.slice(0, 2).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
-                            <p className="text-2xl sm:text-4xl font-bold mb-2 truncate">{displayName}</p>
+                            <p className="font-bold text-base sm:text-xl mb-1 truncate">{displayName}</p>
                             <div className="hidden sm:block">
-                              <p className="text-lg font-medium text-muted-foreground mb-2">Net Deals</p>
-                              <p className="text-3xl sm:text-5xl font-bold text-primary">{closer.sales}</p>
+                              <p className="text-sm font-medium text-muted-foreground mb-1">Net Deals</p>
+                              <p className="font-bold text-xl sm:text-2xl text-primary">{closer.sales}</p>
                             </div>
                             <div className="sm:hidden">
-                              <p className="text-base text-muted-foreground">Net Deals: <span className="font-bold text-primary text-2xl">{closer.sales}</span></p>
+                              <p className="text-xs text-muted-foreground">Net Deals: <span className="font-bold text-primary">{closer.sales}</span></p>
                             </div>
                           </div>
                         </div>
-                        <div className="text-right shrink-0 ml-4">
-                          <p className="text-base sm:text-lg font-medium text-muted-foreground mb-2">Total kW</p>
-                          <p className="font-bold text-2xl sm:text-4xl text-primary">{formatKW(closer.totalKW)}</p>
-                          <p className="text-base sm:text-lg text-muted-foreground">kW</p>
+                        <div className="text-right shrink-0 ml-2">
+                          <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Total kW</p>
+                          <p className="font-bold text-lg sm:text-2xl text-primary">{formatKW(closer.totalKW)}</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">kW</p>
                         </div>
                       </div>
                     );
