@@ -3,10 +3,12 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
-  "functions": {
-    "source": "functions",
-    "runtime": "nodejs18"
-  },
+  "functions": [
+    {
+      "source": "functions",
+      "runtime": "nodejs18"
+    }
+  ],
   "storage": {
     "rules": "storage.rules"
   },
