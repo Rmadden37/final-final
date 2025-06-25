@@ -47,6 +47,7 @@ export default function LeaderboardPage() {
 
   const [closers, setClosers] = useState<CloserData[]>([])
   const [setters, setSetters] = useState<SetterData[]>([])
+  const [selfGen, setSelfGen] = useState<CloserData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [allUsers, setAllUsers] = useState<any[]>([])
@@ -169,6 +170,7 @@ export default function LeaderboardPage() {
       // Process closers - group by name and aggregate
       const closerStats = new Map<string, CloserData>()
       const setterStats = new Map<string, SetterData>()
+      const selfGenStats = new Map<string, CloserData>()
       
       data.forEach((row: any) => {
         const closer = row.closer_name?.trim()
@@ -225,6 +227,29 @@ export default function LeaderboardPage() {
           stats.totalLeads += 1
           stats.grossKW += kw  // Add all kW regardless of realization
         }
+        
+        // Process self-gen data (setter === closer and net account)
+        if (setter && closer && setter === closer && isRealized) {
+          if (!selfGenStats.has(setter)) {
+            const userMatch = findUserPhoto(setter)
+            
+            selfGenStats.set(setter, {
+              name: setter,
+              sales: 0,
+              revenue: 0,
+              totalKW: 0,
+              avgDealSize: 0,
+              matchedProfile: userMatch ? {
+                displayName: userMatch.displayName,
+                photoURL: userMatch.photoURL,
+                email: userMatch.displayName + '@company.com'
+              } : undefined
+            })
+          }
+          const stats = selfGenStats.get(setter)!
+          stats.sales += 1
+          stats.totalKW += kw
+        }
       })
       
       // Convert to arrays and sort
@@ -234,8 +259,12 @@ export default function LeaderboardPage() {
       const settersArray = Array.from(setterStats.values())
         .sort((a, b) => b.grossKW - a.grossKW)  // Rank by gross kW (highest first)
       
+      const selfGenArray = Array.from(selfGenStats.values())
+        .sort((a, b) => b.totalKW - a.totalKW)
+      
       setClosers(closersArray)
       setSetters(settersArray)
+      setSelfGen(selfGenArray)
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')
@@ -303,9 +332,9 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 max-w-7xl">
+    <div className="container mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 max-w-7xl bg-[#191a2b] dark:bg-[#1a1b2e]">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-2">
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl sm:text-3xl font-bold truncate">Performance Leaderboard</h1>
           <p className="text-sm sm:text-base text-muted-foreground">Track top performers across setters and closers</p>
@@ -313,14 +342,19 @@ export default function LeaderboardPage() {
             <p className="text-sm text-red-600 mt-1">{error}</p>
           )}
         </div>
-        <Button onClick={loadData} variant="outline" disabled={loading} className="w-full sm:w-auto">
+        <Button
+          onClick={loadData}
+          variant="outline"
+          disabled={loading}
+          className="w-full sm:w-auto bg-blue-500 dark:bg-gradient-to-r dark:from-blue-500 dark:to-purple-600 dark:text-white dark:border-0 dark:shadow-lg hover:dark:from-blue-400 hover:dark:to-purple-500"
+        >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''} sm:mr-2`} />
           <span className="sm:inline hidden ml-2 sm:ml-0">Refresh</span>
         </Button>
       </div>
 
       {/* Date Filter */}
-      <Card>
+      <Card className="dark:shadow-md">
         <CardContent className="py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
             <div className="flex items-center gap-2 shrink-0">
@@ -329,7 +363,7 @@ export default function LeaderboardPage() {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full sm:w-auto sm:min-w-[140px] justify-between">
+                <Button variant="outline" className="w-full sm:w-auto sm:min-w-[140px] justify-between dark:bg-gradient-to-r dark:from-blue-500 dark:to-purple-600 dark:text-white dark:border-0 dark:shadow-lg hover:dark:from-blue-400 hover:dark:to-purple-500">
                   <span className="truncate">{dateFilters.find(f => f.value === dateFilter)?.label || 'Select Range'}</span>
                   <ChevronDown className="ml-2 h-4 w-4 shrink-0" />
                 </Button>
@@ -353,7 +387,7 @@ export default function LeaderboardPage() {
       {/* Summary Stats - Only for Manager/Admin */}
       {isManagerOrAdmin && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          <Card>
+          <Card className="dark:shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Setters</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
@@ -362,7 +396,7 @@ export default function LeaderboardPage() {
               <div className="text-xl sm:text-2xl font-bold">{setters.length}</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="dark:shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Closers</CardTitle>
               <Target className="h-4 w-4 text-muted-foreground" />
@@ -371,7 +405,7 @@ export default function LeaderboardPage() {
               <div className="text-xl sm:text-2xl font-bold">{closers.length}</div>
             </CardContent>
           </Card>
-          <Card className="sm:col-span-2 lg:col-span-1">
+          <Card className="sm:col-span-2 lg:col-span-1 dark:shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total kW (Net Deals)</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -387,9 +421,10 @@ export default function LeaderboardPage() {
 
       {/* Leaderboard Tabs */}
       <Tabs defaultValue="closers" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 h-auto">
+        <TabsList className="grid w-full grid-cols-3 h-auto">
           <TabsTrigger value="closers" className="text-sm sm:text-base py-2 sm:py-3">Top Closers</TabsTrigger>
           <TabsTrigger value="setters" className="text-sm sm:text-base py-2 sm:py-3">Top Setters</TabsTrigger>
+          <TabsTrigger value="selfgen" className="text-sm sm:text-base py-2 sm:py-3">Top Self-Gen</TabsTrigger>
         </TabsList>
 
         {/* Top Closers Tab Content */}
@@ -537,6 +572,59 @@ export default function LeaderboardPage() {
                 {setters.length === 0 && (
                   <div className="text-center p-8 text-muted-foreground">
                     No setter data available for the selected date range.
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Top Self-Gen Tab Content */}
+        <TabsContent value="selfgen" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Top Self-Gen</CardTitle>
+              <CardDescription>Ranked by self-generated net deals (setter = closer, realization = 1)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 sm:space-y-4">
+                {selfGen.slice(0, 10).map((person, index) => {
+                  const displayName = person.matchedProfile?.displayName || person.name;
+                  const avatarUrl = person.matchedProfile?.photoURL;
+                  return (
+                    <div key={person.name} className="flex items-center justify-between p-4 sm:p-6 border rounded-xl bg-gradient-to-r from-background to-muted/20 hover:shadow-lg active:scale-[0.98] transition-all duration-200 cursor-pointer touch-manipulation">
+                      <div className="flex items-center space-x-3 sm:space-x-6 flex-1 min-w-0">
+                        <div className="shrink-0">
+                          {getRankBadge(index + 1)}
+                        </div>
+                        <Avatar className="h-12 w-12 sm:h-16 sm:w-16 ring-2 ring-border shrink-0">
+                          <AvatarImage src={avatarUrl || undefined} alt={displayName} />
+                          <AvatarFallback className="text-sm sm:text-lg font-semibold">
+                            {displayName.slice(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-base sm:text-xl mb-1 truncate">{displayName}</p>
+                          <div className="hidden sm:block">
+                            <p className="text-sm font-medium text-muted-foreground mb-1">Net Self-Gen Deals</p>
+                            <p className="font-bold text-xl sm:text-2xl text-primary">{person.sales}</p>
+                          </div>
+                          <div className="sm:hidden">
+                            <p className="text-xs text-muted-foreground">Net Self-Gen Deals: <span className="font-bold text-primary">{person.sales}</span></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0 ml-2">
+                        <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Total kW</p>
+                        <p className="font-bold text-lg sm:text-2xl text-primary">{formatKW(person.totalKW)}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">kW</p>
+                      </div>
+                    </div>
+                  )
+                })}
+                {selfGen.length === 0 && (
+                  <div className="text-center p-8 text-muted-foreground">
+                    No self-gen data available for the selected date range.
                   </div>
                 )}
               </div>
