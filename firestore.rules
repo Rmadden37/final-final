@@ -25,9 +25,14 @@ service cloud.firestore {
          request.auth.uid == closerId);
     }
     
-    // Leads collection - authenticated users can read/write
+    // Leads collection - allow all authenticated users to read leads
     match /leads/{leadId} {
-      allow read, write: if request.auth != null;
+      allow read: if request.auth != null;
+      allow write: if isSignedIn() && (
+        (request.method == 'create' && request.auth.uid == request.resource.data.ownerId) ||
+        (request.method != 'create' && request.auth.uid == resource.data.ownerId) ||
+        isAdminOrManager()
+      );
     }
     
     // Teams collection - authenticated users can read, admins can write

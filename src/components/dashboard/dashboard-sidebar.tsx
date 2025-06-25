@@ -39,6 +39,7 @@ import {
   useSidebar
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
 
 // Dynamic import with Next.js dynamic to avoid circular dependency issues
 const CreateLeadForm = dynamic(() => import("./create-lead-form"), {
@@ -47,6 +48,7 @@ const CreateLeadForm = dynamic(() => import("./create-lead-form"), {
 });
 
 function DashboardSidebarContent() {
+  usePushNotifications(); // Register push notifications and badge logic
   const { user, logout, loading } = useAuth();
   const [isCreateLeadModalOpen, setIsCreateLeadModalOpen] = useState(false);
   const pathname = usePathname();
