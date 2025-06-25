@@ -1,9 +1,8 @@
-
 "use client";
 
 import type {User as FirebaseAuthUser} from "firebase/auth";
 import {onAuthStateChanged, signOut as firebaseSignOut} from "firebase/auth";
-import {doc, onSnapshot} from "firebase/firestore";
+import {doc, onSnapshot, setDoc, getDoc} from "firebase/firestore";
 import {useRouter, usePathname} from "next/navigation";
 import type {ReactNode} from "react";
 import React, {createContext, useContext, useEffect, useState} from "react";
@@ -64,7 +63,7 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
       setLoading(true);
       const userDocRef = doc(db, "users", firebaseUser.uid);
 
-      unsubscribeUserDoc = onSnapshot(userDocRef, (docSnap) => {
+      unsubscribeUserDoc = onSnapshot(userDocRef, async (docSnap) => {
         console.log('📄 User document changed, exists:', docSnap.exists());
         if (docSnap.exists()) {
           const appUserData = {uid: firebaseUser.uid, ...docSnap.data()} as AppUser;
@@ -72,8 +71,26 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
           console.log('✅ User set:', appUserData.email, appUserData.role);
         } else {
           // User document not found - expected for new users
-          console.log('❌ User document not found');
-          setUser(null);
+          console.log('❌ User document not found, creating default user doc');
+          // Create a default user doc
+          const defaultUser = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || null,
+            displayName: firebaseUser.displayName || null,
+            role: "setter", // default role, adjust as needed
+            teamId: "default", // or set to a sensible default/team selection logic
+            avatarUrl: firebaseUser.photoURL || null,
+            phoneNumber: firebaseUser.phoneNumber || null,
+            status: "On Duty"
+          };
+          try {
+            await setDoc(userDocRef, defaultUser, {merge: true});
+            setUser(defaultUser as AppUser);
+            console.log('✅ Default user doc created');
+          } catch (err) {
+            console.error('🚨 Failed to create user doc:', err);
+            setUser(null);
+          }
         }
         setLoading(false);
       }, (error) => {
