@@ -1,6 +1,7 @@
 {
   "projects": {
-    ".": "leadflow-4lvrr"
+    ".": "leadflow-4lvrr",
+    "default": "leadflow-4lvrr"
   },
   "targets": {},
   "etags": {}
