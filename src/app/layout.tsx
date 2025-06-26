@@ -113,13 +113,12 @@ export default function RootLayout({
           <meta name="apple-mobile-web-app-status-bar-style" content="default" />
           <meta name="apple-mobile-web-app-title" content="LeadFlow" />
           
-          {/* Apple Touch Icons for all iOS devices */}
-          <link rel="apple-touch-icon" href="/app-icon.svg" />
-          <link rel="apple-touch-icon" sizes="180x180" href="/app-icon.svg" />
-          <link rel="apple-touch-icon" sizes="152x152" href="/app-icon.svg" />
-          <link rel="apple-touch-icon" sizes="120x120" href="/app-icon.svg" />
-          <link rel="apple-touch-icon" sizes="76x76" href="/app-icon.svg" />
+          {/* Apple Touch Icon for all iOS devices (PNG only) */}
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+          <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+          <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon.png" />
+          <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon.png" />
+          <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.png" />
           
           {/* Standard Favicon */}
           <link rel="icon" type="image/svg+xml" href="/app-icon.svg" />
