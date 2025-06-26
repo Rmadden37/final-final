@@ -69,6 +69,14 @@ interface DispatchAnalytics {
   };
 }
 
+interface FilteredMetrics {
+  totalLeads: number;
+  soldLeads: number;
+  sitLeads: number;
+  sitRate: string;
+  conversionRate: string;
+}
+
 const chartConfig = {
   leads: {
     label: "Leads",
@@ -163,6 +171,25 @@ const chartConfig = {
     label: "Do Not Call",
     color: "#991b1b", // Dark Red variant
   },
+} as const;
+
+// Utility function to safely get date from lead
+const getLeadDate = (lead: Lead): Date | null => {
+  if (!lead.createdAt) return null;
+  if (lead.createdAt instanceof Date) return lead.createdAt;
+  if (typeof lead.createdAt === 'object' && 'seconds' in lead.createdAt) {
+    return new Date(lead.createdAt.seconds * 1000);
+  }
+  return null;
+};
+
+// Utility function to safely get chart config
+const getChartConfig = (status: string) => {
+  const config = chartConfig[status as keyof typeof chartConfig];
+  return {
+    label: config?.label || status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
+    color: config?.color || "#64748b"
+  };
 };
 
 export default function AnalyticsDashboard() {
@@ -246,6 +273,12 @@ export default function AnalyticsDashboard() {
     fetchAnalytics();
   }, [user?.teamId, dateRange, toast]);
 
+  // Centralized filtered leads calculation
+  const filteredLeads = useMemo(() => {
+    if (filterCloser === "all") return analytics.leads;
+    return analytics.leads.filter(lead => lead.assignedCloserId === filterCloser);
+  }, [analytics.leads, filterCloser]);
+
   // Calculate setter analytics (lead quality tracking) - memoized for performance
   const setterAnalytics = useMemo((): SetterAnalytics[] => {
     const setterMap = new Map<string, {
@@ -256,11 +289,6 @@ export default function AnalyticsDashboard() {
       immediateLeads: number;
       scheduledLeads: number;
     }>();
-
-    // Filter leads by selected closer if not "all"
-    const filteredLeads = filterCloser === "all" 
-      ? analytics.leads 
-      : analytics.leads.filter(lead => lead.assignedCloserId === filterCloser);
 
     filteredLeads.forEach(lead => {
       if (lead.setterId && lead.setterName) {
@@ -286,7 +314,7 @@ export default function AnalyticsDashboard() {
       ...setter,
       conversionRate: setter.totalLeads > 0 ? (setter.soldLeads / setter.totalLeads) * 100 : 0
     }));
-  }, [analytics.leads, filterCloser]);
+  }, [filteredLeads]);
 
   // Calculate closer analytics - memoized for performance
   const closerAnalytics = useMemo((): CloserAnalytics[] => {
@@ -298,11 +326,6 @@ export default function AnalyticsDashboard() {
       totalNoSale: number;
       totalFailedCredits: number;
     }>();
-
-    // Filter leads by selected closer if not "all"
-    const filteredLeads = filterCloser === "all" 
-      ? analytics.leads 
-      : analytics.leads.filter(lead => lead.assignedCloserId === filterCloser);
 
     filteredLeads.forEach(lead => {
       if (lead.assignedCloserId && lead.assignedCloserName) {
@@ -333,17 +356,12 @@ export default function AnalyticsDashboard() {
       closingPercentage: closer.totalAssigned > 0 ? 
         ((closer.totalSold + closer.totalNoSale + closer.totalFailedCredits) / closer.totalAssigned) * 100 : 0
     }));
-  }, [analytics.leads, filterCloser]);
+  }, [filteredLeads]);
 
   // Calculate dispatch type comparison - memoized for performance
   const dispatchAnalytics = useMemo((): DispatchAnalytics => {
     const immediate = { total: 0, sold: 0, conversionRate: 0 };
     const scheduled = { total: 0, sold: 0, conversionRate: 0 };
-
-    // Filter leads by selected closer if not "all"
-    const filteredLeads = filterCloser === "all" 
-      ? analytics.leads 
-      : analytics.leads.filter(lead => lead.assignedCloserId === filterCloser);
 
     filteredLeads.forEach(lead => {
       if (lead.dispatchType === "immediate") {
@@ -359,124 +377,150 @@ export default function AnalyticsDashboard() {
     scheduled.conversionRate = scheduled.total > 0 ? (scheduled.sold / scheduled.total) * 100 : 0;
 
     return { immediate, scheduled };
-  }, [analytics.leads, filterCloser]);
+  }, [filteredLeads]);
 
-  // Export analytics report as CSV
-  const exportAnalyticsReport = () => {
-    const reportData = [];
+  // Calculate key metrics based on filtered data - memoized for performance
+  const filteredMetrics = useMemo((): FilteredMetrics => {
+    const totalLeads = filteredLeads.length;
+    const soldLeads = filteredLeads.filter(lead => lead.status === 'sold').length;
+    const sitLeads = filteredLeads.filter(lead => ['sold', 'no_sale'].includes(lead.status)).length;
+    const sitRate = totalLeads > 0 ? ((sitLeads / totalLeads) * 100).toFixed(1) : "0";
+    const conversionRate = totalLeads > 0 ? ((soldLeads / totalLeads) * 100).toFixed(1) : "0";
     
-    // Add summary metrics
-    reportData.push(['ANALYTICS REPORT SUMMARY']);
-    reportData.push(['Generated:', new Date().toLocaleString()]);
-    reportData.push(['Date Range:', dateRange]);
-    reportData.push(['Filter:', filterCloser === 'all' ? 'All Closers' : analytics.closers.find(c => c.uid === filterCloser)?.name || 'Unknown']);
-    reportData.push([]);
-    
-    // Key metrics
-    reportData.push(['KEY METRICS']);
-    reportData.push(['Total Leads:', filteredMetrics.totalLeads]);
-    reportData.push(['Conversion Rate:', `${filteredMetrics.conversionRate}%`]);
-    reportData.push(['Average Closing Rate:', `${avgClosingRatio}%`]);
-    reportData.push(['On Duty Closers:', analytics.teamStats?.onDutyClosers || 0]);
-    reportData.push([]);
-    
-    // Setter analytics
-    reportData.push(['SETTER PERFORMANCE']);
-    reportData.push(['Name', 'Total Leads', 'Sold Leads', 'Conversion Rate', 'Immediate Leads', 'Scheduled Leads']);
-    setterAnalytics.forEach(setter => {
-      reportData.push([
-        setter.name,
-        setter.totalLeads,
-        setter.soldLeads,
-        `${setter.conversionRate.toFixed(1)}%`,
-        setter.immediateLeads,
-        setter.scheduledLeads
-      ]);
-    });
-    reportData.push([]);
-    
-    // Closer analytics
-    reportData.push(['CLOSER PERFORMANCE']);
-    reportData.push(['Name', 'Total Assigned', 'Total Sold', 'No Sales', 'Failed Credits', 'Closing Rate']);
-    closerAnalytics.forEach(closer => {
-      reportData.push([
-        closer.name,
-        closer.totalAssigned,
-        closer.totalSold,
-        closer.totalNoSale,
-        closer.totalFailedCredits,
-        `${closer.closingRatio.toFixed(1)}%`
-      ]);
-    });
-    reportData.push([]);
-    
-    // Dispatch analysis
-    reportData.push(['DISPATCH ANALYSIS']);
-    reportData.push(['Type', 'Total Leads', 'Sold Leads', 'Conversion Rate']);
-    reportData.push([
-      'Immediate',
-      dispatchAnalytics.immediate.total,
-      dispatchAnalytics.immediate.sold,
-      `${dispatchAnalytics.immediate.conversionRate.toFixed(1)}%`
-    ]);
-    reportData.push([
-      'Scheduled',
-      dispatchAnalytics.scheduled.total,
-      dispatchAnalytics.scheduled.sold,
-      `${dispatchAnalytics.scheduled.conversionRate.toFixed(1)}%`
-    ]);
-    
-    // Convert to CSV
-    const csvContent = reportData.map(row => 
-      row.map(cell => `"${cell}"`).join(',')
-    ).join('\n');
-    
-    // Check if running in browser environment
-    if (typeof globalThis !== 'undefined' && globalThis.window && globalThis.document) {
-      try {
-        const blob = new globalThis.Blob([csvContent], { type: 'text/csv' });
-        const url = globalThis.URL.createObjectURL(blob);
-        const a = globalThis.document.createElement('a');
-        a.href = url;
-        a.download = `analytics-report-${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
-        globalThis.URL.revokeObjectURL(url);
-        
-        toast({
-          title: "Report Exported",
-          description: "Analytics report has been downloaded as CSV file.",
-        });
-      } catch {
-        toast({
-          title: "Export Failed",
-          description: "Could not export analytics report.",
-          variant: "destructive",
-        });
-      }
-    } else {
-      // Fallback for server-side or when DOM is not available
+    return { totalLeads, soldLeads, sitLeads, sitRate, conversionRate };
+  }, [filteredLeads]);
+
+  const avgClosingRatio = useMemo(() => 
+    closerAnalytics.length > 0 ? 
+      (closerAnalytics.reduce((sum, closer) => sum + closer.closingRatio, 0) / closerAnalytics.length).toFixed(1) : "0",
+    [closerAnalytics]
+  );
+
+  // Export analytics report as CSV - fixed with proper browser checks
+  const exportAnalyticsReport = useCallback(() => {
+    // Check browser environment first
+    if (typeof window === 'undefined' || !window.document) {
       toast({
         title: "Export Unavailable",
         description: "Export feature is only available in browser environment.",
         variant: "destructive",
       });
+      return;
     }
-  };
 
-  // Generate trend data for time-series analysis
-  const generateTrendData = () => {
+    try {
+      const reportData = [];
+      
+      // Add summary metrics
+      reportData.push(['ANALYTICS REPORT SUMMARY']);
+      reportData.push(['Generated:', new Date().toLocaleString()]);
+      reportData.push(['Date Range:', dateRange]);
+      reportData.push(['Filter:', filterCloser === 'all' ? 'All Closers' : analytics.closers.find(c => c.uid === filterCloser)?.name || 'Unknown']);
+      reportData.push([]);
+      
+      // Key metrics
+      reportData.push(['KEY METRICS']);
+      reportData.push(['Total Leads:', filteredMetrics.totalLeads]);
+      reportData.push(['Conversion Rate:', `${filteredMetrics.conversionRate}%`]);
+      reportData.push(['Average Closing Rate:', `${avgClosingRatio}%`]);
+      reportData.push(['On Duty Closers:', analytics.teamStats?.onDutyClosers || 0]);
+      reportData.push([]);
+      
+      // Setter analytics
+      reportData.push(['SETTER PERFORMANCE']);
+      reportData.push(['Name', 'Total Leads', 'Sold Leads', 'Conversion Rate', 'Immediate Leads', 'Scheduled Leads']);
+      setterAnalytics.forEach(setter => {
+        reportData.push([
+          setter.name,
+          setter.totalLeads,
+          setter.soldLeads,
+          `${setter.conversionRate.toFixed(1)}%`,
+          setter.immediateLeads,
+          setter.scheduledLeads
+        ]);
+      });
+      reportData.push([]);
+      
+      // Closer analytics
+      reportData.push(['CLOSER PERFORMANCE']);
+      reportData.push(['Name', 'Total Assigned', 'Total Sold', 'No Sales', 'Failed Credits', 'Closing Rate']);
+      closerAnalytics.forEach(closer => {
+        reportData.push([
+          closer.name,
+          closer.totalAssigned,
+          closer.totalSold,
+          closer.totalNoSale,
+          closer.totalFailedCredits,
+          `${closer.closingRatio.toFixed(1)}%`
+        ]);
+      });
+      reportData.push([]);
+      
+      // Dispatch analysis
+      reportData.push(['DISPATCH ANALYSIS']);
+      reportData.push(['Type', 'Total Leads', 'Sold Leads', 'Conversion Rate']);
+      reportData.push([
+        'Immediate',
+        dispatchAnalytics.immediate.total,
+        dispatchAnalytics.immediate.sold,
+        `${dispatchAnalytics.immediate.conversionRate.toFixed(1)}%`
+      ]);
+      reportData.push([
+        'Scheduled',
+        dispatchAnalytics.scheduled.total,
+        dispatchAnalytics.scheduled.sold,
+        `${dispatchAnalytics.scheduled.conversionRate.toFixed(1)}%`
+      ]);
+      
+      // Convert to CSV
+      const csvContent = reportData.map(row => 
+        row.map(cell => `"${cell}"`).join(',')
+      ).join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `analytics-report-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+      
+      toast({
+        title: "Report Exported",
+        description: "Analytics report has been downloaded as CSV file.",
+      });
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast({
+        title: "Export Failed",
+        description: "Could not export analytics report.",
+        variant: "destructive",
+      });
+    }
+  }, [filteredMetrics, avgClosingRatio, setterAnalytics, closerAnalytics, dispatchAnalytics, analytics, toast, dateRange, filterCloser]);
+
+  // Generate trend data for time-series analysis - optimized
+  const generateTrendData = useCallback(() => {
     const days = parseInt(dateRange.replace('d', ''));
     const trendData = [];
     
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
+      date.setHours(0, 0, 0, 0);
       const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       
       // Filter leads for this specific day
-      const dayLeads = analytics.leads.filter(lead => {
-        const leadDate = new Date(lead.createdAt.seconds * 1000);
-        return leadDate.toDateString() === date.toDateString();
+      const dayLeads = filteredLeads.filter(lead => {
+        const leadDate = getLeadDate(lead);
+        return leadDate && leadDate.toDateString() === date.toDateString();
       });
       
       const totalLeads = dayLeads.length;
@@ -498,35 +542,37 @@ export default function AnalyticsDashboard() {
     }
     
     return trendData;
-  };
+  }, [filteredLeads, dateRange]);
 
   // Calculate weekly growth rate
-  const calculateWeeklyGrowth = () => {
+  const calculateWeeklyGrowth = useCallback(() => {
     const now = new Date();
     const lastWeek = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
     const twoWeeksAgo = new Date(now.getTime() - (14 * 24 * 60 * 60 * 1000));
     
     const thisWeekLeads = analytics.leads.filter(lead => {
-      const leadDate = new Date(lead.createdAt.seconds * 1000);
-      return leadDate >= lastWeek;
+      const leadDate = getLeadDate(lead);
+      return leadDate && leadDate >= lastWeek;
     }).length;
     
     const lastWeekLeads = analytics.leads.filter(lead => {
-      const leadDate = new Date(lead.createdAt.seconds * 1000);
-      return leadDate >= twoWeeksAgo && leadDate < lastWeek;
+      const leadDate = getLeadDate(lead);
+      return leadDate && leadDate >= twoWeeksAgo && leadDate < lastWeek;
     }).length;
     
     if (lastWeekLeads === 0) return 0;
     return ((thisWeekLeads - lastWeekLeads) / lastWeekLeads * 100);
-  };
+  }, [analytics.leads]);
 
   // Get best performing day of the week
-  const getBestPerformingDay = () => {
+  const getBestPerformingDay = useCallback(() => {
     const dayStats: Record<string, { total: number; sold: number }> = {};
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
     analytics.leads.forEach(lead => {
-      const leadDate = new Date(lead.createdAt.seconds * 1000);
+      const leadDate = getLeadDate(lead);
+      if (!leadDate) return;
+      
       const dayOfWeek = leadDate.getDay();
       const dayName = dayNames[dayOfWeek];
       
@@ -552,44 +598,17 @@ export default function AnalyticsDashboard() {
     });
     
     return bestDay;
-  };
+  }, [analytics.leads]);
 
   // Calculate average daily leads
-  const getAverageDailyLeads = () => {
+  const getAverageDailyLeads = useCallback(() => {
     const days = parseInt(dateRange.replace('d', ''));
     return Math.round(analytics.leads.length / days);
-  };
-
-  const avgClosingRatio = useMemo(() => 
-    closerAnalytics.length > 0 ? 
-      (closerAnalytics.reduce((sum, closer) => sum + closer.closingRatio, 0) / closerAnalytics.length).toFixed(1) : "0",
-    [closerAnalytics]
-  );
-
-  // Calculate key metrics based on filtered data - memoized for performance
-  const filteredMetrics = useMemo(() => {
-    // Filter leads by selected closer if not "all"
-    const filteredLeads = filterCloser === "all" 
-      ? analytics.leads 
-      : analytics.leads.filter(lead => lead.assignedCloserId === filterCloser);
-
-    const totalLeads = filteredLeads.length;
-    const soldLeads = filteredLeads.filter(lead => lead.status === 'sold').length;
-    const sitLeads = filteredLeads.filter(lead => ['sold', 'no_sale'].includes(lead.status)).length;
-    const sitRate = totalLeads > 0 ? ((sitLeads / totalLeads) * 100).toFixed(1) : "0";
-    const conversionRate = totalLeads > 0 ? ((soldLeads / totalLeads) * 100).toFixed(1) : "0";
-    
-    return { totalLeads, soldLeads, sitLeads, sitRate, conversionRate };
-  }, [analytics.leads, filterCloser]);
+  }, [analytics.leads, dateRange]);
 
   // Prepare chart data - filtered by selected closer - memoized for performance
   const statusData = useMemo(() => {
-    if (!analytics.leads.length) return [];
-    
-    // Filter leads by selected closer if not "all"
-    const filteredLeads = filterCloser === "all" 
-      ? analytics.leads 
-      : analytics.leads.filter(lead => lead.assignedCloserId === filterCloser);
+    if (!filteredLeads.length) return [];
 
     // Count status occurrences
     const statusCounts: Record<string, number> = {};
@@ -601,14 +620,17 @@ export default function AnalyticsDashboard() {
     // Convert to chart format with proper labels and colors
     return Object.entries(statusCounts)
       .filter(([_, count]) => count > 0) // Only show statuses that have data
-      .map(([status, count]) => ({
-        status: chartConfig[status as keyof typeof chartConfig]?.label || status.replace("_", " "),
-        rawStatus: status,
-        count,
-        fill: chartConfig[status as keyof typeof chartConfig]?.color || "#64748b", // Default fallback color
-      }))
+      .map(([status, count]) => {
+        const config = getChartConfig(status);
+        return {
+          status: config.label,
+          rawStatus: status,
+          count,
+          fill: config.color,
+        };
+      })
       .sort((a, b) => b.count - a.count); // Sort by count descending
-  }, [analytics.leads, filterCloser]);
+  }, [filteredLeads]);
 
   const closerPerformanceData = useMemo(() => 
     closerAnalytics
@@ -622,10 +644,6 @@ export default function AnalyticsDashboard() {
 
   // Prepare stacked dispatch comparison data showing total volume with dispositions - memoized for performance
   const dispatchComparisonData = useMemo(() => {
-    const filteredLeads = filterCloser === "all" 
-      ? analytics.leads 
-      : analytics.leads.filter(lead => lead.assignedCloserId === filterCloser);
-
     const processDispatchType = (dispatchType: string) => {
       const leads = filteredLeads.filter(lead => lead.dispatchType === dispatchType);
       const sold = leads.filter(lead => lead.status === "sold").length;
@@ -650,7 +668,7 @@ export default function AnalyticsDashboard() {
       processDispatchType("immediate"),
       processDispatchType("scheduled"),
     ];
-  }, [analytics.leads, filterCloser]);
+  }, [filteredLeads]);
 
   // Check user permissions AFTER all hooks are called
   if (!user || user.role === "setter") {
