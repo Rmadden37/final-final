@@ -90,7 +90,16 @@ export default function AIAssistantTab() {
         },
       };
 
-      const apiKey = ""; // Handled by environment
+      const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
+      if (!apiKey) {
+        toast({ 
+          title: "API Key Missing", 
+          description: "Please set NEXT_PUBLIC_GEMINI_API_KEY in your environment variables.", 
+          variant: "destructive" 
+        });
+        setIsGenerating(false);
+        return;
+      }
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
       const apiResponse = await fetch(apiUrl, {
