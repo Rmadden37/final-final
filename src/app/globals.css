@@ -21,6 +21,9 @@
     overflow-x: hidden;
     /* Prevent zoom on iOS when focusing inputs */
     -webkit-text-size-adjust: 100%;
+    /* Ensure full width */
+    width: 100%;
+    max-width: 100%;
   }
   
   body {
@@ -34,6 +37,23 @@
     overflow-x: hidden;
     inline-size: 100%;
     min-inline-size: 320px; /* Minimum width for very small screens */
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Global container constraints to prevent overflow */
+  * {
+    box-sizing: border-box;
+  }
+
+  *:not(html):not(body) {
+    max-width: 100%;
+  }
+
+  /* Ensure all containers respect viewport width */
+  .container, main, section, article, div {
+    max-width: 100%;
+    overflow-x: hidden;
   }
   
   /* Better touch targets for mobile */
@@ -64,12 +84,16 @@
     .container {
       padding-inline-start: 1rem;
       padding-inline-end: 1rem;
+      max-width: 100%;
+      overflow-x: hidden;
     }
     
     /* Make cards more mobile-friendly */
     [class*="card"] {
       margin: 0.5rem 0;
       border-radius: 0.75rem;
+      max-width: 100%;
+      overflow-x: hidden;
     }
     
     /* Better input handling on mobile */
@@ -77,6 +101,7 @@
       font-size: 16px; /* Prevent zoom on iOS */
       padding: 0.75rem;
       border-radius: 0.5rem;
+      max-width: 100%;
     }
   }
   
@@ -85,30 +110,54 @@
     .container {
       padding-inline-start: 1.5rem;
       padding-inline-end: 1.5rem;
+      max-width: 100%;
+      overflow-x: hidden;
     }
     
     /* Optimize navigation for tablet */
     nav {
       padding: 0.5rem 1rem;
+      max-width: 100%;
+      overflow-x: hidden;
     }
     
     /* Better modal sizing for tablets */
     [role="dialog"] {
       margin: 1rem;
       max-inline-size: calc(100vw - 2rem);
+      max-width: calc(100vw - 2rem);
     }
-  }
-  
-  /* Improved focus styles for keyboard navigation on mobile */
-  *:focus-visible {
-    outline: 2px solid hsl(var(--ring));
-    outline-offset: 2px;
-  }
-  
-  /* Hide elements that shouldn't be visible on very small screens */
-  @media (max-inline-size: 320px) {
-    .hidden-xs {
-      display: none !important;
+
+    /* Sidebar optimizations for mobile */
+    [data-sidebar="sidebar"] {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    /* Main content area mobile optimization */
+    main {
+      max-width: 100%;
+      overflow-x: hidden;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    /* Header optimization */
+    header {
+      max-width: 100%;
+      overflow-x: hidden;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    /* Ensure sidebar trigger is always visible and accessible */
+    [data-sidebar="trigger"] {
+      min-height: 44px;
+      min-width: 44px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      z-index: 1000;
     }
   }
 }
@@ -1304,51 +1353,168 @@ body.dialog-scroll-locked {
 
 /* Remove gradient and use purple tint for selected day */
 .scheduled-calendar-day.selected, .scheduled-calendar-day[data-selected="true"], .scheduled-calendar-day.selected:focus, .scheduled-calendar-day.selected:active {
-  background: #6C47F5 !important; /* Purple tint */
-  color: #fff !important;
-  border: 2px solid #A084F7 !important;
-  box-shadow: 0 2px 8px 0 rgba(108,71,245,0.12) !important;
-  font-weight: 700;
+  background: #8b5cf6 !important;
+  color: white !important;
 }
 
-/* --- Analytics Page Butter UI/UX Enhancements --- */
-.analytics-container {
-  padding: 32px 24px 32px 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-  overflow-x: hidden;
-}
-
-.analytics-card {
-  width: 100%;
-  max-width: 600px;
-  margin: 24px auto;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-  border-radius: 16px;
-}
-
-.floating-chat {
-  bottom: 32px !important;
-  right: 32px !important;
-}
-
+/* ===== MOBILE SIDEBAR & LAYOUT OPTIMIZATIONS ===== */
 @media (max-width: 768px) {
-  .analytics-container {
-    padding: 16px 8px 80px 8px;
+  /* Mobile Sidebar Enhancements */
+  [data-sidebar="sidebar"] {
+    width: 280px !important;
+    max-width: 90vw !important;
   }
-  .analytics-card {
-    max-width: 100%;
-    margin: 16px 0;
+
+  /* Ensure sidebar trigger is always accessible */
+  [data-sidebar="trigger"] {
+    min-height: 48px !important;
+    min-width: 48px !important;
+    padding: 0.75rem !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    position: relative !important;
+    z-index: 1001 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
-  .floating-chat {
-    bottom: 16px !important;
-    right: 16px !important;
+
+  /* Mobile header improvements */
+  header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    padding: 0.75rem 1rem !important;
+    min-height: 60px !important;
+    display: flex !important;
+    align-items: center !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Main content area - prevent overflow */
+  main {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    padding: 1rem !important;
+    width: 100% !important;
+  }
+
+  /* Dashboard layout optimizations */
+  .dashboard-layout,
+  .dashboard-container {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+
+  /* Sidebar menu items - better touch targets */
+  [data-sidebar="sidebar"] button,
+  [data-sidebar="sidebar"] a {
+    min-height: 48px !important;
+    padding: 0.75rem 1rem !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    width: 100% !important;
+    text-align: left !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Prevent any content from causing horizontal scroll */
+  * {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Mobile layout wrapper */
+  .flex {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Cards and components */
+  .card,
+  [class*="card"] {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Tables and grids - make them scrollable horizontally if needed */
+  table {
+    min-width: 100% !important;
+    table-layout: auto !important;
+  }
+
+  .grid {
+    grid-template-columns: 1fr !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Floating elements */
+  .floating-chat-button {
+    bottom: 5rem !important;
+    right: 1rem !important;
+    z-index: 50 !important;
+    min-height: 56px !important;
+    min-width: 56px !important;
   }
 }
-/* Usage: 
-<div className="analytics-container">
-  <div className="analytics-card">...</div>
-  ...
-</div>
-Floating chat button: add className="floating-chat" to the button
-*/
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+  [data-sidebar="sidebar"] {
+    width: 260px !important;
+    max-width: 85vw !important;
+  }
+
+  header {
+    padding: 0.5rem 0.75rem !important;
+    min-height: 56px !important;
+  }
+
+  main {
+    padding: 0.75rem !important;
+  }
+
+  [data-sidebar="trigger"] {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    padding: 0.5rem !important;
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 600px) {
+  header {
+    min-height: 48px !important;
+    padding: 0.5rem 1rem !important;
+  }
+
+  [data-sidebar="sidebar"] {
+    max-width: 320px !important;
+  }
+}
+
+/* ===== PREVENT HORIZONTAL SCROLL UTILITIES ===== */
+.no-horizontal-scroll {
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+}
+
+.mobile-safe-width {
+  max-width: calc(100vw - 2rem) !important;
+  overflow-x: hidden !important;
+}
+
+.mobile-container {
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  box-sizing: border-box !important;
+}

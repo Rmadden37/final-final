@@ -143,23 +143,23 @@ function DashboardSidebarContent() {
   return (
     <Sidebar
       collapsible="icon"
-      className="border-r"
+      className="border-r no-horizontal-scroll"
     >
-      <SidebarHeader className="flex flex-col items-center justify-center py-4">
+      <SidebarHeader className="flex flex-col items-center justify-center py-4 no-horizontal-scroll">
         {/* Center logo at the top of the sidebar */}
-        <div className="flex items-center w-full justify-center gap-2">
+        <div className="flex items-center w-full justify-center gap-2 no-horizontal-scroll">
           <Image src="https://firebasestorage.googleapis.com/v0/b/leadflow-4lvrr.firebasestorage.app/o/Leadflow%20Logos%2FyhekQsF%20-%20Imgur.png?alt=media&token=c8226178-a128-4404-b727-f6c009e833e6" alt="LeadFlow Logo" width={40} height={40} priority />
         </div>
       </SidebarHeader>
-      <SidebarContent className="mb-10">
-        <SidebarMenu>
+      <SidebarContent className="mb-10 no-horizontal-scroll">
+        <SidebarMenu className="no-horizontal-scroll">
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className={`nav-item shadow-sm text-lg text-sidebar-primary group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard" ? " active" : ""}`}
+              className={`nav-item shadow-sm text-lg text-sidebar-primary group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center min-h-[48px] touch-manipulation${pathname === "/dashboard" ? " active" : ""}`}
               onClick={handleNav}
             >
-              <Link href="/dashboard">
+              <Link href="/dashboard" className="w-full flex items-center">
                 <Home className="h-6 w-6 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3 text-gray-700 dark:text-gray-100 premium:text-premium-purple" />
                 <span className="font-semibold group-data-[collapsible=icon]:hidden">Dashboard</span>
               </Link>
@@ -373,18 +373,18 @@ export default function DashboardSidebar({ children }: { children?: React.ReactN
 function SidebarWithTrigger({ pathname, children }: { pathname: string; children?: React.ReactNode }) {
   const { toggleSidebar } = useSidebar();
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex h-screen w-full no-horizontal-scroll">
       <DashboardSidebarContent />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden no-horizontal-scroll">
         {/* Header with sidebar trigger */}
-        <header className="sticky top-0 z-40 w-full border-b border-border/20 bg-white/95 dark:bg-slate-950/95 dark:card-glass dark:glow-turquoise premium:card-glass premium:glow-premium backdrop-blur-md supports-[backdrop-filter]:bg-white/95 dark:supports-[backdrop-filter]:bg-slate-950/95 premium:supports-[backdrop-filter]:bg-transparent shadow-sm">
-          <div className="flex h-16 items-center px-4">
+        <header className="sticky top-0 z-40 w-full border-b border-border/20 bg-white/95 dark:bg-slate-950/95 dark:card-glass dark:glow-turquoise premium:card-glass premium:glow-premium backdrop-blur-md supports-[backdrop-filter]:bg-white/95 dark:supports-[backdrop-filter]:bg-slate-950/95 premium:supports-[backdrop-filter]:bg-transparent shadow-sm no-horizontal-scroll">
+          <div className="flex h-16 items-center px-4 no-horizontal-scroll">
             <SidebarTrigger
-              className="mr-3 dark:text-turquoise dark:hover:bg-slate-800/50 dark:hover:glow-cyan premium:text-premium-purple premium:hover:bg-premium-glass/50 premium:hover:glow-premium"
+              className="mr-3 dark:text-turquoise dark:hover:bg-slate-800/50 dark:hover:glow-cyan premium:text-premium-purple premium:hover:bg-premium-glass/50 premium:hover:glow-premium min-h-[44px] min-w-[44px] md:min-h-[48px] md:min-w-[48px]"
               onClick={toggleSidebar}
             />
-            <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium">
+            <div className="flex items-center space-x-2 overflow-hidden">
+              <span className="text-sm font-medium truncate">
                 {pathname === "/dashboard" ? "Dashboard" :
                  pathname === "/dashboard/lead-history" ? "Lead History" :
                  pathname === "/dashboard/analytics" ? "Analytics" :
@@ -398,7 +398,7 @@ function SidebarWithTrigger({ pathname, children }: { pathname: string; children
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-4">
+        <main className="flex-1 overflow-auto p-4 mobile-container">
           {children || "Dashboard content goes here"}
         </main>
       </div>
