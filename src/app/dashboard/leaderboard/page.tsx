@@ -452,7 +452,7 @@ export default function LeaderboardPage() {
                     return (
                       <div
                         key={closer.name}
-                        className={`flex items-center justify-between p-4 sm:p-6 border rounded-xl bg-gradient-to-r ${isPremium ? (index === 0 ? 'from-premium-purple/40 to-premium-teal/20 ring-4 ring-premium-purple shadow-premium-purple scale-[1.06]' : 'from-premium-purple/10 to-premium-teal/5 border-premium-glow shadow-premium-purple') : (index === 0 ? 'from-blue-100 to-white ring-2 ring-blue-500 shadow-2xl scale-[1.04]' : 'from-white to-gray-50 shadow-lg dark:from-slate-900 dark:to-slate-800')} hover:shadow-2xl active:scale-[0.98] transition-all duration-200 cursor-pointer touch-manipulation`}
+                        className={`flex items-center justify-between p-4 sm:p-6 border rounded-xl bg-gradient-to-r relative overflow-hidden ${isPremium ? (index === 0 ? 'from-premium-purple/40 to-premium-teal/20 ring-4 ring-premium-purple shadow-premium-purple scale-[1.06]' : 'from-premium-purple/10 to-premium-teal/5 border-premium-glow shadow-premium-purple') : (index === 0 ? 'from-blue-100 to-white ring-2 ring-blue-500 shadow-2xl scale-[1.04]' : 'from-white to-gray-50 shadow-lg dark:from-slate-900 dark:to-slate-800')} hover:shadow-2xl active:scale-[0.98] transition-all duration-200 cursor-pointer touch-manipulation`}
                         style={index === 0 ? { zIndex: 2 } : { }}
                       >
                         <div className="flex items-center space-x-4 flex-1 min-w-0">
@@ -504,7 +504,7 @@ export default function LeaderboardPage() {
                     const displayName = setter.matchedProfile?.displayName || setter.name;
                     const avatarUrl = setter.matchedProfile?.photoURL;
                     return (
-                      <div key={setter.name} className={`flex items-center justify-between p-4 sm:p-6 border rounded-xl bg-gradient-to-r ${isPremium ? (index === 0 ? 'from-premium-purple/40 to-premium-teal/20 ring-4 ring-premium-purple shadow-premium-purple scale-[1.06]' : 'from-premium-purple/10 to-premium-teal/5 border-premium-glow shadow-premium-purple') : (index === 0 ? 'from-blue-100 to-white ring-2 ring-blue-500 shadow-2xl scale-[1.04]' : 'from-white to-gray-50 shadow-lg dark:from-slate-900 dark:to-slate-800')} hover:shadow-2xl active:scale-[0.98] transition-all duration-200 cursor-pointer touch-manipulation`} style={index === 0 ? { zIndex: 2 } : {}}>
+                      <div key={setter.name} className={`flex items-center justify-between p-4 sm:p-6 border rounded-xl bg-gradient-to-r relative overflow-hidden ${isPremium ? (index === 0 ? 'from-premium-purple/40 to-premium-teal/20 ring-4 ring-premium-purple shadow-premium-purple scale-[1.06]' : 'from-premium-purple/10 to-premium-teal/5 border-premium-glow shadow-premium-purple') : (index === 0 ? 'from-blue-100 to-white ring-2 ring-blue-500 shadow-2xl scale-[1.04]' : 'from-white to-gray-50 shadow-lg dark:from-slate-900 dark:to-slate-800')} hover:shadow-2xl active:scale-[0.98] transition-all duration-200 cursor-pointer touch-manipulation`} style={index === 0 ? { zIndex: 2 } : {}}>
                         <div className="flex items-center space-x-4 flex-1 min-w-0">
                           <div className="shrink-0">
                             {getRankBadge(index + 1)}
@@ -554,7 +554,7 @@ export default function LeaderboardPage() {
                     const displayName = person.matchedProfile?.displayName || person.name;
                     const avatarUrl = person.matchedProfile?.photoURL;
                     return (
-                      <div key={person.name} className={`flex items-center justify-between p-4 sm:p-6 border rounded-xl bg-gradient-to-r ${isPremium ? (index === 0 ? 'from-premium-purple/40 to-premium-teal/20 ring-4 ring-premium-purple shadow-premium-purple scale-[1.06]' : 'from-premium-purple/10 to-premium-teal/5 border-premium-glow shadow-premium-purple') : (index === 0 ? 'from-blue-100 to-white ring-2 ring-blue-500 shadow-2xl scale-[1.04]' : 'from-white to-gray-50 shadow-lg dark:from-slate-900 dark:to-slate-800')} hover:shadow-2xl active:scale-[0.98] transition-all duration-200 cursor-pointer touch-manipulation`} style={index === 0 ? { zIndex: 2 } : {}}>
+                      <div key={person.name} className={`flex items-center justify-between p-4 sm:p-6 border rounded-xl bg-gradient-to-r relative overflow-hidden ${isPremium ? (index === 0 ? 'from-premium-purple/40 to-premium-teal/20 ring-4 ring-premium-purple shadow-premium-purple scale-[1.06]' : 'from-premium-purple/10 to-premium-teal/5 border-premium-glow shadow-premium-purple') : (index === 0 ? 'from-blue-100 to-white ring-2 ring-blue-500 shadow-2xl scale-[1.04]' : 'from-white to-gray-50 shadow-lg dark:from-slate-900 dark:to-slate-800')} hover:shadow-2xl active:scale-[0.98] transition-all duration-200 cursor-pointer touch-manipulation`} style={index === 0 ? { zIndex: 2 } : {}}>
                         <div className="flex items-center space-x-4 flex-1 min-w-0">
                           <div className="shrink-0">
                             {getRankBadge(index + 1)}

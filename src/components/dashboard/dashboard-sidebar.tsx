@@ -336,6 +336,21 @@ function DashboardSidebarContent() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+      {/* Render Create Lead Modal */}
+      {isCreateLeadModalOpen && (
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="relative bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-md mx-auto p-4 animate-none" style={{maxWidth: '95vw'}}>
+            <button
+              onClick={() => setIsCreateLeadModalOpen(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-900 dark:hover:text-white text-2xl font-bold z-10"
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <CreateLeadForm isOpen={isCreateLeadModalOpen} onClose={() => setIsCreateLeadModalOpen(false)} />
+          </div>
+        </div>
+      )}
     </Sidebar>
   );
 }

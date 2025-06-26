@@ -268,6 +268,7 @@ const SidebarTrigger = React.forwardRef<
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Always log for debug
       console.log('[SidebarTrigger] isMobile:', isMobile, 'openMobile:', openMobile);
     }
   }, [isMobile, openMobile]);
@@ -278,12 +279,21 @@ const SidebarTrigger = React.forwardRef<
       data-sidebar="trigger"
       variant="ghost"
       size="icon"
-      className={cn("h-7 w-7 z-[1001] md:z-auto flex items-center justify-center min-h-[44px] min-w-[44px] md:min-h-[48px] md:min-w-[48px]", className)}
-      style={{ position: 'relative' }}
+      className={cn(
+        // Always visible, always on top
+        "h-7 w-7 z-[1001] md:z-auto flex items-center justify-center min-h-[44px] min-w-[44px] md:min-h-[48px] md:min-w-[48px]",
+        // On mobile, fix to top left for accessibility
+        isMobile ? "fixed top-2 left-2 z-[1100] bg-white/80 dark:bg-slate-900/80 rounded-full shadow-lg border border-gray-200 dark:border-slate-800" : "",
+        className
+      )}
+      style={{ position: isMobile ? 'fixed' : 'relative' }}
       onClick={(event) => {
+        event.stopPropagation(); // Prevent bubbling
         onClick?.(event);
         toggleSidebar();
       }}
+      aria-label="Toggle Sidebar"
+      tabIndex={0}
       {...props}
     >
       <PanelLeft />
