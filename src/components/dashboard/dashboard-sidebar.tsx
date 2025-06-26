@@ -386,7 +386,7 @@ export default function DashboardSidebar({ children }: { children?: React.ReactN
 }
 
 function SidebarWithTrigger({ pathname, children }: { pathname: string; children?: React.ReactNode }) {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, isMobile } = useSidebar();
   return (
     <div className="flex h-screen w-full no-horizontal-scroll">
       <DashboardSidebarContent />
@@ -394,10 +394,12 @@ function SidebarWithTrigger({ pathname, children }: { pathname: string; children
         {/* Header with sidebar trigger */}
         <header className="sticky top-0 z-40 w-full border-b border-border/20 bg-white/95 dark:bg-slate-950/95 dark:card-glass dark:glow-turquoise premium:card-glass premium:glow-premium backdrop-blur-md supports-[backdrop-filter]:bg-white/95 dark:supports-[backdrop-filter]:bg-slate-950/95 premium:supports-[backdrop-filter]:bg-transparent shadow-sm no-horizontal-scroll">
           <div className="flex h-16 items-center px-4 no-horizontal-scroll">
-            <SidebarTrigger
-              className="mr-3 dark:text-turquoise dark:hover:bg-slate-800/50 dark:hover:glow-cyan premium:text-premium-purple premium:hover:bg-premium-glass/50 premium:hover:glow-premium min-h-[44px] min-w-[44px] md:min-h-[48px] md:min-w-[48px]"
-              onClick={toggleSidebar}
-            />
+            {!isMobile && (
+              <SidebarTrigger
+                className="mr-3 dark:text-turquoise dark:hover:bg-slate-800/50 dark:hover:glow-cyan premium:text-premium-purple premium:hover:bg-premium-glass/50 premium:hover:glow-premium min-h-[44px] min-w-[44px] md:min-h-[48px] md:min-w-[48px]"
+                onClick={toggleSidebar}
+              />
+            )}
             <div className="flex items-center space-x-2 overflow-hidden">
               <span className="text-sm font-medium truncate">
                 {pathname === "/dashboard" ? "Dashboard" :
