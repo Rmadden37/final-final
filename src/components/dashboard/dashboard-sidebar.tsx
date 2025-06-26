@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
+import Image from "next/image";
 
 // Dynamic import with Next.js dynamic to avoid circular dependency issues
 const CreateLeadForm = dynamic(() => import("./create-lead-form"), {
@@ -139,427 +140,203 @@ function DashboardSidebarContent() {
     if (isMobile) setOpenMobile(false);
   };
 
-  // Sidebar overlay for mobile
-  if (isMobile) {
-    return (
-      <>
-        {openMobile && (
-          <div className="fixed inset-0 z-50 flex">
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 bg-black/40"
-              onClick={() => setOpenMobile(false)}
-            />
-            <div className="relative z-50 w-64 max-w-full bg-white dark:bg-slate-900 border-r shadow-lg h-full">
-              <Sidebar collapsible="icon" className="h-full border-none">
-                <SidebarHeader className="flex flex-col items-center justify-center py-4">
-                  <img
-                    src="https://imgur.com/yhekQsF.png"
-                    alt="Leadflow Logo"
-                    className="max-h-[48px] w-auto mb-2"
-                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                  />
-                </SidebarHeader>
-                <SidebarContent className="mb-10">
-                  <SidebarMenu>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        asChild
-                        className={`nav-item shadow-sm text-lg text-sidebar-primary group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard" ? " active" : ""}`}
-                        onClick={handleNav}
-                      >
-                        <Link href="/dashboard">
-                          <Home className="h-6 w-6 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3 text-gray-700 dark:text-gray-100 premium:text-premium-purple" />
-                          <span className="font-semibold group-data-[collapsible=icon]:hidden">Dashboard</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-
-                    {/* Create Lead Button */}
-                    {(user?.role === "setter" || isManagerOrAdmin) && (
-                      <SidebarMenuItem>
-                        <SidebarMenuButton
-                          onClick={() => setIsCreateLeadModalOpen(true)}
-                          className="nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center"
-                        >
-                          <PlusCircle className="h-6 w-6 text-green-500 dark:text-green-300 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
-                          <span className="font-semibold group-data-[collapsible=icon]:hidden">Create New Lead</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    )}
-
-                    {/* Leaderboard */}
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        asChild
-                        className={`nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/leaderboard" ? " active" : ""}`}
-                        onClick={handleNav}
-                      >
-                        <Link href="/dashboard/leaderboard">
-                          <Trophy className="h-6 w-6 text-yellow-500 dark:text-yellow-300 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
-                          <span className="font-semibold group-data-[collapsible=icon]:hidden">Leaderboard</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-
-                    <Separator className="my-3" />
-
-                    {/* Manager/Admin Tools */}
-                    {isManagerOrAdmin && (
-                      <>
-                        {/* For Managers: Show manager tools directly */}
-                        {isManager && !isAdmin && (
-                          <>
-                            <SidebarMenuItem>
-                              <SidebarMenuButton asChild className={`nav-item shadow-sm${pathname === "/dashboard/lead-history" ? " active" : ""}`} onClick={handleNav}>
-                                <Link href="/dashboard/lead-history">
-                                  <ClipboardList className="h-5 w-5 text-gray-700 dark:text-gray-100 premium:text-premium-purple" />
-                                  <span className="font-semibold">Lead History</span>
-                                </Link>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
-
-                            <SidebarMenuItem>
-                              <SidebarMenuButton asChild className={`nav-item shadow-sm${pathname === "/dashboard/performance-analytics" ? " active" : ""}`} onClick={handleNav}>
-                                <Link href="/dashboard/performance-analytics">
-                                  <Brain className="h-5 w-5 text-blue-500 dark:text-blue-300 premium:text-premium-purple" />
-                                  <span className="font-semibold">Analytics</span>
-                                </Link>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
-                          </>
-                        )}
-
-                        {/* For Admins: Show both Manager Tools and Admin Tools sections */}
-                        {isAdminOnly && (
-                          <>
-                            <SidebarMenuItem>
-                              <div className="flex items-center space-x-3 px-2 py-1 text-sm font-medium text-muted-foreground group-data-[collapsible=icon]:hidden shadow-sm rounded-md">
-                                <Users className="h-4 w-4 text-gray-700 dark:text-gray-100 premium:text-premium-purple" />
-                                <span>Manager Tools</span>
-                              </div>
-                            </SidebarMenuItem>
-
-                            <SidebarMenuItem>
-                              <SidebarMenuButton asChild className={`nav-item ml-4 shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/lead-history" ? " active" : ""}`} onClick={handleNav}>
-                                <Link href="/dashboard/lead-history">
-                                  <ClipboardList className="h-4 w-4 text-gray-700 dark:text-gray-100 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
-                                  <span className="font-semibold group-data-[collapsible=icon]:hidden">Lead History</span>
-                                </Link>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
-
-                            <SidebarMenuItem>
-                              <SidebarMenuButton asChild className={`nav-item ml-4 shadow-sm group-data-[collapsible=icon]:justify-center group_data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/manage-teams" ? " active" : ""}`} onClick={handleNav}>
-                                <Link href="/dashboard/manage-teams">
-                                  <Users className="h-4 w-4 text-gray-700 dark:text-gray-100 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
-                                  <span className="font-semibold group-data-[collapsible=icon]:hidden">Manage Teams</span>
-                                </Link>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
-
-                            <SidebarMenuItem>
-                              <SidebarMenuButton asChild className={`nav-item ml-4 shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/performance-analytics" ? " active" : ""}`} onClick={handleNav}>
-                                <Link href="/dashboard/performance-analytics">
-                                  <Brain className="h-4 w-4 text-blue-500 dark:text-blue-300 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
-                                  <span className="font-semibold group-data-[collapsible=icon]:hidden">Analytics</span>
-                                </Link>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
-
-                            <div className="my-2" />
-
-                            {/* Admin Tools */}
-                            <SidebarMenuItem>
-                              <SidebarMenuButton asChild className={`nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/admin-tools" ? " active" : ""}`} onClick={handleNav}>
-                                <Link href="/dashboard/admin-tools">
-                                  <Settings className="h-5 w-5 text-gray-700 dark:text-gray-100 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
-                                  <span className="font-semibold group-data-[collapsible=icon]:hidden">Admin Tools</span>
-                                </Link>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
-                          </>
-                        )}
-
-                        <Separator className="my-2" />
-                      </>
-                    )}
-
-                    {/* Availability Toggle for closers */}
-                    {user?.role === "closer" && (
-                      <SidebarMenuItem>
-                        <div className="px-2 py-1">
-                          <AvailabilityToggle />
-                        </div>
-                      </SidebarMenuItem>
-                    )}
-
-                    {/* User Profile */}
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild size="lg" className={`nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/profile" ? " active" : ""}`}>
-                        <Link href="/dashboard/profile">
-                          <Avatar className="h-8 w-8 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3">
-                            <AvatarImage 
-                              src={user?.avatarUrl || undefined} 
-                              alt={user?.displayName || user?.email || 'User'} 
-                            />
-                            <AvatarFallback>
-                              {getAvatarFallbackText()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                            <span className="truncate font-semibold">
-                              {user?.displayName || user?.email}
-                            </span>
-                            <span className="truncate text-xs capitalize">{user?.role}</span>
-                          </div>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarContent>
-
-                <SidebarFooter>
-                  <SidebarMenu>
-                    {/* Theme Toggle */}
-                    <SidebarMenuItem>
-                      <div className="flex items-center justify-between px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
-                        <div className="flex items-center space-x-2 group-data-[collapsible=icon]:space-x-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:justify-center">
-                          <Monitor className="h-4 w-4 group-data-[collapsible=icon]:mx-auto" />
-                          <span className="text-xs group-data-[collapsible=icon]:hidden">Theme</span>
-                        </div>
-                        <ThemeToggleButton />
-                      </div>
-                    </SidebarMenuItem>
-
-                    {/* Logout Button */}
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        onClick={logout}
-                        size="sm"
-                        className="hover:bg-transparent"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        <span>Logout</span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarFooter>
-              </Sidebar>
-            </div>
-          </div>
-        )}
-      </>
-    );
-  }
-
-  // Desktop sidebar (unchanged)
   return (
-    <>
-      <Sidebar collapsible="icon" className="border-r">
-        <SidebarHeader className="flex flex-col items-center justify-center py-4">
-          <img
-            src="https://imgur.com/yhekQsF.png"
-            alt="Leadflow Logo"
-            className="max-h-[48px] w-auto mb-2"
-            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-          />
-        </SidebarHeader>
-        <SidebarContent className="mb-10">
-          <SidebarMenu>
+    <Sidebar
+      collapsible="icon"
+      className="border-r"
+    >
+      <SidebarHeader className="flex flex-col items-center justify-center py-4">
+        {/* Center logo at the top of the sidebar */}
+        <div className="flex items-center w-full justify-center gap-2">
+          <Image src="https://firebasestorage.googleapis.com/v0/b/leadflow-4lvrr.firebasestorage.app/o/Leadflow%20Logos%2FyhekQsF%20-%20Imgur.png?alt=media&token=c8226178-a128-4404-b727-f6c009e833e6" alt="LeadFlow Logo" width={40} height={40} priority />
+        </div>
+      </SidebarHeader>
+      <SidebarContent className="mb-10">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className={`nav-item shadow-sm text-lg text-sidebar-primary group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard" ? " active" : ""}`}
+              onClick={handleNav}
+            >
+              <Link href="/dashboard">
+                <Home className="h-6 w-6 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3 text-gray-700 dark:text-gray-100 premium:text-premium-purple" />
+                <span className="font-semibold group-data-[collapsible=icon]:hidden">Dashboard</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {/* Create Lead Button */}
+          {(user?.role === "setter" || isManagerOrAdmin) && (
             <SidebarMenuItem>
               <SidebarMenuButton
-                asChild
-                className={`nav-item shadow-sm text-lg text-sidebar-primary group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard" ? " active" : ""}`}
-                onClick={handleNav}
+                onClick={() => setIsCreateLeadModalOpen(true)}
+                className="nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center"
               >
-                <Link href="/dashboard">
-                  <Home className="h-6 w-6 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3 text-gray-700 dark:text-gray-100 premium:text-premium-purple" />
-                  <span className="font-semibold group-data-[collapsible=icon]:hidden">Dashboard</span>
-                </Link>
+                <PlusCircle className="h-6 w-6 text-green-500 dark:text-green-300 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
+                <span className="font-semibold group-data-[collapsible=icon]:hidden">Create New Lead</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
+          )}
 
-            {/* Create Lead Button */}
-            {(user?.role === "setter" || isManagerOrAdmin) && (
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  onClick={() => setIsCreateLeadModalOpen(true)}
-                  className="nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center"
-                >
-                  <PlusCircle className="h-6 w-6 text-green-500 dark:text-green-300 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
-                  <span className="font-semibold group-data-[collapsible=icon]:hidden">Create New Lead</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            )}
+          {/* Leaderboard */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className={`nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/leaderboard" ? " active" : ""}`}
+              onClick={handleNav}
+            >
+              <Link href="/dashboard/leaderboard">
+                <Trophy className="h-6 w-6 text-yellow-500 dark:text-yellow-300 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
+                <span className="font-semibold group-data-[collapsible=icon]:hidden">Leaderboard</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
 
-            {/* Leaderboard */}
+          <Separator className="my-3" />
+
+          {/* Manager/Admin Tools */}
+          {isManagerOrAdmin && (
+            <>
+              {/* For Managers: Show manager tools directly */}
+              {isManager && !isAdmin && (
+                <>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild className={`nav-item shadow-sm${pathname === "/dashboard/lead-history" ? " active" : ""}`} onClick={handleNav}>
+                      <Link href="/dashboard/lead-history">
+                        <ClipboardList className="h-5 w-5 text-gray-700 dark:text-gray-100 premium:text-premium-purple" />
+                        <span className="font-semibold">Lead History</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild className={`nav-item shadow-sm${pathname === "/dashboard/performance-analytics" ? " active" : ""}`} onClick={handleNav}>
+                      <Link href="/dashboard/performance-analytics">
+                        <Brain className="h-5 w-5 text-blue-500 dark:text-blue-300 premium:text-premium-purple" />
+                        <span className="font-semibold">Analytics</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </>
+              )}
+
+              {/* For Admins: Show both Manager Tools and Admin Tools sections */}
+              {isAdminOnly && (
+                <>
+                  <SidebarMenuItem>
+                    <div className="flex items-center space-x-3 px-2 py-1 text-sm font-medium text-muted-foreground group-data-[collapsible=icon]:hidden shadow-sm rounded-md">
+                      <Users className="h-4 w-4 text-gray-700 dark:text-gray-100 premium:text-premium-purple" />
+                      <span>Manager Tools</span>
+                    </div>
+                  </SidebarMenuItem>
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild className={`nav-item ml-4 shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/lead-history" ? " active" : ""}`} onClick={handleNav}>
+                      <Link href="/dashboard/lead-history">
+                        <ClipboardList className="h-4 w-4 text-gray-700 dark:text-gray-100 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
+                        <span className="font-semibold group-data-[collapsible=icon]:hidden">Lead History</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild className={`nav-item ml-4 shadow-sm group-data-[collapsible=icon]:justify-center group_data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/manage-teams" ? " active" : ""}`} onClick={handleNav}>
+                      <Link href="/dashboard/manage-teams">
+                        <Users className="h-4 w-4 text-gray-700 dark:text-gray-100 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
+                        <span className="font-semibold group-data-[collapsible=icon]:hidden">Manage Teams</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild className={`nav-item ml-4 shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/performance-analytics" ? " active" : ""}`} onClick={handleNav}>
+                      <Link href="/dashboard/performance-analytics">
+                        <Brain className="h-4 w-4 text-blue-500 dark:text-blue-300 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
+                        <span className="font-semibold group-data-[collapsible=icon]:hidden">Analytics</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  <div className="my-2" />
+
+                  {/* Admin Tools */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild className={`nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/admin-tools" ? " active" : ""}`} onClick={handleNav}>
+                      <Link href="/dashboard/admin-tools">
+                        <Settings className="h-5 w-5 text-gray-700 dark:text-gray-100 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
+                        <span className="font-semibold group-data-[collapsible=icon]:hidden">Admin Tools</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </>
+              )}
+
+              <Separator className="my-2" />
+            </>
+          )}
+
+          {/* Availability Toggle for closers */}
+          {user?.role === "closer" && (
             <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                className={`nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/leaderboard" ? " active" : ""}`}
-                onClick={handleNav}
-              >
-                <Link href="/dashboard/leaderboard">
-                  <Trophy className="h-6 w-6 text-yellow-500 dark:text-yellow-300 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
-                  <span className="font-semibold group-data-[collapsible=icon]:hidden">Leaderboard</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
-            <Separator className="my-3" />
-
-            {/* Manager/Admin Tools */}
-            {isManagerOrAdmin && (
-              <>
-                {/* For Managers: Show manager tools directly */}
-                {isManager && !isAdmin && (
-                  <>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild className={`nav-item shadow-sm${pathname === "/dashboard/lead-history" ? " active" : ""}`} onClick={handleNav}>
-                        <Link href="/dashboard/lead-history">
-                          <ClipboardList className="h-5 w-5 text-gray-700 dark:text-gray-100 premium:text-premium-purple" />
-                          <span className="font-semibold">Lead History</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild className={`nav-item shadow-sm${pathname === "/dashboard/performance-analytics" ? " active" : ""}`} onClick={handleNav}>
-                        <Link href="/dashboard/performance-analytics">
-                          <Brain className="h-5 w-5 text-blue-500 dark:text-blue-300 premium:text-premium-purple" />
-                          <span className="font-semibold">Analytics</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </>
-                )}
-
-                {/* For Admins: Show both Manager Tools and Admin Tools sections */}
-                {isAdminOnly && (
-                  <>
-                    <SidebarMenuItem>
-                      <div className="flex items-center space-x-3 px-2 py-1 text-sm font-medium text-muted-foreground group-data-[collapsible=icon]:hidden shadow-sm rounded-md">
-                        <Users className="h-4 w-4 text-gray-700 dark:text-gray-100 premium:text-premium-purple" />
-                        <span>Manager Tools</span>
-                      </div>
-                    </SidebarMenuItem>
-
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild className={`nav-item ml-4 shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/lead-history" ? " active" : ""}`} onClick={handleNav}>
-                        <Link href="/dashboard/lead-history">
-                          <ClipboardList className="h-4 w-4 text-gray-700 dark:text-gray-100 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
-                          <span className="font-semibold group-data-[collapsible=icon]:hidden">Lead History</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild className={`nav-item ml-4 shadow-sm group-data-[collapsible=icon]:justify-center group_data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/manage-teams" ? " active" : ""}`} onClick={handleNav}>
-                        <Link href="/dashboard/manage-teams">
-                          <Users className="h-4 w-4 text-gray-700 dark:text-gray-100 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
-                          <span className="font-semibold group-data-[collapsible=icon]:hidden">Manage Teams</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild className={`nav-item ml-4 shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/performance-analytics" ? " active" : ""}`} onClick={handleNav}>
-                        <Link href="/dashboard/performance-analytics">
-                          <Brain className="h-4 w-4 text-blue-500 dark:text-blue-300 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
-                          <span className="font-semibold group-data-[collapsible=icon]:hidden">Analytics</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-
-                    <div className="my-2" />
-
-                    {/* Admin Tools */}
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild className={`nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/admin-tools" ? " active" : ""}`} onClick={handleNav}>
-                        <Link href="/dashboard/admin-tools">
-                          <Settings className="h-5 w-5 text-gray-700 dark:text-gray-100 premium:text-premium-purple group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3" />
-                          <span className="font-semibold group-data-[collapsible=icon]:hidden">Admin Tools</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </>
-                )}
-
-                <Separator className="my-2" />
-              </>
-            )}
-
-            {/* Availability Toggle for closers */}
-            {user?.role === "closer" && (
-              <SidebarMenuItem>
-                <div className="px-2 py-1">
-                  <AvailabilityToggle />
-                </div>
-              </SidebarMenuItem>
-            )}
-
-            {/* User Profile */}
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg" className={`nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/profile" ? " active" : ""}`}>
-                <Link href="/dashboard/profile">
-                  <Avatar className="h-8 w-8 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3">
-                    <AvatarImage 
-                      src={user?.avatarUrl || undefined} 
-                      alt={user?.displayName || user?.email || 'User'} 
-                    />
-                    <AvatarFallback>
-                      {getAvatarFallbackText()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                    <span className="truncate font-semibold">
-                      {user?.displayName || user?.email}
-                    </span>
-                    <span className="truncate text-xs capitalize">{user?.role}</span>
-                  </div>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarContent>
-
-        <SidebarFooter>
-          <SidebarMenu>
-            {/* Theme Toggle */}
-            <SidebarMenuItem>
-              <div className="flex items-center justify-between px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
-                <div className="flex items-center space-x-2 group-data-[collapsible=icon]:space-x-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:justify-center">
-                  <Monitor className="h-4 w-4 group-data-[collapsible=icon]:mx-auto" />
-                  <span className="text-xs group-data-[collapsible=icon]:hidden">Theme</span>
-                </div>
-                <ThemeToggleButton />
+              <div className="px-2 py-1">
+                <AvailabilityToggle />
               </div>
             </SidebarMenuItem>
+          )}
 
-            {/* Logout Button */}
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                onClick={logout}
-                size="sm"
-                className="hover:bg-transparent"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Logout</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
-      </Sidebar>
+          {/* User Profile */}
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild size="lg" className={`nav-item shadow-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:justify-start group-data-[collapsible=expanded]:pl-4 group-data-[collapsible=expanded]:items-center${pathname === "/dashboard/profile" ? " active" : ""}`}>
+              <Link href="/dashboard/profile">
+                <Avatar className="h-8 w-8 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3">
+                  <AvatarImage 
+                    src={user?.avatarUrl || undefined} 
+                    alt={user?.displayName || user?.email || 'User'} 
+                  />
+                  <AvatarFallback>
+                    {getAvatarFallbackText()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
+                  <span className="truncate font-semibold">
+                    {user?.displayName || user?.email}
+                  </span>
+                  <span className="truncate text-xs capitalize">{user?.role}</span>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarContent>
 
-      {/* Create Lead Modal */}
-      {(user?.role === "setter" || user?.role === "manager" || user?.role === "admin") && (
-        <CreateLeadForm
-          isOpen={isCreateLeadModalOpen}
-          onClose={() => setIsCreateLeadModalOpen(false)}
-        />
-      )}
-    </>
+      <SidebarFooter>
+        <SidebarMenu>
+          {/* Theme Toggle */}
+          <SidebarMenuItem>
+            <div className="flex items-center justify-between px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+              <div className="flex items-center space-x-2 group-data-[collapsible=icon]:space-x-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:justify-center">
+                <Monitor className="h-4 w-4 group-data-[collapsible=icon]:mx-auto" />
+                <span className="text-xs group-data-[collapsible=icon]:hidden">Theme</span>
+              </div>
+              <ThemeToggleButton />
+            </div>
+          </SidebarMenuItem>
+
+          {/* Logout Button */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={logout}
+              size="sm"
+              className="hover:bg-transparent"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
   );
 }
 

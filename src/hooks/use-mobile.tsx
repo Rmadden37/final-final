@@ -6,13 +6,21 @@ export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined);
 
   React.useEffect(() => {
-    const mql = window.matchMedia(`(max-inline-size: ${MOBILE_BREAKPOINT - 1}px)`);
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    const checkMobile = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const aspectRatio = height / width;
+      // Mobile if width is less than breakpoint OR aspect ratio is phone-like
+      setIsMobile(width < MOBILE_BREAKPOINT || aspectRatio > 1.3);
     };
-    mql.addEventListener("change", onChange);
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-    return () => mql.removeEventListener("change", onChange);
+    const mql = window.matchMedia(`(max-inline-size: ${MOBILE_BREAKPOINT - 1}px)`);
+    mql.addEventListener("change", checkMobile);
+    window.addEventListener("resize", checkMobile);
+    checkMobile();
+    return () => {
+      mql.removeEventListener("change", checkMobile);
+      window.removeEventListener("resize", checkMobile);
+    };
   }, []);
 
   return !!isMobile;

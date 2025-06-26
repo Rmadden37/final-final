@@ -1310,3 +1310,45 @@ body.dialog-scroll-locked {
   box-shadow: 0 2px 8px 0 rgba(108,71,245,0.12) !important;
   font-weight: 700;
 }
+
+/* --- Analytics Page Butter UI/UX Enhancements --- */
+.analytics-container {
+  padding: 32px 24px 32px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow-x: hidden;
+}
+
+.analytics-card {
+  width: 100%;
+  max-width: 600px;
+  margin: 24px auto;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  border-radius: 16px;
+}
+
+.floating-chat {
+  bottom: 32px !important;
+  right: 32px !important;
+}
+
+@media (max-width: 768px) {
+  .analytics-container {
+    padding: 16px 8px 80px 8px;
+  }
+  .analytics-card {
+    max-width: 100%;
+    margin: 16px 0;
+  }
+  .floating-chat {
+    bottom: 16px !important;
+    right: 16px !important;
+  }
+}
+/* Usage: 
+<div className="analytics-container">
+  <div className="analytics-card">...</div>
+  ...
+</div>
+Floating chat button: add className="floating-chat" to the button
+*/

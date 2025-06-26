@@ -1,4 +1,3 @@
-
 "use client";
 
 import type {Lead, LeadStatus,Closer} from "@/types";
@@ -24,6 +23,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import { DatePicker } from "@/components/ui/date-picker";
 import { TimePicker } from "@/components/ui/time-picker";
 import { cn } from "@/lib/utils";
+import { LeadNotifications } from "@/lib/notification-service";
 
 interface LeadDispositionModalProps {
   lead: Lead;
@@ -234,6 +234,7 @@ export default function LeadDispositionModal({lead, isOpen, onClose}: LeadDispos
       }
 
       // Handle reassignment logic
+      let reassignedCloser: Closer | undefined = undefined;
       if (selectedStatus === "waiting_assignment") {
         if (selectedCloserId && (user?.role === "manager" || user?.role === "admin")) {
           // Assign to specific closer
@@ -241,6 +242,7 @@ export default function LeadDispositionModal({lead, isOpen, onClose}: LeadDispos
           if (selectedCloser) {
             updateData.assignedCloserId = selectedCloser.uid;
             updateData.assignedCloserName = selectedCloser.name;
+            reassignedCloser = selectedCloser;
             // Keep status as waiting_assignment so closer can accept
           }
         } else {
@@ -251,7 +253,15 @@ export default function LeadDispositionModal({lead, isOpen, onClose}: LeadDispos
       }
 
       await updateDoc(leadDocRef, updateData);
-      
+
+      // Send notification if reassigned to a closer
+      if (reassignedCloser) {
+        await LeadNotifications.leadAssigned(
+          { ...lead, ...updateData, id: lead.id },
+          reassignedCloser.uid
+        );
+      }
+
       const successMessage = selectedStatus === "waiting_assignment" && selectedCloserId 
         ? `Lead reassigned to ${availableClosers.find(c => c.uid === selectedCloserId)?.name}.`
         : `Lead marked as ${selectedStatus.replace("_", " ")}.`;

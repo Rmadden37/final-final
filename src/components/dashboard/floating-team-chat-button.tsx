@@ -53,7 +53,7 @@ export default function TeamChatButton() {
           className="hidden sm:flex hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600"
         >
           <span className="relative">
-            <MessageCircle className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+            <MessageCircle className="mr-2 h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
             {hasUnread && (
               <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 border-2 border-white dark:border-gray-900 animate-pulse z-10" />
             )}
@@ -68,7 +68,7 @@ export default function TeamChatButton() {
           className="sm:hidden hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600"
         >
           <span className="relative">
-            <MessageCircle className="h-4 w-4 text-green-500" />
+            <MessageCircle className="h-5 w-5 text-green-500" />
             {hasUnread && (
               <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 border-2 border-white dark:border-gray-900 animate-pulse z-10" />
             )}

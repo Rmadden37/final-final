@@ -21,7 +21,7 @@ import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, Di
 import ReactCrop, {type Crop, PixelCrop, centerCrop, makeAspectCrop} from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import NotificationSettings from "@/components/notifications/notification-settings";
-import NotificationTestPanel from "@/components/notifications/notification-test-panel";
+// import NotificationTestPanel from "@/components/notifications/notification-test-panel";
 
 
 const profileFormSchema = z.object({
@@ -182,8 +182,9 @@ export default function ProfilePage() {
 
   function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
     const {width, height} = e.currentTarget;
+    // Use px unit and width for compatibility with react-image-crop v10+
     const initialCrop = centerCrop(
-      makeAspectCrop({unit: "%", width: 90}, 1, width, height),
+      makeAspectCrop({unit: "px", width: Math.floor(Math.min(width, height) * 0.9)}, 1, width, height),
       width,
       height
     );
@@ -424,13 +425,13 @@ export default function ProfilePage() {
       </Card>
 
       {/* Notification Testing Panel (Development) */}
-      {process.env.NODE_ENV === 'development' && (
+      {/* {process.env.NODE_ENV === 'development' && (
         <Card className="shadow-xl border-yellow-200 dark:border-yellow-800">
           <CardContent className="p-6">
             <NotificationTestPanel />
           </CardContent>
         </Card>
-      )}
+      )} */}
 
       {/* Photo Cropping Modal */}
       <Dialog open={isPhotoModalOpen} onOpenChange={(open) => {
@@ -465,7 +466,7 @@ export default function ProfilePage() {
                   alt="Crop me"
                   src={upImgSrc}
                   onLoad={onImageLoad}
-                  style={{maxHeight: "70vh"}}
+                  style={{ maxBlockSize: "70vh" }}
                 />
               </ReactCrop>
               <div>
@@ -475,8 +476,8 @@ export default function ProfilePage() {
                   style={{
                     border: "1px solid black",
                     objectFit: "contain",
-                    width: completedCrop?.width ?? 0,
-                    height: completedCrop?.height ?? 0,
+                    inlineSize: completedCrop?.width ?? 0,
+                    blockSize: completedCrop?.height ?? 0,
                     borderRadius: "50%",
                   }}
                 />

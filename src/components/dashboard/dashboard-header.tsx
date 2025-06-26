@@ -49,17 +49,23 @@ export default function DashboardHeader() {
 
           <Link href="/dashboard" className="mr-6 sm:mr-8 flex items-center space-x-3 text-[#3574F2] dark:text-turquoise premium:text-premium-purple group">
             <div className="p-3 bg-gradient-to-br from-[#3574F2]/20 to-[#5096F2]/10 dark:from-turquoise/20 dark:to-cyan/10 premium:from-premium-purple/20 premium:to-premium-teal/10 rounded-xl group-hover:from-[#3574F2]/30 group-hover:to-[#5096F2]/20 dark:group-hover:from-turquoise/30 dark:group-hover:to-cyan/20 premium:group-hover:from-premium-purple/30 premium:group-hover:to-premium-teal/30 transition-all duration-300 shadow-sm dark:glow-turquoise premium:glow-premium premium:icon-hover-glow">
-              {/* Light mode: Use new light logo */}
+              {/* Light mode: Use new light logo (only in light mode, not dark or premium) */}
               <img 
-                src="https://imgur.com/BQs5krw.png" 
+                src="https://imgur.com/oujPvCe.png" 
                 alt="LeadFlow Logo" 
                 className="h-8 w-8 object-contain transition-all duration-300 dark:hidden premium:hidden"
               />
-              {/* Dark/Premium mode: Use dark logo */}
+              {/* Dark mode: Use dark logo */}
               <img 
                 src="https://imgur.com/eYR7cr2.png" 
                 alt="LeadFlow Logo" 
-                className="h-8 w-8 object-contain transition-all duration-300 hidden dark:block premium:block"
+                className="h-8 w-8 object-contain transition-all duration-300 hidden dark:block premium:hidden"
+              />
+              {/* Premium mode: Use premium logo */}
+              <img 
+                src="https://firebasestorage.googleapis.com/v0/b/leadflow-4lvrr.firebasestorage.app/o/Leadflow%20Logos%2FChatGPT%20Image%20Jun%2024%2C%202025%20at%2001_49_10%20PM.png?alt=media&token=6ed5dd94-fb82-4ffc-af46-dfdcca722a1e.png" 
+                alt="LeadFlow Logo" 
+                className="h-8 w-8 object-contain transition-all duration-300 hidden premium:block"
               />
             </div>
             <div className="flex flex-col">

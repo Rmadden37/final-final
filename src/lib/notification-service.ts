@@ -102,10 +102,14 @@ export const LeadNotifications = {
       title: '📋 New Lead Assigned',
       body: `${lead.customerName} has been assigned to you`,
       tag: `assigned-${lead.id}`,
+      badge: '/icon-192x192.png',
       data: {
         type: 'lead_assigned',
         leadId: lead.id,
-        actionUrl: `/dashboard/leads/${lead.id}`
+        actionUrl: `/dashboard/leads/${lead.id}`,
+        badgeCount: 1, // Used by service worker to increment badge
+        color: '#EF4444', // Red for in-app notification
+        priority: 'high'
       }
     });
   },

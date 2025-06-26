@@ -116,6 +116,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        port: '',
+        pathname: '/v0/b/leadflow-4lvrr.firebasestorage.app/o/**',
+      },
     ],
   },
 };
