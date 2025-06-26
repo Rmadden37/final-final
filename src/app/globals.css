@@ -1500,21 +1500,21 @@ body.dialog-scroll-locked {
   }
 }
 
-/* ===== PREVENT HORIZONTAL SCROLL UTILITIES ===== */
-.no-horizontal-scroll {
-  max-width: 100vw !important;
-  overflow-x: hidden !important;
+/* === Card Border Radius & Shadow Polish === */
+[data-card], .rounded-xl, .card-glass, .dashboard-card-mobile, [data-dashboard-card], .premium [data-card], .premium .rounded-xl, .premium .card-glass {
+  border-radius: 1.25rem !important; /* 20px, extra round */
+  overflow: hidden !important;
+  box-shadow: 0 6px 32px 0 rgba(30,30,60,0.10), 0 1.5px 6px 0 rgba(30,30,60,0.08) !important;
 }
 
-.mobile-safe-width {
-  max-width: calc(100vw - 2rem) !important;
-  overflow-x: hidden !important;
+.premium [data-card], .premium .rounded-xl, .premium .card-glass {
+  border-radius: 1.75rem !important; /* 28px, even rounder for premium */
+  overflow: hidden !important;
+  box-shadow: 0 12px 48px 0 rgba(53,116,242,0.18), 0 2px 8px 0 rgba(53,116,242,0.10) !important;
 }
 
-.mobile-container {
-  max-width: 100vw !important;
-  overflow-x: hidden !important;
-  padding-left: 1rem !important;
-  padding-right: 1rem !important;
-  box-sizing: border-box !important;
+/* Ensure all card glows, gradients, and backgrounds are clipped to card boundaries */
+[data-card] *, .rounded-xl *, .card-glass * {
+  position: relative;
+  z-index: 1;
 }

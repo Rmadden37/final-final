@@ -13,11 +13,11 @@ const Card = React.forwardRef<
     data-card="true"
     className={cn(
       // Light mode: Clean white cards with proper shadows and borders
-      "rounded-xl border border-slate-200 bg-white text-card-foreground",
+      "rounded-2xl overflow-hidden border border-slate-200 bg-white text-card-foreground",
       "shadow-lg shadow-slate-200/50 hover:shadow-xl hover:shadow-slate-300/50",
       "transition-all duration-200 ease-in-out",
       // Mobile optimizations
-      "mobile:rounded-lg mobile:mx-2 mobile:shadow-md",
+      "mobile:rounded-xl mobile:mx-2 mobile:shadow-md",
       "mobile:border-slate-300/50",
       className
     )}
