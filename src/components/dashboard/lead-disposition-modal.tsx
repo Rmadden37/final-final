@@ -286,7 +286,7 @@ export default function LeadDispositionModal({lead, isOpen, onClose}: LeadDispos
     <Dialog open={isOpen} onOpenChange={(open) => {
       if (!open) onClose();
     }}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-w-full sm:max-w-md p-2 sm:p-6 overflow-x-hidden">
         <DialogHeader>
           <DialogTitle className="font-headline">
             {(user?.role === "manager" || user?.role === "admin") ? "Manager Disposition" : "Update Lead Disposition"}
@@ -299,7 +299,7 @@ export default function LeadDispositionModal({lead, isOpen, onClose}: LeadDispos
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <RadioGroup onValueChange={(value) => setSelectedStatus(value as LeadStatus)} value={selectedStatus}>
+          <RadioGroup onValueChange={(value) => setSelectedStatus(value as LeadStatus)} value={selectedStatus} className="w-full">
             {availableOptions.map((status) => (
               <div 
                 key={status} 
@@ -344,12 +344,12 @@ export default function LeadDispositionModal({lead, isOpen, onClose}: LeadDispos
                     Select a closer to reassign this lead to, or leave unselected to move to general assignment queue.
                   </p>
                   <Select onValueChange={setSelectedCloserId} value={selectedCloserId}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full max-w-full">
                       <SelectValue placeholder="Select a closer (or leave blank for general queue)" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-w-full">
                       {availableClosers.map((closer) => (
-                        <SelectItem key={closer.uid} value={closer.uid}>
+                        <SelectItem key={closer.uid} value={closer.uid} className="truncate max-w-full">
                           {closer.name}
                         </SelectItem>
                       ))}
@@ -371,25 +371,28 @@ export default function LeadDispositionModal({lead, isOpen, onClose}: LeadDispos
                 date={appointmentDate}
                 onDateChange={setAppointmentDate}
                 placeholder="Pick a date"
-                className="w-full"
+                className="w-full max-w-full"
               />
-              <div className="w-full">
+              <div className="w-full max-w-full">
                 <TimePicker
                   time={appointmentTime}
                   onTimeChange={setAppointmentTime}
                   placeholder="Select time"
                   timeSlots={timeSlots}
+                  className="w-full max-w-full"
                 />
               </div>
             </div>
           )}
 
-          <Textarea
-            placeholder="Add any relevant notes..."
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={3}
-          />
+          <div style={{ minHeight: 24 }}>
+            <Textarea
+              placeholder="Add any relevant notes..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+            />
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
