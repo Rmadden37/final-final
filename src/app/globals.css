@@ -313,12 +313,11 @@
     --sidebar-border: 0 0% 100% / 0.1; /* Subtle white border */
     --sidebar-ring: 264 100% 76%; /* Purple focus ring */
   }
-}
 
-@layer base {
   * {
     border-color: hsl(var(--border));
   }
+  
   body {
     color: hsl(var(--foreground));
     font-family: var(--font-body);
@@ -370,6 +369,7 @@
     background-image: radial-gradient(circle at 1px 1px, rgba(148, 163, 184, 0.15) 1px, transparent 0);
     background-size: 20px 20px;
   }
+  
   .bg-grid-slate-700 {
     background-image: radial-gradient(circle at 1px 1px, rgba(51, 65, 85, 0.3) 1px, transparent 0);
     background-size: 20px 20px;
@@ -554,7 +554,7 @@
     overflow: hidden;
   }
 
-  /* Aggressive premium card override */
+  /* Premium glass morphism cards */
   .premium *[class*="card"],
   .premium *[class*="Card"],
   .premium .bg-white,
@@ -686,56 +686,57 @@
     font-weight: 900 !important;
     color: #F8F8F8 !important;
   }
+  
   .premium .icon-glow-purple {
     filter: drop-shadow(0 0 8px rgba(187, 134, 252, 0.6)) brightness(1.2) !important;
   }
+  
   .premium .icon-glow-teal {
     filter: drop-shadow(0 0 8px rgba(3, 218, 198, 0.6)) brightness(1.2) !important;
   }
+  
   .premium .icon-glow-white {
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4)) brightness(1.1) !important;
   }
+  
   .premium .icon-glow-cyan {
     filter: drop-shadow(0 0 8px rgba(51, 204, 255, 0.6)) brightness(1.2) !important;
   }
+  
   .premium .shadow-premium-purple {
     box-shadow: 0 0 35px rgba(187, 134, 252, 0.3) !important;
   }
+  
   .premium .hover-glow-premium:hover {
     box-shadow: 0 0 35px rgba(187, 134, 252, 0.6), 0 0 70px rgba(3, 218, 198, 0.3) !important;
   }
+  
   .premium .shadow-premium-teal {
     box-shadow: 0 0 15px rgba(3, 218, 198, 0.3) !important;
   }
+  
   .premium .hover-glow-cyan:hover {
     box-shadow: 0 0 25px rgba(51, 204, 255, 0.5) !important;
   }
-  /* Premium icon styling */
-  .premium .icon-glow-purple {
-    filter: drop-shadow(0 0 8px rgba(187, 134, 252, 0.6)) brightness(1.2) !important;
-  }
+
   /* Premium tab system enhancements */
   .premium .bg-gradient-to-r {
     background: linear-gradient(to right, var(--tw-gradient-stops)) !important;
   }
-  .premium .icon-glow-teal {
-    filter: drop-shadow(0 0 8px rgba(3, 218, 198, 0.6)) brightness(1.2) !important;
-  }
+
   /* Premium glass morphism background variations */
   .premium .bg-premium-glass-50 {
     background: rgba(20, 20, 35, 0.5) !important;
   }
-  .premium .icon-glow-white {
-    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4)) brightness(1.1) !important;
-  }
+
   .premium .bg-premium-glass-30 {
     background: rgba(20, 20, 35, 0.3) !important;
-  } filter: drop-shadow(0 0 8px rgba(51, 204, 255, 0.6)) brightness(1.2) !important;
   }
+  
   .premium .bg-premium-glass-40 {
     background: rgba(20, 20, 35, 0.4) !important;
-  }premium .hover-glow-premium:hover {
-    box-shadow: 0 0 35px rgba(187, 134, 252, 0.6), 0 0 70px rgba(3, 218, 198, 0.3) !important;
+  }
+
   /* Premium spinner and loading states */
   .premium .animate-spin.text-premium-teal {
     color: #03DAC6 !important;
@@ -747,8 +748,8 @@
     filter: drop-shadow(0 0 8px rgba(187, 134, 252, 0.6)) !important;
   }
 
-  /* Premium enhanced pulse animation */ariations */
-  .premium .icon-pulse {lass-50 {
+  /* Premium enhanced pulse animation */
+  .premium .icon-pulse {
     animation: premium-icon-pulse 2s ease-in-out infinite !important;
   }
 
@@ -762,11 +763,7 @@
       transform: scale(1.05) !important;
     }
   }
-  /* Premium muted text enhancements */
-  .premium .text-muted-foreground {
-    color: #D0D0D0 !important;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.1) !important;
-  }
+
   /* Premium enhanced focus states */
   .premium button:focus,
   .premium input:focus,
@@ -805,44 +802,38 @@
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
+  
   .dark .bg-transparent {
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
+  
   .dark .bg-transparent *[class*="card"],
   .dark .bg-transparent *[class*="Card"] {
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
-  .premium [class*="lead-queue"] .card-glass,
-  .premium .bg-transparent.card-glass {
-    background: transparent !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-  }
 
-  /* Enhanced transparency for all card components */de any premium card styling */
+  /* Enhanced transparency for all card components */
   .premium .bg-transparent[class*="Card"],
-  .premium .bg-transparent.card-header,rd"],
-  .premium .bg-transparent.card-content {"] {
+  .premium .bg-transparent.card-header,
+  .premium .bg-transparent.card-content {
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
 
   .dark .bg-transparent[class*="Card"],
-  .dark .bg-transparent.card-header,rd"],
-  .dark .bg-transparent.card-content {"] {
+  .dark .bg-transparent.card-header,
+  .dark .bg-transparent.card-content {
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
 
-  /* Refined tab triggers with masculine active states */ansparency is desired */
-
+  /* Refined tab triggers with masculine active states */
   .premium .bg-transparent[data-state="active"] {
     background: hsla(185 85% 45% / 0.08) !important; /* Subtle teal background */
     border: 1px solid hsla(185 85% 45% / 0.25) !important;
@@ -854,11 +845,6 @@
     border: 1px solid hsla(185 85% 45% / 0.3) !important;
   }
 
-  .premium .bg-transparent.card-header,
-  .premium .bg-transparent.card-content {
-    /* Add any specific styles for card-header/content if needed */
-  }
-
   /* Masculine ring colors */
   .premium .ring-slate-200 {
     --tw-ring-color: hsla(185 85% 45% / 0.15) !important; /* Teal ring */
@@ -868,718 +854,575 @@
     --tw-ring-color: hsla(185 85% 45% / 0.2) !important; /* Teal ring */
   }
 
-  .dark .bg-transparent.card-content {
-    background: transparent !important;
-  }
-
-  /* Light frosted glass enhancements for closer cards */
-  .closer-card-light-frosted {
-    background: rgba(255, 255, 255, 0.15) !important;
-    backdrop-filter: blur(20px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
-  }
-
-  .dark .bg-transparent[data-state="active"] {
-    background: hsla(185 85% 45% / 0.12) !important; /* Teal active state */
-  }
-
-  .closer-card-light-frosted:hover {
-    background: rgba(255, 255, 255, 0.25) !important;
-    border-color: rgba(255, 255, 255, 0.35) !important;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.35) !important; /* Teal ring */
-    transform: translateY(-2px) scale(1.02) !important;
-  }
-  .dark .ring-slate-800 {
-  /* Masculine light frosted glass for closer cards */t; /* Teal ring */
   .dark .closer-card-light-frosted {
     background: hsla(210 18% 15% / 0.9) !important;
-    border-color: hsl(210 12% 25%) !important;er cards */
-    box-shadow: ight-frosted {
-      0 8px 32px rgba(0, 0, 0, 0.4),0.15) !important;
-      inset 0 1px 0 hsla(185 85% 45% / 0.1) !important; /* Subtle teal highlight */
-  } -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border-color: hsl(210 12% 25%) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 hsla(185 85% 45% / 0.1) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
     border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  }
+  
   .dark .closer-card-light-frosted:hover {
     background: hsla(210 18% 18% / 0.95) !important;
     border-color: hsl(185 85% 45%) !important; /* Teal border on hover */
-    box-shadow: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
-      0 12px 40px rgba(0, 0, 0, 0.5),
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5),
       inset 0 1px 0 hsla(185 85% 45% / 0.2) !important;
-  }closer-card-light-frosted:hover {
-    background: rgba(255, 255, 255, 0.25) !important;
-  /* Premium theme light frosted glass for closer cards */
-  .premium .closer-card-light-frosted {
-    background: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(25px) saturate(200%) !important;
-    -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 
-      0 8px 32px rgba(187, 134, 252, 0.15),er cards */
-      0 4px 16px rgba(3, 218, 198, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-  } border-color: hsl(210 12% 25%) !important;
-    box-shadow: 
-  .premium .closer-card-light-frosted:hover {
-    background: rgba(255, 255, 255, 0.15) !important;t; /* Subtle teal highlight */
-    border-color: rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 
-      0 12px 40px rgba(187, 134, 252, 0.25),
-      0 6px 20px rgba(3, 218, 198, 0.12),!important;
-      inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;order on hover */
-  } box-shadow: 
-      0 12px 40px rgba(0, 0, 0, 0.5),
-  /* Premium: Make all muted/grey icons more visible */
-  .premium .text-muted-foreground,
-  .premium .text-gray-400,
-  .premium .text-gray-500,rosted glass for closer cards */
-  .premium .text-gray-600,ght-frosted {
-  .premium .text-slate-400,55, 255, 0.1) !important;
-  .premium .text-slate-500,5px) saturate(200%) !important;
-  .premium .text-slate-600 { blur(25px) saturate(200%) !important;
-    color: #F3F3F3 !important;, 255, 255, 0.2) !important;
-    filter: drop-shadow(0 0 10px rgba(255,255,255,0.22)) brightness(1.15) !important;
-    text-shadow: 0 0 10px rgba(255,255,255,0.22) !important;
-  }   0 4px 16px rgba(3, 218, 198, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-  /* Premium: Make Lucide/heroicons grey icons pop */
-  .premium svg.text-muted-foreground,
-  .premium svg.text-gray-400,-frosted:hover {
-  .premium svg.text-gray-500,, 255, 0.15) !important;
-  .premium svg.text-gray-600,55, 255, 0.3) !important;
-  .premium svg.text-slate-400,
-  .premium svg.text-slate-500,4, 252, 0.25),
-  .premium svg.text-slate-600 {98, 0.12),
-    stroke: #F3F3F3 !important;55, 255, 0.3) !important;
-    filter: drop-shadow(0 0 10px rgba(255,255,255,0.22)) brightness(1.15) !important;
   }
-} /* Premium: Make all muted/grey icons even brighter */
-  .premium .text-muted-foreground,
+}
+
 /* Mobile Dashboard Card Optimization - 75% phone screen height */
-  @media (max-width: 768px) {
-    /* Dashboard main grid - single column layout on mobile */
-    .dashboard-grid-mobile,
-    .dashboard-page-grid {,
-      grid-template-columns: 1fr !important;
-      gap: 1rem !important;nt;
-      height: auto !important;px rgba(255,255,255,0.22)) brightness(1.22) !important;
-    }ext-shadow: 0 0 10px rgba(255,255,255,0.22) !important;
-    
-    /* Dashboard cards - 75% of viewport height */
-    .dashboard-card-mobile,oreground,
-    [data-dashboard-card],00,
-    .mobile-75vh {t-gray-500,
-      min-height: 75vh !important;
-      height: 75vh !important;
-      display: flex !important;
-      flex-direction: column !important;
-      margin-bottom: 1rem !important;
-    }ilter: drop-shadow(0 0 10px rgba(255,255,255,0.22)) brightness(1.22) !important;
-    
-    /* Card headers - fixed size */
-    .dashboard-card-mobile .card-header,
-    [data-dashboard-card] .card-header {
-      flex-shrink: 0 !important;
-      padding: 1rem !important;
-    }-index: 2;
-    
-    /* Card content - scrollable area */
-    .dashboard-card-mobile .card-content,styling */
-    [data-dashboard-card] .card-content {
-      flex: 1 !important;
-      overflow-y: auto !important;
-      padding: 0.5rem 1rem 1rem !important;
-      -webkit-overflow-scrolling: touch !important;
-    }ont-weight: 900 !important;
-    color: #F8F8F8 !important;
-    /* Mobile scrollable content areas with proper height calculation */134, 252, 0.15) !important;
-    .mobile-scroll-area {
-      max-height: calc(75vh - 8rem) !important;
-      overflow-y: auto !important;
-      -webkit-overflow-scrolling: touch !important;ant;
-    }
-    
-    /* Individual dashboard components on mobile */
-    .dashboard-page-grid > div {0, 35, 0.8) !important;
-      min-height: 75vh !important;
-    }
-    remium .shadow-premium-purple {
-    /* Better mobile typography */ 134, 252, 0.3) !important;
-    .mobile-card-title {
-      font-size: 1.25rem !important;
-      font-weight: 600 !important;
-    }ox-shadow: 0 0 15px rgba(3, 218, 198, 0.3) !important;
-    
-    .mobile-card-subtitle {
-      font-size: 0.875rem !important;
-      opacity: 0.7;ow-purple {
-    }ilter: drop-shadow(0 0 8px rgba(187, 134, 252, 0.6)) brightness(1.2) !important;
-    
-    /* Chat button positioning fix */
-    .floating-chat-button {{
-      bottom: 5rem !important;x rgba(3, 218, 198, 0.6)) brightness(1.2) !important;
-      right: 1rem !important;
-      z-index: 50 !important;
-    }emium .icon-glow-white {
-    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4)) brightness(1.1) !important;
-    /* Queue empty state optimization */
-    .queue-empty-state {
-      display: flex;w-cyan {
-      flex-direction: column;px rgba(51, 204, 255, 0.6)) brightness(1.2) !important;
-      align-items: center;
-      justify-content: center;
-      text-align: center;s */
-      padding: 2rem 1rem;emium:hover {
-      height: 100%; 35px rgba(187, 134, 252, 0.6), 0 0 70px rgba(3, 218, 198, 0.3) !important;
-    }
-    
-    /* Mobile member status styling */
-    .mobile-member-item {rgba(51, 204, 255, 0.5) !important;
-      padding: 0.75rem !important;
-      border-radius: 0.5rem;
-      margin-bottom: 0.5rem;ncements */
-    }emium .bg-gradient-to-r {
-    background: linear-gradient(to right, var(--tw-gradient-stops)) !important;
-    /* Lead queue tabs optimization */
-    .mobile-queue-tabs {
-      width: 100% !important;ackground variations */
-    }emium .bg-premium-glass-50 {
-    background: rgba(20, 20, 35, 0.5) !important;
-    .mobile-queue-tab {
-      flex: 1 !important;
-      font-size: 0.875rem !important;
-    }ackground: rgba(20, 20, 35, 0.3) !important;
+@media (max-width: 768px) {
+  /* Dashboard main grid - single column layout on mobile */
+  .dashboard-grid-mobile,
+  .dashboard-page-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    height: auto !important;
   }
   
-  @media (max-width: 480px) {40 {
-    /* Extra small mobile devices - maintain 75% height but optimize spacing */
-    .dashboard-card-mobile,
-    [data-dashboard-card],
-    .mobile-75vh {er and loading states */
-      min-height: 75vh !important;ium-teal {
-      height: 75vh !important;
-      margin-bottom: 1rem !important;3, 218, 198, 0.6)) !important;
-    }
-    
-    /* Tighter spacing for small screens */e {
-    .dashboard-card-mobile .card-header,
-    [data-dashboard-card] .card-header {, 134, 252, 0.6)) !important;
-      padding: 0.75rem !important;
-    }
-     Premium enhanced pulse animation */
-    .dashboard-card-mobile .card-content,
-    [data-dashboard-card] .card-content {-in-out infinite !important;
-      padding: 0.25rem 0.75rem 0.75rem !important;
-    }
-  }keyframes premium-icon-pulse {
-    0%, 100% { 
-/* Mobile Chat Interface Optimizations */ 218, 198, 0.6)) brightness(1.1) !important;
-@media (max-width: 768px) {important;
+  /* Dashboard cards - 75% of viewport height */
+  .dashboard-card-mobile,
+  .mobile-75vh {
+    min-height: 75vh !important;
+    height: 75vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  /* Card headers - fixed size */
+  .dashboard-card-mobile .card-header,
+  [data-dashboard-card] .card-header {
+    flex-shrink: 0 !important;
+    padding: 1rem !important;
+  }
+  
+  /* Card content - scrollable area */
+  .dashboard-card-mobile .card-content,
+  [data-dashboard-card] .card-content {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 0.5rem 1rem 1rem !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* Mobile scrollable content areas with proper height calculation */
+  .mobile-scroll-area {
+    max-height: calc(75vh - 8rem) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* Individual dashboard components on mobile */
+  .dashboard-page-grid > div {
+    min-height: 75vh !important;
+  }
+  
+  /* Better mobile typography */
+  .mobile-card-title {
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .mobile-card-subtitle {
+    font-size: 0.875rem !important;
+    opacity: 0.7;
+  }
+  
+  /* Chat button positioning fix */
+  .floating-chat-button {
+    bottom: 5rem !important;
+    right: 1rem !important;
+    z-index: 50 !important;
+  }
+  
+  /* Queue empty state optimization */
+  .queue-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+  
+  /* Mobile member status styling */
+  .mobile-member-item {
+    padding: 0.75rem !important;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small mobile devices - maintain 75% height but optimize spacing */
+  .dashboard-card-mobile,
+  [data-dashboard-card],
+  .mobile-75vh {
+    min-height: 75vh !important;
+    height: 75vh !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  /* Tighter spacing for small screens */
+  .dashboard-card-mobile .card-header,
+  [data-dashboard-card] .card-header {
+    padding: 0.75rem !important;
+  }
+  
+  .dashboard-card-mobile .card-content,
+  [data-dashboard-card] .card-content {
+    padding: 0.25rem 0.75rem 0.75rem !important;
+  }
+}
+
+/* Mobile Chat Interface Optimizations */
+@media (max-width: 768px) {
   /* Mobile Chat Dialog - Full Screen */
   [data-radix-dialog-content] .chat-dialog-mobile {
-    max-width: 100vw !important;px rgba(3, 218, 198, 0.9)) brightness(1.3) !important;
-    max-height: 100vh !important;ortant;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
     width: 100vw !important;
     height: 100vh !important;
     margin: 0 !important;
-    border-radius: 0 !important;ents */
-    border: none !important;round {
-  } color: #D0D0D0 !important;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.1) !important;
+    border-radius: 0 !important;
+  }
+
   /* Mobile Chat Layout - Stack vertically on small screens */
   .chat-layout-mobile {
     flex-direction: column !important;
-  }premium button:focus,
-  .premium input:focus,
-  /* Chat Sidebar - Full width on mobile when active */
-  .chat-sidebar-mobile {gba(187, 134, 252, 0.5) !important;
-    width: 100% !important;portant;
-    border-right: none !important; 134, 252, 0.3) !important;
-    border-bottom: 1px solid hsl(var(--border)) !important;
   }
-  /* Premium enhanced transition effects */
-  /* Chat Main Area - Hide sidebar on mobile when chat is selected */
-  .chat-main-mobile {.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
-    flex: 1 !important;
-    min-height: 0 !important;
-  }premium .duration-300 {
-    transition-duration: 300ms !important;
-  /* Mobile Chat Header - Compact */
-  .chat-header-mobile {
-    padding: 0.75rem !important;er override */
-  }premium .bg-transparent {
-    background: transparent !important;
-  /* Mobile Chat Messages - Better touch targets */
-  .chat-message-mobile {ter: none !important;
-    padding: 0.75rem !important;
-    margin-bottom: 0.5rem !important;
-  }* Premium transparent card override - specific to lead queue */
-  .premium [class*="lead-queue"] .card-glass,
-  /* Mobile Chat Input - Larger touch targets */
-  .chat-input-mobile {arent !important;
-    min-height: 44px !important;tant;
-    font-size: 16px !important; /* Prevent zoom on iOS */
-    padding: 0.75rem !important;255, 255, 0.1) !important;
+
+  /* Chat Sidebar - Full width on mobile when active */
+  .chat-sidebar-mobile {
+    width: 100% !important;
+    border-right: none !important;
   }
   
-  /* Mobile Chat Buttons - Better accessibility */rride any premium card styling */
-  .chat-button-mobile {ent,
-    min-height: 44px !important;ss*="card"],
-    min-width: 44px !important;ass*="Card"] {
-    padding: 0.75rem !important;ortant;
+  /* Chat Main Area - Hide sidebar on mobile when chat is selected */
+  .chat-main-mobile {
+    flex: 1 !important;
+    min-height: 0 !important;
+  }
+
+  /* Mobile Chat Header - Compact */
+  .chat-header-mobile {
+    padding: 0.75rem !important;
+  }
+
+  /* Mobile Chat Messages - Better touch targets */
+  .chat-message-mobile {
+    padding: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  /* Mobile Chat Input - Larger touch targets */
+  .chat-input-mobile {
+    min-height: 44px !important;
+    font-size: 16px !important; /* Prevent zoom on iOS */
+    padding: 0.75rem !important;
+  }
+
+  /* Mobile Chat Buttons - Better accessibility */
+  .chat-button-mobile {
+    min-height: 44px !important;
+    padding: 0.75rem !important;
     touch-action: manipulation !important;
     -webkit-tap-highlight-color: transparent !important;
   }
   
   /* Channel Item - Enhanced for single-click */
-  .channel-item-mobile {*[class*="card"],
-    min-height: 48px !important;="Card"] {
-    padding: 0.75rem !important;ortant;
+  .channel-item-mobile {
+    min-height: 48px !important;
+    padding: 0.75rem !important;
     margin-bottom: 0.25rem !important;
-    touch-action: manipulation !important;nt;
+    touch-action: manipulation !important;
     -webkit-tap-highlight-color: transparent !important;
     user-select: none !important;
-    -webkit-user-select: none !important; styling when transparency is desired */
-    cursor: pointer !important;-glass {
-    transition: all 0.2s ease !important;
-  } backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  .channel-item-mobile:hover,
-  .channel-item-mobile:active {
-    background-color: hsl(var(--accent)) !important;/
-    transform: translateY(-1px) !important;
-  }premium .bg-transparent.card-header,
-  .premium .bg-transparent.card-content {
-  .channel-item-mobile:focus-visible {;
-    outline: 2px solid hsl(var(--ring)) !important;
-    outline-offset: 2px !important;important;
+    -webkit-user-select: none !important;
   }
-  
-  /* Mobile Emoji Picker - Full width */
-  .emoji-picker-mobile {card-header,
-    position: fixed !important;ntent {
-    bottom: 0 !important;nt !important;
-    left: 0 !important;ne !important;
-    right: 0 !important;ter: none !important;
+
+  /* Emoji Picker - Full width */
+  .emoji-picker-mobile {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    border-radius: 0.5rem 0.5rem 0 0 !important;states */
-    border-bottom: none !important;te="active"] {
-  } background: hsla(185 85% 45% / 0.08) !important; /* Subtle teal background */
-    border: 1px solid hsla(185 85% 45% / 0.25) !important;
-  /* Mobile Channel List - Better spacing */
-  .channel-list-mobile {
-    padding: 0.5rem !important;ate="active"] {
-  } background: hsla(185 85% 45% / 0.12) !important; /* Teal active state */
-    border: 1px solid hsla(185 85% 45% / 0.3) !important;
-  /* Mobile Chat Title - Responsive text */
-  .chat-title-mobile {
-    font-size: 1rem !important;
-    line-height: 1.25 !important;
-  } --tw-ring-color: hsla(185 85% 45% / 0.15) !important; /* Teal ring */
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+    border-bottom: none !important;
   }
+
   /* Mobile Message Bubbles - Better readability */
   .message-bubble-mobile {
-    max-width: 85% !important;85% 45% / 0.2) !important; /* Teal ring */
+    max-width: 85% !important;
     padding: 0.75rem !important;
     margin-bottom: 0.5rem !important;
-    border-radius: 1rem !important;ts for closer cards */
-  }closer-card-light-frosted {
-    background: rgba(255, 255, 255, 0.15) !important;
-  /* Mobile Avatar - Consistent sizing */180%) !important;
-  .avatar-mobile {op-filter: blur(20px) saturate(180%) !important;
-    width: 32px !important;255, 255, 255, 0.25) !important;
+    border-radius: 1rem !important;
+  }
+
+  /* Mobile Avatar - Consistent sizing */
+  .avatar-mobile {
+    width: 32px !important;
     height: 32px !important;
-    flex-shrink: 0 !important; 0.1),
-  }   inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+    flex-shrink: 0 !important;
+  }
+
   /* Mobile Back Button - For navigation */
   .back-button-mobile {
-    min-height: 44px !important;er {
-    min-width: 44px !important;255, 0.25) !important;
-    margin-right: 0.5rem !important;, 0.35) !important;
-  } box-shadow: 
-}     0 12px 40px rgba(0, 0, 0, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
-@media (max-width: 480px) {2px) scale(1.02) !important;
-  /* Extra small mobile devices */
-  .chat-dialog-mobile {
-    padding: 0 !important;ed glass for closer cards */
-  }dark .closer-card-light-frosted {
-    background: hsla(210 18% 15% / 0.9) !important;
-  .chat-header-mobile {10 12% 25%) !important;
-    padding: 0.5rem !important;
-  }   0 8px 32px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 hsla(185 85% 45% / 0.1) !important; /* Subtle teal highlight */
-  .channel-item-mobile {
-    padding: 0.5rem !important;
-  }dark .closer-card-light-frosted:hover {
-    background: hsla(210 18% 18% / 0.95) !important;
-  .message-bubble-mobile {85% 45%) !important; /* Teal border on hover */
-    max-width: 90% !important;
-    padding: 0.5rem 0.75rem !important;
-  }   inset 0 1px 0 hsla(185 85% 45% / 0.2) !important;
+    min-height: 44px !important;
+    min-width: 44px !important;
+    margin-right: 0.5rem !important;
   }
-  /* Smaller text for very small screens */
-  .chat-title-mobile {ht frosted glass for closer cards */
-    font-size: 0.875rem !important;ed {
-  } background: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(25px) saturate(200%) !important;
-  /* Better emoji picker sizing */25px) saturate(200%) !important;
-  .emoji-picker-mobile {ba(255, 255, 255, 0.2) !important;
-    max-height: 40vh !important;
-  }   0 8px 32px rgba(187, 134, 252, 0.15),
-}     0 4px 16px rgba(3, 218, 198, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
 /* Hide mobile-specific elements on desktop */
 @media (min-width: 769px) {
-  .mobile-only {er-card-light-frosted:hover {
-    display: none !important;, 255, 0.15) !important;
-  } border-color: rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 
-  .back-button-mobile {187, 134, 252, 0.25),
-    display: none !important; 198, 0.12),
-  }   inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
-} }
-
-/* Show mobile elements only on mobile */ven brighter */
-@media (max-width: 768px) {ground,
-  .desktop-only {gray-400,
+  .mobile-only {
     display: none !important;
-  }premium .text-gray-600,
-} .premium .text-slate-400,
-  .premium .text-slate-500,
-/* --- Sidebar Navigation Item Styles --- */
-.dark .nav-item {A !important;
-  color: hsl(220, 8%, 62%) !important; /* Muted gray for inactive */1.22) !important;
-  background: transparent !important;5,255,0.22) !important;
+  }
+}
+
+/* Show mobile elements only on mobile */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+/* Sidebar Navigation Item Styles */
+.dark .nav-item {
+  color: hsl(220, 8%, 62%) !important; /* Muted gray for inactive */
+  background: transparent !important;
   border-left: 3px solid transparent !important;
   font-weight: 500;
   transition: background 0.18s, color 0.18s, border 0.18s;
-} .premium svg.text-gray-400,
-.dark .nav-item.active,y-500,
+}
+
+.dark .nav-item.active,
 .dark .nav-item[aria-current="page"],
 .dark .nav-item[data-active="true"] {
   color: #e6f0ff !important; /* Soft blue-white text */
   background: linear-gradient(90deg, #1a2640 80%, #223a6b 100%) !important; /* Deep blue gradient */
   border-left: 3px solid #3574F2 !important; /* Subtle blue accent border */
-  box-shadow: 0 2px 8px 0 rgba(53,116,242,0.08) !important; /* Soft blue shadow */nt;
+  box-shadow: 0 2px 8px 0 rgba(53,116,242,0.08) !important; /* Soft blue shadow */
   font-weight: 600;
   transition: background 0.18s, color 0.18s, border 0.18s;
-} /* Premium card content positioning */
-  .premium .card-glass > *,
-/* Light mode for reference (optional, can be adjusted as needed) */
-.nav-item {n: relative;
+}
+
+/* Light mode nav items */
+.nav-item {
   color: hsl(215, 25%, 17%) !important;
   background: transparent !important;
   font-weight: 500;
-  transition: background 0.18s, color 0.18s;ling */
-} .premium .text-2xl,
-.nav-item.active,3xl,
+  transition: background 0.18s, color 0.18s;
+}
+
+.nav-item.active,
 .nav-item[aria-current="page"],
 .nav-item[data-active="true"] {
   color: hsl(215, 100%, 50%) !important;
   background: hsla(215, 100%, 50%, 0.08) !important;
-  font-weight: 600;!important;
-}   text-shadow: 0 0 20px rgba(255, 255, 255, 0.25), 0 0 40px rgba(187, 134, 252, 0.15) !important;
-/* --- End Sidebar Navigation Item Styles --- */
+  font-weight: 600;
+}
 
 /* Team Management Mobile Styles */
-@media (max-width: 600px) { 255, 255, 0.18) !important;
+@media (max-width: 600px) {
   /* Team Management Card/Container */
   .team-management-card,
-  .team-management-container,{
-  .team-management-section {0, 20, 35, 0.8) !important;
+  .team-management-container,
+  .team-management-section {
     padding: 1.25rem 0.75rem !important;
     border-radius: 1.25rem !important;
-    margin: 0.5rem 0 !important;e {
-    box-shadow: 0 2px 12px rgba(0,0,0,0.10) !important;rtant;
+    margin: 0.5rem 0 !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10) !important;
     min-width: 0 !important;
   }
-  /* Headings and text */m-teal {
-  .team-management-card h1,ba(3, 218, 198, 0.3) !important;
+  
+  /* Headings and text */
+  .team-management-card h1,
   .team-management-card h2,
   .team-management-card h3,
-  .team-management-card h4,/
-  .team-management-card h5,e {
-  .team-management-card h6, 8px rgba(187, 134, 252, 0.6)) brightness(1.2) !important;
+  .team-management-card h4,
+  .team-management-card h5,
+  .team-management-card h6,
   .team-management-container h1,
   .team-management-container h2,
   .team-management-container h3 {
-    font-size: 1.1rem !important;gba(3, 218, 198, 0.6)) brightness(1.2) !important;
+    font-size: 1.1rem !important;
     line-height: 1.3 !important;
     margin-bottom: 0.5rem !important;
-  }premium .icon-glow-white {
-  /* Inputs, selects, and buttons stack and fill width */ brightness(1.1) !important;
+  }
+  
+  /* Inputs, selects, and buttons stack and fill width */
   .team-management-card input,
   .team-management-card select,
   .team-management-card button,
-  .team-management-container input,a(51, 204, 255, 0.6)) brightness(1.2) !important;
+  .team-management-container input,
   .team-management-container select,
   .team-management-container button {
-    width: 100% !important;*/
-    min-width: 0 !important;um:hover {
-    margin-bottom: 0.75rem !important;, 252, 0.6), 0 0 70px rgba(3, 218, 198, 0.3) !important;
+    width: 100% !important;
+    min-width: 0 !important;
     font-size: 1rem !important;
     padding: 0.75rem 1rem !important;
     border-radius: 0.75rem !important;
-    box-sizing: border-box !important; 255, 0.5) !important;
+    box-sizing: border-box !important;
   }
+  
   /* Search bar and filters */
-  .team-management-search {ancements */
-    width: 100% !important;r {
-    margin-bottom: 1rem !important;right, var(--tw-gradient-stops)) !important;
+  .team-management-search {
+    width: 100% !important;
+    margin-bottom: 1rem !important;
     font-size: 1rem !important;
   }
-  /* Team member list spacing */ground variations */
-  .team-member-list {m-glass-50 {
-    margin-top: 1rem !important; 0.5) !important;
+  
+  /* Team member list spacing */
+  .team-member-list {
+    margin-top: 1rem !important;
     gap: 0.75rem !important;
   }
-  .team-member-list > * {ass-30 {
-    margin-bottom: 0.5rem !important; !important;
+  
+  .team-member-list > * {
+    margin-bottom: 0.5rem !important;
     border-radius: 0.75rem !important;
     padding: 0.75rem !important;
-  }premium .bg-premium-glass-40 {
-  /* Buttons in a row stack vertically */portant;
+  }
+  
+  /* Buttons in a row stack vertically */
   .team-management-actions {
     display: flex !important;
-    flex-direction: column !important;s */
-    gap: 0.5rem !important;xt-premium-teal {
-  } color: #03DAC6 !important;
-  /* Prevent horizontal scroll */gba(3, 218, 198, 0.6)) !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  
+  /* Prevent horizontal scroll */
   .team-management-card,
   .team-management-container {
-    overflow-x: hidden !important;ium-purple {
-  } color: #BB86FC !important;
-}   filter: drop-shadow(0 0 8px rgba(187, 134, 252, 0.6)) !important;
+    overflow-x: hidden !important;
   }
+}
+
 /* Prevent background scroll and reserve space for scrollbar */
-body.dialog-scroll-locked { animation */
+body.dialog-scroll-locked {
   overflow: hidden !important;
   /* padding-right is set dynamically via JS to match scrollbar width */
-} }
+}
 
 /* Visually prominent blue gradient button for Invite New User */
 .invite-user-prominent-btn {
-  background: linear-gradient(90deg, #3574F2 0%, #5096F2 100%) !important;!important;
-  color: #fff !important; !important;
+  background: linear-gradient(90deg, #3574F2 0%, #5096F2 100%) !important;
+  color: #fff !important;
   font-weight: 700 !important;
   border: 2px solid #3574F2 !important;
   box-shadow: 0 4px 24px 0 rgba(53,116,242,0.18), 0 1.5px 6px 0 rgba(53,116,242,0.10) !important;
-  padding: 0.85rem 2.25rem !important;t;
+  padding: 0.85rem 2.25rem !important;
   font-size: 1.1rem !important;
   border-radius: 1rem !important;
   letter-spacing: 0.01em;
   transition: all 0.18s cubic-bezier(.4,0,.2,1);
-} .premium .text-muted-foreground {
-.invite-user-prominent-btn:hover, .invite-user-prominent-btn:focus {
+}
+
+.invite-user-prominent-btn:hover, 
+.invite-user-prominent-btn:focus {
   background: linear-gradient(90deg, #2552a3 0%, #3574F2 100%) !important;
   color: #fff !important;
   box-shadow: 0 8px 32px 0 rgba(53,116,242,0.28), 0 2px 8px 0 rgba(53,116,242,0.18) !important;
-  border-color: #2552a3 !important;*/
-} .premium button:focus,
+  border-color: #2552a3 !important;
+}
+
 .dark .invite-user-prominent-btn {
   background: linear-gradient(90deg, #0a2240 0%, #3574F2 100%) !important;
-  color: #e0eaff !important;187, 134, 252, 0.5) !important;
+  color: #e0eaff !important;
   border-color: #3574F2 !important;
   box-shadow: 0 4px 24px 0 rgba(53,116,242,0.22), 0 1.5px 6px 0 rgba(53,116,242,0.14) !important;
-} }
-.dark .invite-user-prominent-btn:hover, .dark .invite-user-prominent-btn:focus {
+}
+
+.dark .invite-user-prominent-btn:hover, 
+.dark .invite-user-prominent-btn:focus {
   background: linear-gradient(90deg, #183a6d 0%, #2552a3 100%) !important;
-  color: #fff !important;l {
-  border-color: #2552a3 !important;er(0.2, 0.8, 0.2, 1) !important;
+  color: #fff !important;
+  border-color: #2552a3 !important;
   box-shadow: 0 8px 32px 0 rgba(53,116,242,0.32), 0 2px 8px 0 rgba(53,116,242,0.22) !important;
 }
-  .premium .duration-300 {
-/* Remove gradient and use purple tint for selected day */
-.scheduled-calendar-day.selected, .scheduled-calendar-day[data-selected="true"], .scheduled-calendar-day.selected:focus, .scheduled-calendar-day.selected:active {
+
+.scheduled-calendar-day.selected, 
+.scheduled-calendar-day[data-selected="true"], 
+.scheduled-calendar-day.selected:focus, 
+.scheduled-calendar-day.selected:active {
   background: #8b5cf6 !important;
-  color: white !important;ontainer override */
-} .premium .bg-transparent {
-    background: transparent !important;
-/* ===== MOBILE SIDEBAR & LAYOUT OPTIMIZATIONS ===== */
-@media (max-width: 768px) {: none !important;
+  color: white !important;
+}
+
+/* Mobile Sidebar & Layout Optimizations */
+@media (max-width: 768px) {
   /* Mobile Sidebar Enhancements */
   [data-sidebar="sidebar"] {
-    width: 280px !important;d override - specific to lead queue */
-    max-width: 90vw !important;] .card-glass,
-  }premium .bg-transparent.card-glass {
-    background: transparent !important;
+    width: 280px !important;
+    max-width: 90vw !important;
+  }
+
   /* Ensure sidebar trigger is always accessible */
-  [data-sidebar="trigger"] { none !important;
-    min-height: 48px !important;255, 255, 0.1) !important;
+  [data-sidebar="trigger"] {
+    min-height: 48px !important;
     min-width: 48px !important;
     padding: 0.75rem !important;
-    touch-action: manipulation !important;s to override any premium card styling */
+    touch-action: manipulation !important;
     -webkit-tap-highlight-color: transparent !important;
-    position: relative !important;*="card"],
-    z-index: 1001 !important;class*="Card"] {
-    display: flex !important;important;
-    align-items: center !important;t;
-    justify-content: center !important;rtant;
+    position: relative !important;
+    z-index: 1001 !important;
   }
 
   /* Mobile header improvements */
-  header {g-transparent *[class*="card"],
-    position: sticky !important;="Card"] {
-    top: 0 !important;arent !important;
-    z-index: 1000 !important;portant;
-    padding: 0.75rem 1rem !important;portant;
+  header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    padding: 0.75rem 1rem !important;
     min-height: 60px !important;
     display: flex !important;
-    align-items: center !important;m card styling when transparency is desired */
-    max-width: 100vw !important;glass {
-    overflow-x: hidden !important;tant;
-  } backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    align-items: center !important;
+  }
+
   /* Main content area - prevent overflow */
   main {
-    max-width: 100vw !important;ll card components */
-    overflow-x: hidden !important;"Card"],
-    padding: 1rem !important;rd-header,
-    width: 100% !important;card-content {
-  } background: transparent !important;
-    backdrop-filter: none !important;
-  /* Dashboard layout optimizations */ortant;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Dashboard layout optimizations */
   .dashboard-layout,
   .dashboard-container {
-    max-width: 100vw !important;Card"],
-    overflow-x: hidden !important;r,
-    width: 100% !important;d-content {
-  } background: transparent !important;
-    backdrop-filter: none !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
   /* Sidebar menu items - better touch targets */
   [data-sidebar="sidebar"] button,
   [data-sidebar="sidebar"] a {
-    min-height: 48px !important;asculine active states */
-    padding: 0.75rem 1rem !important;="active"] {
-    touch-action: manipulation !important;important; /* Subtle teal background */
-    -webkit-tap-highlight-color: transparent !important;t;
+    min-height: 48px !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  /* Masculine active states */
+  [data-sidebar="sidebar"] button[data-state="active"],
+  [data-sidebar="sidebar"] a[data-state="active"] {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
     width: 100% !important;
     text-align: left !important;
-    display: flex !important;state="active"] {
-    align-items: center !important;0.12) !important; /* Teal active state */
-    gap: 0.75rem !important;85 85% 45% / 0.3) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 0.75rem 1rem !important;
+    border: 1px solid hsl(185 85% 45% / 0.3) !important;
   }
 
   /* Prevent any content from causing horizontal scroll */
-  * {emium .ring-slate-200 {
-    max-width: 100vw !important;% 45% / 0.15) !important; /* Teal ring */
+  * {
+    max-width: 100vw !important;
     overflow-x: hidden !important;
   }
-  .dark .ring-slate-800 {
-  /* Mobile layout wrapper */ 85% 45% / 0.2) !important; /* Teal ring */
+
+  /* Mobile layout wrapper */
   .flex {
     max-width: 100vw !important;
-    overflow-x: hidden !important;nts for closer cards */
-  }closer-card-light-frosted {
-    background: rgba(255, 255, 255, 0.15) !important;
-  /* Cards and components */px) saturate(180%) !important;
-  .card,kit-backdrop-filter: blur(20px) saturate(180%) !important;
-  [class*="card"] {id rgba(255, 255, 255, 0.25) !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important;),
-    margin-left: 0 !important;255, 255, 0.25) !important;
-    margin-right: 0 !important;bezier(0.2, 0.8, 0.2, 1) !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Cards and components */
+  .card,
+  [class*="card"] {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 1rem !important;
+    border-radius: 1.25rem !important;
+    box-shadow: 0 10px 40px 0 rgba(30,30,60,0.18), 0 4px 16px 0 rgba(30,30,60,0.12) !important;
   }
 
   /* Tables and grids - make them scrollable horizontally if needed */
-  table {round: rgba(255, 255, 255, 0.25) !important;
-    min-width: 100% !important;, 255, 0.35) !important;
+  table {
+    min-width: 100% !important;
     table-layout: auto !important;
-  }   0 12px 40px rgba(0, 0, 0, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
-  .grid {form: translateY(-2px) scale(1.02) !important;
+  }
+
+  .grid {
     grid-template-columns: 1fr !important;
     max-width: 100% !important;
-    overflow-x: hidden !important; for closer cards */
-  }dark .closer-card-light-frosted {
-    background: hsla(210 18% 15% / 0.9) !important;
-  /* Floating elements */ 12% 25%) !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Floating elements */
   .floating-chat-button {
-    bottom: 5rem !important;0, 0.4),
-    right: 1rem !important;5 85% 45% / 0.1) !important; /* Subtle teal highlight */
+    bottom: 5rem !important;
+    right: 1rem !important;
     z-index: 50 !important;
     min-height: 56px !important;
-    min-width: 56px !important;ted:hover {
-  } background: hsla(210 18% 18% / 0.95) !important;
-}   border-color: hsl(185 85% 45%) !important; /* Teal border on hover */
-    box-shadow: 
-/* Extra small mobile devices */0.5),
-@media (max-width: 480px) {5 85% 45% / 0.2) !important;
+    min-width: 56px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small mobile devices */
   [data-sidebar="sidebar"] {
     width: 260px !important;
-    max-width: 85vw !important;d glass for closer cards */
-  }premium .closer-card-light-frosted {
-    background: rgba(255, 255, 255, 0.1) !important;
-  header {op-filter: blur(25px) saturate(200%) !important;
-    padding: 0.5rem 0.75rem !important; saturate(200%) !important;
-    min-height: 56px !important;255, 255, 0.2) !important;
-  } box-shadow: 
-      0 8px 32px rgba(187, 134, 252, 0.15),
-  main {4px 16px rgba(3, 218, 198, 0.08),
-    padding: 0.75rem !important;5, 255, 0.2) !important;
+    max-width: 85vw !important;
   }
 
-  [data-sidebar="trigger"] {t-frosted:hover {
-    min-height: 44px !important;55, 0.15) !important;
-    min-width: 44px !important;, 255, 0.3) !important;
+  header {
+    padding: 0.5rem 0.75rem !important;
+    min-height: 56px !important;
+  }
+
+  main {
+    padding: 0.75rem !important;
+  }
+
+  /* Ensure sidebar trigger is always accessible */
+  [data-sidebar="trigger"] {
+    min-height: 44px !important;
+    min-width: 44px !important;
     padding: 0.5rem !important;
-  }   0 12px 40px rgba(187, 134, 252, 0.25),
-}     0 6px 20px rgba(3, 218, 198, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  }
+}
+
 /* Landscape mobile optimization */
 @media (max-width: 1024px) and (orientation: landscape) and (max-height: 600px) {
-  header {um: Make all muted/grey icons even brighter */
-    min-height: 48px !important;d,
+  header {
     padding: 0.5rem 1rem !important;
-  }premium .text-gray-500,
-  .premium .text-gray-600,
+  }
+
   [data-sidebar="sidebar"] {
     max-width: 320px !important;
-  }premium .text-slate-600 {
-}   color: #FAFAFA !important;
-    filter: drop-shadow(0 0 10px rgba(255,255,255,0.22)) brightness(1.22) !important;
-/* === Card Border Radius & Shadow Polish (Stronger Shadow) === */
-[data-card], .rounded-xl, .card-glass, .dashboard-card-mobile, [data-dashboard-card], .premium [data-card], .premium .rounded-xl, .premium .card-glass {
+  }
+}
+
+/* Card Border Radius & Shadow Polish */
+[data-card], 
+.rounded-xl, 
+.card-glass, 
+.dashboard-card-mobile, 
+[data-dashboard-card], 
+.premium [data-card], 
+.premium .rounded-xl, 
+.premium .card-glass {
   border-radius: 1.25rem !important;
-  overflow: hidden !important;ground,
+  overflow: hidden !important;
   box-shadow: 0 10px 40px 0 rgba(30,30,60,0.18), 0 4px 16px 0 rgba(30,30,60,0.12) !important;
-} .premium svg.text-gray-500,
-  .premium svg.text-gray-600,
-.premium [data-card], .premium .rounded-xl, .premium .card-glass {
+}
+
+.premium [data-card], 
+.premium .rounded-xl, 
+.premium .card-glass {
   border-radius: 1.75rem !important;
-  overflow: hidden !important;{
+  overflow: hidden !important;
   box-shadow: 0 18px 64px 0 rgba(53,116,242,0.22), 0 6px 24px 0 rgba(53,116,242,0.14) !important;
-}   filter: drop-shadow(0 0 10px rgba(255,255,255,0.22)) brightness(1.22) !important;
-  }
-[data-card] *, .rounded-xl *, .card-glass * {
-  position: relative;tent positioning */
-  z-index: 1;ard-glass > *,
-} .premium [class*="card"] > * {
-    position: relative;
-    z-index: 2;
-  }
+}
 
-  /* Premium specific card numbers/stats styling */
-  .premium .text-2xl,
-  .premium .text-3xl,
-  .premium .text-4xl,
-  .premium .text-5xl,
-  .premium .text-6xl {
-    font-weight: 900 !important;
-    color: #F8F8F8 !important;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.25), 0 0 40px rgba(187, 134, 252, 0.15) !important;
-  }
-
-  .premium .border-premium-glow {
-    border-color: rgba(255, 255, 255, 0.18) !important;
-  }
-
-  .premium .bg-premium-glass {
-    background-color: rgba(20, 
+[data-card] *, 
+.rounded-xl *, 
+.card-glass * {
+  position: relative;
+  z-index: 1;
+}
