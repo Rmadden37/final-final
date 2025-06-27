@@ -1,3 +1,4 @@
+// src/components/dashboard/closer-card.tsx
 "use client";
 
 import type {Closer, LeadStatus} from "@/types";
@@ -53,7 +54,6 @@ export default function CloserCard({
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   
-  // Check lead status
   const isAcceptedLead = currentLeadStatus === "accepted";
   const isScheduledLead = currentLeadStatus === "scheduled";
   const isWaitingAssignmentLead = currentLeadStatus === "waiting_assignment";
@@ -62,14 +62,6 @@ export default function CloserCard({
   const showInteractiveSwitch = canUserManagerOrSelfToggle && allowInteractiveToggle && !assignedLeadName;
 
   const handleToggleCloserAvailability = async (checked: boolean) => {
-    console.log('🔥 CloserCard - Status toggle clicked:', { 
-      closerName: closer.name, 
-      closerUid: closer.uid, 
-      currentStatus: closer.status,
-      newStatus: checked ? "On Duty" : "Off Duty",
-      userRole: user?.role 
-    });
-
     if (!user || !canUserManagerOrSelfToggle || assignedLeadName) return;
 
     setIsUpdatingStatus(true);
@@ -95,54 +87,47 @@ export default function CloserCard({
     }
   };
 
-
-
   const currentStatusIsOnDuty = closer.status === "On Duty";
   const avatarSrc = closer.avatarUrl || `https://ui-avatars.com/api/?name=${(closer.name || "User").replace(/\s+/g, "+")}&background=random&color=fff`;
   const avatarDataAiHint = closer.avatarUrl ? undefined : (closer.name?.split(" ")[0]?.toLowerCase() || "person");
 
   return (
-    <Card className="shadow-xl hover:shadow-2xl transition-all duration-300">
-      <CardContent className="p-3">
-        <div className="flex items-start space-x-2">
+    <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700">
+      <CardContent className="p-4 sm:p-5 lg:p-6">
+        <div className="flex items-start space-x-3 sm:space-x-4">
           {/* Position indicator */}
           {position && (
-            <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 text-slate-600 text-xs font-bold rounded-full border border-slate-300">
+            <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-slate-600 text-sm sm:text-base font-bold rounded-full border border-slate-300">
               {position}
             </div>
           )}
+          
+          {/* Avatar - Made larger */}
           <Avatar 
-            className="h-10 w-10 border-2 shadow-lg flex-shrink-0 cursor-pointer transition-all duration-300 border-slate-200"
+            className="h-12 w-12 sm:h-14 sm:w-14 lg:h-16 lg:w-16 border-2 shadow-lg flex-shrink-0 cursor-pointer transition-all duration-300 border-slate-200 hover:border-primary hover:shadow-xl"
             onClick={() => {
-              console.log('🔥 CloserCard - Avatar clicked:', { 
-                closerName: closer.name, 
-                closerUid: closer.uid,
-                userRole: user?.role 
-              });
               setIsProfileModalOpen(true);
             }}
           >
             <AvatarImage src={avatarSrc} alt={closer.name || "User"} data-ai-hint={avatarDataAiHint} />
-            <AvatarFallback className="font-bold text-xs bg-blue-100 text-blue-900">
+            <AvatarFallback className="font-bold text-sm sm:text-base lg:text-lg bg-blue-100 text-blue-900">
               {closer.name ? closer.name.substring(0, 2).toUpperCase() : "N/A"}
             </AvatarFallback>
           </Avatar>
+          
           <div className="flex-1 min-w-0 pr-2">
-            <div className="flex items-center gap-1">
-              <p className="text-xs font-bold font-headline text-gray-900 truncate">
+            <div className="flex items-center gap-2">
+              {/* Name - Made larger */}
+              <p className="text-sm sm:text-base lg:text-lg font-bold font-headline text-gray-900 dark:text-gray-100 truncate">
                 {closer.name || "Unnamed Closer"}
               </p>
             </div>
+            
             {assignedLeadName ? (
               <div 
-                className={`flex items-center text-xs mt-1 ${onLeadClick ? 'cursor-pointer hover:text-blue-600 transition-colors' : ''} text-blue-700`}
+                className={`flex items-center text-sm sm:text-base mt-2 ${onLeadClick ? 'cursor-pointer hover:text-blue-600 transition-colors' : ''} text-blue-700 dark:text-blue-300`}
                 onClick={() => {
                   if (onLeadClick) {
-                    console.log('🔥 CloserCard - Lead assignment clicked:', { 
-                      closerName: closer.name, 
-                      leadName: assignedLeadName,
-                      userRole: user?.role 
-                    });
                     onLeadClick();
                   }
                 }}
@@ -150,36 +135,36 @@ export default function CloserCard({
                 tabIndex={onLeadClick ? 0 : undefined}
                 onKeyDown={onLeadClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onLeadClick(); } } : undefined}
               >
-                <Briefcase className="mr-1 h-3 w-3 flex-shrink-0" />
-                <span className="font-medium truncate text-xs">Working on: {assignedLeadName}</span>
+                <Briefcase className="mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <span className="font-medium truncate">Working on: {assignedLeadName}</span>
               </div>
             ) : showInteractiveSwitch ? (
-              <div className="flex items-center space-x-2 mt-1">
+              <div className="flex items-center space-x-3 mt-2">
                 <Switch
                   id={`status-toggle-${closer.uid}`}
                   checked={currentStatusIsOnDuty}
                   onCheckedChange={handleToggleCloserAvailability}
                   disabled={isUpdatingStatus || isUpdatingOrder}
                   aria-label={currentStatusIsOnDuty ? `Set ${closer.name || "Closer"} to Off Duty` : `Set ${closer.name || "Closer"} to On Duty`}
-                  className="scale-75"
+                  className="scale-90 sm:scale-100"
                 />
                 <Label
                   htmlFor={`status-toggle-${closer.uid}`}
-                  className={`text-xs font-medium ${currentStatusIsOnDuty ? "text-green-700" : "text-red-600"}`}
+                  className={`text-sm sm:text-base font-medium ${currentStatusIsOnDuty ? "text-green-700 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
                 >
                   {isUpdatingStatus ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     currentStatusIsOnDuty ? "Available" : "Off Duty"
                   )}
                 </Label>
               </div>
             ) : (
-              <div className={`flex items-center text-xs mt-1 ${currentStatusIsOnDuty ? "text-green-700" : "text-red-600"}`}>
+              <div className={`flex items-center text-sm sm:text-base mt-2 ${currentStatusIsOnDuty ? "text-green-700 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
                 {currentStatusIsOnDuty ? (
-                  <UserCheck className="mr-1 h-3 w-3" />
+                  <UserCheck className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                 ) : (
-                  <UserX className="mr-1 h-3 w-3" />
+                  <UserX className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                 )}
                 <span className="font-medium">{currentStatusIsOnDuty ? "Available" : "Off Duty"}</span>
               </div>
@@ -187,23 +172,16 @@ export default function CloserCard({
           </div>
         </div>
         
-        {/* Right side controls - moved to separate row to prevent overlap */}
+        {/* Action buttons row */}
         {((isWaitingAssignmentLead || isScheduledLead || isAcceptedLead) && onDispositionChange) || 
          (showMoveControls && onMove && !assignedLeadName) ? (
-          <div className="flex items-center justify-end space-x-1 mt-2 pt-2 border-t border-slate-200">
-            {/* Single Accept button for waiting_assignment and scheduled leads (managers/admins) */}
+          <div className="flex items-center justify-end space-x-2 mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+            {/* Accept buttons for managers/admins */}
             {(isWaitingAssignmentLead || isScheduledLead) && (user?.role === "manager" || user?.role === "admin") && onDispositionChange && (
               <Button 
                 size="sm" 
-                className="h-6 px-2 text-xs bg-green-500/80 backdrop-blur-sm hover:bg-green-600/90 text-white border border-green-400/30 hover:border-green-300/50 transition-all duration-300"
+                className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm bg-green-500/80 backdrop-blur-sm hover:bg-green-600/90 text-white border border-green-400/30 hover:border-green-300/50 transition-all duration-300"
                 onClick={() => {
-                  console.log('🔥 CloserCard - Accept & Start button clicked:', { 
-                    closerName: closer.name, 
-                    leadStatus: currentLeadStatus,
-                    leadId: leadId,
-                    userRole: user?.role 
-                  });
-                  // Skip directly to in_process for managers
                   onDispositionChange("in_process");
                   toast({
                     title: "Lead Accepted",
@@ -219,15 +197,8 @@ export default function CloserCard({
             {isScheduledLead && user?.role === "closer" && onDispositionChange && (
               <Button 
                 size="sm" 
-                className="h-6 px-2 text-xs bg-green-500/80 backdrop-blur-sm hover:bg-green-600/90 text-white border border-green-400/30 hover:border-green-300/50 transition-all duration-300"
+                className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm bg-green-500/80 backdrop-blur-sm hover:bg-green-600/90 text-white border border-green-400/30 hover:border-green-300/50 transition-all duration-300"
                 onClick={() => {
-                  console.log('🔥 CloserCard - Accept Job button clicked:', { 
-                    closerName: closer.name, 
-                    leadStatus: currentLeadStatus,
-                    leadId: leadId,
-                    userRole: user?.role 
-                  });
-                  // Update lead from scheduled to accepted
                   onDispositionChange("accepted");
                   toast({
                     title: "Job Accepted",
@@ -243,15 +214,8 @@ export default function CloserCard({
             {isAcceptedLead && user?.role === "closer" && onDispositionChange && (
               <Button 
                 size="sm" 
-                className="h-6 px-2 text-xs bg-blue-500/80 backdrop-blur-sm hover:bg-blue-600/90 text-white border border-blue-400/30 hover:border-blue-300/50 transition-all duration-300"
+                className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm bg-blue-500/80 backdrop-blur-sm hover:bg-blue-600/90 text-white border border-blue-400/30 hover:border-blue-300/50 transition-all duration-300"
                 onClick={() => {
-                  console.log('🔥 CloserCard - Start Working button clicked:', { 
-                    closerName: closer.name, 
-                    leadStatus: currentLeadStatus,
-                    leadId: leadId,
-                    userRole: user?.role 
-                  });
-                  // Update lead from accepted to in_process
                   onDispositionChange("in_process");
                   toast({
                     title: "Lead Status Updated",
@@ -262,17 +226,15 @@ export default function CloserCard({
                 Start Working
               </Button>
             )}
-            
 
-            
             {/* Move Controls */}
             {showMoveControls && onMove && !assignedLeadName && (
               <div className="flex items-center space-x-1 ml-2">
-                <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => onMove("up")} disabled={!canMoveUp || isUpdatingStatus || isUpdatingOrder}>
-                  <ArrowUp className="h-3 w-3" />
+                <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-7 sm:w-7" onClick={() => onMove("up")} disabled={!canMoveUp || isUpdatingStatus || isUpdatingOrder}>
+                  <ArrowUp className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => onMove("down")} disabled={!canMoveDown || isUpdatingStatus || isUpdatingOrder}>
-                  <ArrowDown className="h-3 w-3" />
+                <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-7 sm:w-7" onClick={() => onMove("down")} disabled={!canMoveDown || isUpdatingStatus || isUpdatingOrder}>
+                  <ArrowDown className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             )}
@@ -287,7 +249,7 @@ export default function CloserCard({
         profile={{
           uid: closer.uid,
           name: closer.name || "Unnamed Closer",
-          email: null, // Closers don't have email in the schema
+          email: null,
           phone: closer.phone || null,
           avatarUrl: closer.avatarUrl || `https://ui-avatars.com/api/?name=${(closer.name || "User").replace(/\s+/g, "+")}&background=random&color=fff`,
           role: "closer"

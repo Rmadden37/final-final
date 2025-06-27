@@ -1,3 +1,4 @@
+// src/components/dashboard/scheduled-leads-calendar.tsx
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -16,19 +17,6 @@ interface ScheduledLeadsCalendarProps {
 
 export default function ScheduledLeadsCalendar({ scheduledLeads, loading }: ScheduledLeadsCalendarProps) {
   const [selectedDate, setSelectedDate] = useState(new Date());
-
-  // Debug logging
-  console.log(`📅 ScheduledLeadsCalendar received ${scheduledLeads.length} leads:`, scheduledLeads);
-  
-  // Check for Prince Vegeta specifically
-  const princeVegetaLead = scheduledLeads.find(lead => 
-    lead.customerName.toLowerCase().includes('prince') || lead.customerName.toLowerCase().includes('vegeta')
-  );
-  if (princeVegetaLead) {
-    console.log('🥦 Prince Vegeta found in calendar:', princeVegetaLead);
-  } else {
-    console.log('❌ Prince Vegeta not found in calendar leads');
-  }
 
   // Generate the next 14 days starting from today
   const dates = useMemo(() => {
@@ -91,36 +79,33 @@ export default function ScheduledLeadsCalendar({ scheduledLeads, loading }: Sche
     return (
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
-          <Calendar className="h-8 w-8 animate-pulse text-primary mx-auto mb-2 premium:text-premium-teal premium:nav-icon premium:icon-glow-teal premium:icon-pulse" />
-          <p className="text-muted-foreground">Loading calendar...</p>
+          <Calendar className="h-6 w-6 sm:h-8 sm:w-8 animate-pulse text-primary mx-auto mb-2 premium:text-premium-teal premium:nav-icon premium:icon-glow-teal premium:icon-pulse" />
+          <p className="text-sm text-muted-foreground">Loading calendar...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Date Navigation Header - Responsive */}
-      <div className="flex items-center justify-between mb-3 p-2 bg-muted/30 rounded-lg">
+    <div className="flex flex-col h-full min-h-0">
+      {/* Date Navigation Header - Mobile Responsive */}
+      <div className="flex items-center justify-between mb-2 p-2 bg-muted/30 rounded-lg shrink-0">
         <Button
           variant="ghost"
           size="sm"
           onClick={goToPreviousDay}
           disabled={!canGoPrevious}
-          className="h-7 w-7 p-0 sm:h-8 sm:w-8 premium:hover:bg-premium-glass/50 premium:hover:glow-premium transition-all duration-300"
+          className="h-6 w-6 p-0 sm:h-8 sm:w-8 premium:hover:bg-premium-glass/50 premium:hover:glow-premium transition-all duration-300"
         >
           <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 premium:nav-icon premium:icon-glow-purple" />
         </Button>
         
-        <div className="text-center">
-          <h3 className="font-semibold text-xs sm:text-sm">
+        <div className="text-center min-w-0">
+          <h3 className="font-semibold text-sm sm:text-base truncate">
             {isToday(selectedDate) ? "Today" : format(selectedDate, "EEEE")}
           </h3>
-          <p className="text-xs text-muted-foreground hidden sm:block">
+          <p className="text-xs text-muted-foreground">
             {format(selectedDate, "MMM d, yyyy")}
-          </p>
-          <p className="text-xs text-muted-foreground sm:hidden">
-            {format(selectedDate, "MMM d")}
           </p>
         </div>
         
@@ -129,16 +114,16 @@ export default function ScheduledLeadsCalendar({ scheduledLeads, loading }: Sche
           size="sm"
           onClick={goToNextDay}
           disabled={!canGoNext}
-          className="h-7 w-7 p-0 sm:h-8 sm:w-8 premium:hover:bg-premium-glass/50 premium:hover:glow-premium transition-all duration-300"
+          className="h-6 w-6 p-0 sm:h-8 sm:w-8 premium:hover:bg-premium-glass/50 premium:hover:glow-premium transition-all duration-300"
         >
           <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 premium:nav-icon premium:icon-glow-purple" />
         </Button>
       </div>
 
       {/* Horizontal Date Scrollbar - Mobile Optimized */}
-      <div className="mb-3">
+      <div className="mb-2 shrink-0">
         <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex space-x-1 sm:space-x-2 pb-2">
+          <div className="flex space-x-1 pb-2">
             {dates.map(date => {
               const dateKey = format(date, 'yyyy-MM-dd');
               const leadsCount = leadsByDate.get(dateKey)?.length || 0;
@@ -152,15 +137,15 @@ export default function ScheduledLeadsCalendar({ scheduledLeads, loading }: Sche
                   size="sm"
                   onClick={() => setSelectedDate(date)}
                   className={`
-                    flex-shrink-0 flex flex-col items-center p-1.5 sm:p-2 h-auto min-w-[50px] sm:min-w-[60px]
+                    flex-shrink-0 flex flex-col items-center p-1.5 h-auto min-w-[45px] text-xs
                     ${isPast ? 'opacity-60' : ''}
                     ${isSelected ? 'ring-2 ring-primary ring-offset-1' : ''}
                   `}
                 >
-                  <span className="text-xs font-medium leading-tight">
+                  <span className="font-medium leading-tight">
                     {isToday(date) ? "Today" : format(date, "EEE")}
                   </span>
-                  <span className="text-sm font-bold leading-tight">
+                  <span className="font-bold leading-tight">
                     {format(date, "d")}
                   </span>
                   {leadsCount > 0 && (
@@ -176,24 +161,22 @@ export default function ScheduledLeadsCalendar({ scheduledLeads, loading }: Sche
       </div>
 
       {/* Leads for Selected Date - Mobile Optimized */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden">
         {leadsForSelectedDate.length === 0 ? (
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
               <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground mx-auto mb-2 premium:text-premium-teal premium:nav-icon premium:icon-glow-teal" />
-              <p className="text-sm sm:text-base text-muted-foreground">
-                No appointments for{" "}
-                <span className="hidden sm:inline">{format(selectedDate, "MMM d")}</span>
-                <span className="sm:hidden">today</span>
+              <p className="text-sm text-muted-foreground">
+                No appointments for {format(selectedDate, "MMM d")}
               </p>
             </div>
           </div>
         ) : (
-          <ScrollArea className="h-full pr-2 sm:pr-4">
-            <div className="space-y-2 sm:space-y-3">
+          <ScrollArea className="h-full pr-1">
+            <div className="space-y-2">
               {leadsForSelectedDate.map(lead => (
-                <div key={lead.id} className="border-l-2 sm:border-l-4 border-primary/20 pl-2 sm:pl-3">
-                  <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                <div key={lead.id} className="border-l-2 border-primary/20 pl-2">
+                  <div className="flex items-center gap-1 mb-1">
                     <Clock className="h-3 w-3 text-muted-foreground premium:text-premium-teal premium:nav-icon premium:icon-glow-teal" />
                     <span className="text-xs font-medium text-muted-foreground">
                       {lead.scheduledAppointmentTime && 

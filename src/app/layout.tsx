@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import type { Metadata, Viewport } from 'next';
+import { IOSPWAHandler } from "@/components/ios-pwa-handler";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -56,7 +57,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} font-body antialiased bg-background text-foreground min-h-screen`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <IOSPWAHandler />
+          {children}
+        </Providers>
       </body>
     </html>
   );

@@ -1,3 +1,4 @@
+// src/components/dashboard/closer-lineup.tsx
 "use client";
 
 import {useState, useEffect} from "react";
@@ -22,13 +23,10 @@ export default function CloserLineup() {
   const [isLoadingAssignedCloserIds, setIsLoadingAssignedCloserIds] = useState(true);
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
 
-  // Check if user can manage closers (managers and admins)
   const canManageClosers = user?.role === "manager" || user?.role === "admin";
-  
-  // Check if user is a closer (show full lineup)
   const isCloser = user?.role === "closer";
 
-  // Effect 1: Fetch UIDs of closers assigned to ANY lead (waiting_assignment, scheduled, accepted, in_process).
+  // Effect 1: Fetch UIDs of closers assigned to ANY lead
   useEffect(() => {
     if (!user?.teamId) {
       setAssignedLeadCloserIds(new Set());
@@ -69,7 +67,7 @@ export default function CloserLineup() {
     return () => unsubscribeLeads();
   }, [user?.teamId, toast]);
 
-  // Effect 2: Fetch "On Duty" closers, then filter out those assigned to an "in_process" lead.
+  // Effect 2: Fetch "On Duty" closers, then filter out those assigned to leads
   useEffect(() => {
     if (!user?.teamId) {
       setClosersInLineup([]);
@@ -110,17 +108,6 @@ export default function CloserLineup() {
           } as Closer;
         });
 
-        // Log to debug why Ryan Madden might be appearing in lineup
-        if (allOnDutyClosers.some(closer => closer.name === "Ryan Madden")) {
-          const ryanMadden = allOnDutyClosers.find(closer => closer.name === "Ryan Madden");
-          console.log("Ryan Madden status:", { 
-            isOnDuty: ryanMadden?.status === "On Duty",
-            uid: ryanMadden?.uid,
-            hasAssignedLead: assignedLeadCloserIds.has(ryanMadden?.uid || ""),
-            assignedCloserIds: Array.from(assignedLeadCloserIds)
-          });
-        }
-        
         const availableClosers = allOnDutyClosers.filter(
           (closer) => !assignedLeadCloserIds.has(closer.uid)
         );
@@ -142,7 +129,6 @@ export default function CloserLineup() {
             return a.name.localeCompare(b.name);
           });
 
-        // Sort all on duty closers for the full lineup view (closers can see this)
         const sortedAllOnDutyClosers = allOnDutyClosers
           .map((closer, index) => ({
             ...closer,
@@ -182,19 +168,12 @@ export default function CloserLineup() {
   const isOverallLoading = isLoadingAssignedCloserIds || isLoadingClosersForLineup;
 
   const handleCardClick = () => {
-    console.log('🔥 CloserLineup - Card header clicked for manager tools:', { 
-      userRole: user?.role, 
-      canManageClosers,
-      modalWillOpen: canManageClosers 
-    });
     if (canManageClosers) {
       setIsManageModalOpen(true);
     }
   };
 
-  // Determine which closers to display and the appropriate messaging
   const getDisplayData = () => {
-    // Safety check for user data
     if (!user || !user.role) {
       return {
         closers: [],
@@ -205,7 +184,6 @@ export default function CloserLineup() {
     }
 
     if (isCloser) {
-      // Closers see the full On Duty lineup with their position
       const displayClosers = allOnDutyClosers;
       const emptyTitle = "No On Duty Closers";
       const emptyDescription = "No closers are currently on duty.";
@@ -218,7 +196,6 @@ export default function CloserLineup() {
         titleSuffix
       };
     } else {
-      // Managers/admins/setters see only available closers
       const displayClosers = closersInLineup;
       const emptyTitle = "No Available Closers";
       const emptyDescription = "All closers are currently off duty or assigned to leads.";
@@ -235,14 +212,13 @@ export default function CloserLineup() {
 
   const { closers: displayClosers, emptyTitle, emptyDescription, titleSuffix } = getDisplayData();
 
-  // Early return if user is not loaded yet
   if (!user) {
     return (
       <Card className="h-full flex flex-col bg-white shadow-lg hover:shadow-xl transition-all duration-200 border-0 ring-1 ring-slate-200">
-        <CardContent className="flex-grow overflow-hidden px-6 pb-6">
-          <div className="flex h-full flex-col items-center justify-center text-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            <p className="text-muted-foreground text-sm mt-2">Loading...</p>
+        <CardContent className="flex-grow overflow-hidden px-4 pb-4">
+          <div className="flex h-full flex-col items-center justify-center text-center py-8">
+            <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-muted-foreground" />
+            <p className="text-sm text-muted-foreground mt-2">Loading...</p>
           </div>
         </CardContent>
       </Card>
@@ -254,71 +230,71 @@ export default function CloserLineup() {
       <Card 
         className="h-full flex flex-col bg-white shadow-lg hover:shadow-xl transition-all duration-200 border-0 ring-1 ring-slate-200"
       >
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 px-6 pt-6">
-          <CardTitle className="text-xl sm:text-2xl font-bold font-headline flex items-center text-slate-900 dark:text-slate-100 premium:text-premium-purple premium:text-glow">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 px-4 pt-4 shrink-0">
+          <CardTitle className="text-lg sm:text-xl font-bold font-headline flex items-center text-slate-900 dark:text-slate-100 premium:text-premium-purple premium:text-glow">
             <div className={
-              `mr-3 rounded-lg flex items-center justify-center p-2 border-2 border-premium-purple dark:border-premium-purple premium:border-premium-purple premium:shadow-premium-purple premium:bg-gradient-to-br premium:from-premium-purple/80 premium:to-premium-teal/80 premium:icon-glow-purple`
+              `mr-2 rounded-lg flex items-center justify-center p-2 border-2 border-premium-purple dark:border-premium-purple premium:border-premium-purple premium:shadow-premium-purple premium:bg-gradient-to-br premium:from-premium-purple/80 premium:to-premium-teal/80 premium:icon-glow-purple`
             } onClick={canManageClosers ? handleCardClick : undefined}>
-              <Users className="h-6 w-6 text-premium-purple premium:icon-glow-purple" />
+              <Users className="h-4 w-4 sm:h-5 sm:w-5 text-premium-purple premium:icon-glow-purple" />
             </div>
-            <div className="flex flex-col">
-              <span>Closer Lineup</span>
-              <span className="text-sm font-normal text-muted-foreground premium:text-premium-teal">{titleSuffix}</span>
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm sm:text-base leading-tight">Closer Lineup</span>
+              <span className="text-xs font-normal text-muted-foreground premium:text-premium-teal truncate">{titleSuffix}</span>
             </div>
           </CardTitle>
-          <div className="flex items-center gap-2">
-            {isOverallLoading && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}
+          <div className="flex items-center gap-2 shrink-0">
+            {isOverallLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
           </div>
         </CardHeader>
-      <CardContent className="flex-grow overflow-hidden px-6 pb-6">
-        {displayClosers.length === 0 && !isOverallLoading ? (
-          <div className="flex h-full flex-col items-center justify-center text-center py-12">
-            <div className="p-4 bg-slate-100 rounded-full mb-4">
-              <Users className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">{emptyTitle}</h3>
-            <p className="text-muted-foreground text-sm max-w-xs">
-              {emptyDescription}
-            </p>
-            {user && !user.teamId && (
-              <p className="text-xs text-red-600 bg-red-50 px-3 py-1 rounded-md mt-2">
-                Error: User missing team assignment
-              </p>
-            )}
-          </div>
-        ) : (
-          <div className="h-64">
-            <ScrollArea className="h-full">
-              <div className="space-y-4 pr-2">
-                {displayClosers.map((closer, index) => {
-                  const isCurrentUser = closer.uid === user?.uid;
-                  const isAssigned = assignedLeadCloserIds.has(closer.uid);
-                  
-                  return (
-                    <div key={closer.uid} className={isCurrentUser ? "ring-2 ring-blue-400 rounded-lg" : ""}>
-                      <CloserCard
-                        closer={closer}
-                        allowInteractiveToggle={false}
-                        position={index + 1}
-                        assignedLeadName={
-                          isAssigned ? "Working on lead" : undefined
-                        }
-                      />
-                    </div>
-                  );
-                })}
+        
+        <CardContent className="flex-grow overflow-hidden px-4 pb-4">
+          {displayClosers.length === 0 && !isOverallLoading ? (
+            <div className="flex h-full flex-col items-center justify-center text-center py-8">
+              <div className="p-3 bg-slate-100 rounded-full mb-3">
+                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
               </div>
-            </ScrollArea>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-    
-    {/* Manage Closers Modal */}
-    <ManageClosersModal
-      isOpen={isManageModalOpen}
-      onClose={() => setIsManageModalOpen(false)}
-    />
+              <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">{emptyTitle}</h3>
+              <p className="text-muted-foreground text-sm max-w-xs">
+                {emptyDescription}
+              </p>
+              {user && !user.teamId && (
+                <p className="text-xs text-red-600 bg-red-50 px-3 py-1 rounded-md mt-2">
+                  Error: User missing team assignment
+                </p>
+              )}
+            </div>
+          ) : (
+            <div className="h-full overflow-hidden">
+              <ScrollArea className="h-full">
+                <div className="space-y-3 pr-2">
+                  {displayClosers.map((closer, index) => {
+                    const isCurrentUser = closer.uid === user?.uid;
+                    const isAssigned = assignedLeadCloserIds.has(closer.uid);
+                    
+                    return (
+                      <div key={closer.uid} className={isCurrentUser ? "ring-2 ring-blue-400 rounded-lg" : ""}>
+                        <CloserCard
+                          closer={closer}
+                          allowInteractiveToggle={false}
+                          position={index + 1}
+                          assignedLeadName={
+                            isAssigned ? "Working on lead" : undefined
+                          }
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      <ManageClosersModal
+        isOpen={isManageModalOpen}
+        onClose={() => setIsManageModalOpen(false)}
+      />
     </>
   );
 }
