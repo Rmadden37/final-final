@@ -1,0 +1,285 @@
+/* Leaderboard Component Styles */
+/* Save as: src/styles/leaderboard.css */
+
+.leaderboard-container {
+  @apply space-y-6;
+}
+
+.leaderboard-card {
+  @apply p-6 sm:p-8 border-2 rounded-2xl bg-gradient-to-r relative overflow-hidden;
+  @apply hover:shadow-2xl active:scale-[0.98] transition-all duration-300 cursor-pointer touch-manipulation;
+}
+
+.leaderboard-card.rank-1 {
+  @apply from-blue-100 to-white ring-4 ring-blue-500 shadow-2xl scale-[1.04] border-blue-200;
+}
+
+.leaderboard-card.rank-1.premium {
+  @apply from-purple-500/40 to-teal-400/20 ring-4 ring-purple-500 shadow-lg border-purple-400;
+}
+
+.leaderboard-card.rank-other {
+  @apply from-white to-gray-50 shadow-lg border-gray-200;
+}
+
+.leaderboard-card.rank-other.premium {
+  @apply from-purple-500/10 to-teal-400/5 border-purple-400 shadow-lg;
+}
+
+.leaderboard-card.rank-other.dark {
+  @apply dark:from-slate-900 dark:to-slate-800 dark:border-slate-700;
+}
+
+.leaderboard-content {
+  @apply flex items-center justify-between;
+}
+
+.leaderboard-left-section {
+  @apply flex items-center space-x-6 flex-1 min-w-0;
+}
+
+.leaderboard-right-section {
+  @apply text-right shrink-0 ml-4;
+}
+
+/* Rank Badges */
+.rank-badge {
+  @apply font-bold shadow-lg px-4 py-3 text-xl;
+}
+
+.rank-badge.gold {
+  @apply bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900 border-yellow-300;
+}
+
+.rank-badge.silver {
+  @apply bg-gradient-to-r from-gray-300 to-gray-500 text-gray-800 border-gray-400;
+}
+
+.rank-badge.bronze {
+  @apply bg-gradient-to-r from-amber-600 to-amber-800 text-amber-100 border-amber-500;
+}
+
+.rank-badge.other {
+  @apply font-semibold px-4 py-3 text-xl border-2;
+}
+
+.rank-icon {
+  @apply w-8 h-8 mr-3;
+}
+
+.rank-icon.gold {
+  @apply text-yellow-700;
+}
+
+.rank-icon.silver {
+  @apply text-gray-600;
+}
+
+.rank-icon.bronze {
+  @apply text-amber-200;
+}
+
+/* Avatars */
+.leaderboard-avatar {
+  @apply h-20 w-20 sm:h-24 sm:w-24 ring-4 bg-white shadow-xl;
+}
+
+.leaderboard-avatar.premium {
+  @apply ring-teal-400;
+}
+
+.leaderboard-avatar.default {
+  @apply ring-blue-300;
+}
+
+.leaderboard-avatar.dark {
+  @apply dark:ring-blue-900;
+}
+
+.leaderboard-avatar-fallback {
+  @apply text-2xl font-bold;
+}
+
+.leaderboard-avatar-fallback.premium {
+  @apply text-teal-400 bg-purple-500/10;
+}
+
+.leaderboard-avatar-fallback.default {
+  @apply text-blue-700 bg-blue-50;
+}
+
+.leaderboard-avatar-fallback.dark {
+  @apply dark:text-blue-300 dark:bg-slate-800;
+}
+
+.leaderboard-avatar-image {
+  @apply object-cover;
+}
+
+/* Names and Text */
+.leaderboard-name {
+  @apply font-bold text-2xl sm:text-3xl mb-2 truncate;
+}
+
+.leaderboard-name.premium {
+  @apply text-white;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.25), 0 0 40px rgba(187, 134, 252, 0.15);
+}
+
+.leaderboard-name.default {
+  @apply text-gray-900;
+}
+
+.leaderboard-name.dark {
+  @apply dark:text-white;
+}
+
+.leaderboard-metric-container {
+  @apply flex items-center gap-2 mb-1;
+}
+
+.leaderboard-metric-label {
+  @apply text-lg font-medium;
+}
+
+.leaderboard-metric-label.premium {
+  @apply text-purple-400;
+}
+
+.leaderboard-metric-label.default {
+  @apply text-gray-500;
+}
+
+.leaderboard-metric-label.dark {
+  @apply dark:text-gray-300;
+}
+
+.leaderboard-metric-value {
+  @apply font-bold text-2xl;
+}
+
+.leaderboard-metric-value.premium {
+  @apply text-teal-400;
+}
+
+.leaderboard-metric-value.default {
+  @apply text-blue-700;
+}
+
+.leaderboard-metric-value.dark {
+  @apply dark:text-blue-300;
+}
+
+/* Right Section - kW Display */
+.leaderboard-kw-label {
+  @apply text-lg font-medium mb-2;
+}
+
+.leaderboard-kw-label.premium {
+  @apply text-purple-400;
+}
+
+.leaderboard-kw-label.default {
+  @apply text-gray-500;
+}
+
+.leaderboard-kw-label.dark {
+  @apply dark:text-gray-300;
+}
+
+.leaderboard-kw-value {
+  @apply font-bold text-3xl sm:text-4xl;
+}
+
+.leaderboard-kw-value.premium {
+  @apply text-teal-400;
+}
+
+.leaderboard-kw-value.default {
+  @apply text-blue-700;
+}
+
+.leaderboard-kw-value.dark {
+  @apply dark:text-blue-300;
+}
+
+.leaderboard-kw-unit {
+  @apply text-lg;
+}
+
+.leaderboard-kw-unit.premium {
+  @apply text-purple-400;
+}
+
+.leaderboard-kw-unit.default {
+  @apply text-gray-400;
+}
+
+.leaderboard-kw-unit.dark {
+  @apply dark:text-gray-500;
+}
+
+/* Empty State */
+.leaderboard-empty {
+  @apply text-center p-12 text-xl;
+}
+
+.leaderboard-empty.default {
+  @apply text-gray-400;
+}
+
+.leaderboard-empty.dark {
+  @apply dark:text-gray-500;
+}
+
+/* Card Headers */
+.leaderboard-card-header {
+  @apply pb-4;
+}
+
+.leaderboard-card-title {
+  @apply text-2xl font-bold;
+}
+
+.leaderboard-card-title.premium {
+  @apply text-purple-400;
+}
+
+.leaderboard-card-title.default {
+  @apply text-gray-800;
+}
+
+.leaderboard-card-title.dark {
+  @apply dark:text-white;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 640px) {
+  .leaderboard-card {
+    @apply p-4;
+  }
+  
+  .leaderboard-left-section {
+    @apply space-x-4;
+  }
+  
+  .leaderboard-avatar {
+    @apply h-16 w-16;
+  }
+  
+  .leaderboard-name {
+    @apply text-xl;
+  }
+  
+  .leaderboard-kw-value {
+    @apply text-2xl;
+  }
+  
+  .rank-badge {
+    @apply px-3 py-2 text-lg;
+  }
+  
+  .rank-icon {
+    @apply w-6 h-6 mr-2;
+  }
+}

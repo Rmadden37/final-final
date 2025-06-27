@@ -1,5 +1,6 @@
 'use client'
 
+import '../../../styles/leaderboard.css'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -41,6 +42,39 @@ interface SetterData {
   }
 }
 
+// Helper component for rank badges
+const LeaderboardRankBadge = ({ rank }: { rank: number }) => {
+  if (rank === 1) {
+    return (
+      <Badge className="rank-badge gold">
+        <Trophy className="rank-icon gold" />
+        <span>1st</span>
+      </Badge>
+    )
+  }
+  if (rank === 2) {
+    return (
+      <Badge className="rank-badge silver">
+        <Medal className="rank-icon silver" />
+        <span>2nd</span>
+      </Badge>
+    )
+  }
+  if (rank === 3) {
+    return (
+      <Badge className="rank-badge bronze">
+        <Medal className="rank-icon bronze" />
+        <span>3rd</span>
+      </Badge>
+    )
+  }
+  return (
+    <Badge variant="outline" className="rank-badge other">
+      #{rank}
+    </Badge>
+  )
+}
+
 export default function LeaderboardPage() {
   const { user } = useAuth();
   const isManagerOrAdmin = user?.role === "manager" || user?.role === "admin";
@@ -75,7 +109,8 @@ export default function LeaderboardPage() {
     { label: 'LW (Last Week)', value: 'lw', start: startOfLastWeek, end: new Date(startOfWeek.getTime() - 1) },
     { label: 'WTD', value: 'wtd', start: startOfWeek },
     { label: 'MTD', value: 'mtd', start: startOfMonth },
-    { label: 'YTD', value: 'ytd', start: startOfYTD },  ]
+    { label: 'YTD', value: 'ytd', start: startOfYTD },
+  ]
 
   // Fetch users for photo matching
   useEffect(() => {
@@ -142,18 +177,56 @@ export default function LeaderboardPage() {
     const filter = memoizedDateFilters.find(f => f.value === dateFilter)
     if (!filter) return true
     
-    const [month, day, year] = dateStr.split('/')
-    if (!month || !day || !year) return false
+    if (!dateStr || dateStr.trim() === '') return false
     
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    let date: Date | null = null
+    const trimmedDate = dateStr.trim()
     
-    // Handle specific date ranges with end dates
-    if (filter.end) {
-      return date >= filter.start && date <= filter.end
+    // Try multiple date formats that Google Sheets commonly uses
+    try {
+      // Format 1: M/D/YYYY or MM/DD/YYYY
+      if (trimmedDate.includes('/')) {
+        const parts = trimmedDate.split('/')
+        if (parts.length === 3) {
+          const [month, day, year] = parts
+          date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+        }
+      }
+      // Format 2: YYYY-MM-DD
+      else if (trimmedDate.includes('-') && trimmedDate.length >= 8) {
+        date = new Date(trimmedDate)
+      }
+      // Format 3: MM-DD-YYYY
+      else if (trimmedDate.includes('-')) {
+        const parts = trimmedDate.split('-')
+        if (parts.length === 3) {
+          const [month, day, year] = parts
+          date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+        }
+      }
+      // Format 4: Try direct parsing (handles many formats automatically)
+      else {
+        date = new Date(trimmedDate)
+      }
+      
+      // Validate the parsed date
+      if (!date || isNaN(date.getTime())) {
+        console.warn('❌ Could not parse date:', trimmedDate)
+        return false
+      }
+      
+      // Handle specific date ranges with end dates
+      if (filter.end) {
+        return date >= filter.start && date <= filter.end
+      }
+      
+      // Handle ranges that go until today
+      return date >= filter.start
+      
+    } catch (error) {
+      console.error('❌ Date parsing error for:', trimmedDate, error)
+      return false
     }
-    
-    // Handle ranges that go until today
-    return date >= filter.start
   }, [dateFilter, memoizedDateFilters])
 
   // Load data from API
@@ -278,8 +351,6 @@ export default function LeaderboardPage() {
     loadData()
   }, [loadData]) // Re-run when loadData changes
 
-  // Check if a date is in the selected range (formatting functions)
-
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -291,31 +362,6 @@ export default function LeaderboardPage() {
 
   const formatKW = (kw: number) => {
     return kw.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })
-  }
-
-  const getRankBadge = (rank: number) => {
-    if (rank === 1) return (
-      <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900 font-bold border-yellow-300 shadow-lg px-2 py-1 sm:px-3 sm:py-2 text-sm sm:text-lg">
-        <Trophy className="w-4 h-4 sm:w-6 sm:h-6 mr-1 sm:mr-2 text-yellow-700" />
-        <span className="hidden sm:inline">1st</span>
-        <span className="sm:hidden">1</span>
-      </Badge>
-    )
-    if (rank === 2) return (
-      <Badge className="bg-gradient-to-r from-gray-300 to-gray-500 text-gray-800 font-bold border-gray-400 shadow-lg px-2 py-1 sm:px-3 sm:py-2 text-sm sm:text-lg">
-        <Medal className="w-4 h-4 sm:w-6 sm:h-6 mr-1 sm:mr-2 text-gray-600" />
-        <span className="hidden sm:inline">2nd</span>
-        <span className="sm:hidden">2</span>
-      </Badge>
-    )
-    if (rank === 3) return (
-      <Badge className="bg-gradient-to-r from-amber-600 to-amber-800 text-amber-100 font-bold border-amber-500 shadow-lg px-2 py-1 sm:px-3 sm:py-2 text-sm sm:text-lg">
-        <Medal className="w-4 h-4 sm:w-6 sm:h-6 mr-1 sm:mr-2 text-amber-200" />
-        <span className="hidden sm:inline">3rd</span>
-        <span className="sm:hidden">3</span>
-      </Badge>
-    )
-    return <Badge variant="outline" className="font-semibold px-2 py-1 sm:px-3 sm:py-2 text-sm sm:text-lg">#{rank}</Badge>
   }
 
   // Detect premium mode (body or root has .premium class)
@@ -343,7 +389,6 @@ export default function LeaderboardPage() {
   const premiumCard = 'premium card-glass shadow-premium-purple border-premium-glow bg-premium-glass';
   const premiumStat = 'stat-glow';
   const premiumTab = 'bg-gradient-to-r from-premium-purple/20 to-premium-teal/10 border border-premium-glow glow-premium';
-  const premiumTop = 'ring-4 ring-premium-purple scale-[1.06] shadow-premium-purple';
 
   return (
     <div className={`min-h-screen w-full ${isPremium ? 'premium bg-premium-glass' : 'bg-[#f8fafc] dark:bg-slate-950'}`}>
@@ -439,51 +484,75 @@ export default function LeaderboardPage() {
           </TabsList>
 
           {/* Top Closers Tab Content */}
-          <TabsContent value="closers" className="space-y-4">
+          <TabsContent value="closers" className="leaderboard-container">
             <Card className={`${isPremium ? premiumCard : 'bg-white border border-gray-300 shadow-xl dark:bg-slate-900 dark:border-slate-800 dark:shadow-lg'}`} data-card>
-              <CardHeader>
-                <CardTitle className={`text-xl font-bold ${isPremium ? 'text-premium-purple' : 'text-gray-800 dark:text-white'}`}>Top Closers</CardTitle>
+              <CardHeader className="leaderboard-card-header">
+                <CardTitle className={`leaderboard-card-title ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                  Top Closers
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="leaderboard-container">
                   {closers.slice(0, 10).map((closer, index) => {
                     const displayName = closer.matchedProfile?.displayName || closer.name;
                     const avatarUrl = closer.matchedProfile?.photoURL;
+                    const isTopRank = index === 0;
+                    
                     return (
                       <div
                         key={closer.name}
-                        className={`flex items-center justify-between p-4 sm:p-6 border rounded-xl bg-gradient-to-r relative overflow-hidden ${isPremium ? (index === 0 ? 'from-premium-purple/40 to-premium-teal/20 ring-4 ring-premium-purple shadow-premium-purple scale-[1.06]' : 'from-premium-purple/10 to-premium-teal/5 border-premium-glow shadow-premium-purple') : (index === 0 ? 'from-blue-100 to-white ring-2 ring-blue-500 shadow-2xl scale-[1.04]' : 'from-white to-gray-50 shadow-lg dark:from-slate-900 dark:to-slate-800')} hover:shadow-2xl active:scale-[0.98] transition-all duration-200 cursor-pointer touch-manipulation`}
-                        style={index === 0 ? { zIndex: 2 } : { }}
+                        className={`leaderboard-card ${isTopRank ? 'rank-1' : 'rank-other'} ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}
+                        style={isTopRank ? { zIndex: 2 } : {}}
                       >
-                        <div className="flex items-center space-x-4 flex-1 min-w-0">
-                          <div className="shrink-0">
-                            {getRankBadge(index + 1)}
-                          </div>
-                          <Avatar className={`h-14 w-14 sm:h-16 sm:w-16 ring-2 ${isPremium ? 'ring-premium-teal' : 'ring-blue-300 dark:ring-blue-900'} bg-white shadow-lg`}>
-                            <AvatarImage src={avatarUrl || undefined} alt={displayName} />
-                            <AvatarFallback className={`text-lg font-bold ${isPremium ? 'text-premium-teal bg-premium-glass' : 'text-blue-700 bg-blue-50 dark:text-blue-300 dark:bg-slate-800'}`}>{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <p className={`font-bold text-lg sm:text-2xl mb-1 truncate ${isPremium ? 'text-glow' : 'text-gray-900 dark:text-white'}`}>{displayName}</p>
-                            <div className="hidden sm:block">
-                              <p className={`text-sm font-medium mb-1 ${isPremium ? 'text-premium-purple' : 'text-gray-500 dark:text-gray-300'}`}>Net Deals</p>
-                              <p className={`font-bold text-xl ${isPremium ? 'text-premium-teal' : 'text-blue-700 dark:text-blue-300'}`}>{closer.sales}</p>
+                        <div className="leaderboard-content">
+                          <div className="leaderboard-left-section">
+                            <div className="shrink-0">
+                              <LeaderboardRankBadge rank={index + 1} />
                             </div>
-                            <div className="sm:hidden">
-                              <p className={`text-xs ${isPremium ? 'text-premium-purple' : 'text-gray-500 dark:text-gray-300'}`}>Net Deals: <span className={`font-bold ${isPremium ? 'text-premium-teal' : 'text-blue-700 dark:text-blue-300'}`}>{closer.sales}</span></p>
+                            
+                            <Avatar className={`leaderboard-avatar ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              <AvatarImage 
+                                src={avatarUrl || undefined} 
+                                alt={displayName} 
+                                className="leaderboard-avatar-image" 
+                              />
+                              <AvatarFallback className={`leaderboard-avatar-fallback ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                                {displayName.slice(0, 2).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            
+                            <div className="flex-1 min-w-0">
+                              <p className={`leaderboard-name ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                                {displayName}
+                              </p>
+                              <div className="leaderboard-metric-container">
+                                <p className={`leaderboard-metric-label ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                                  Net Deals:
+                                </p>
+                                <p className={`leaderboard-metric-value ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                                  {closer.sales}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="text-right shrink-0 ml-2">
-                          <p className={`text-xs sm:text-sm font-medium mb-1 ${isPremium ? 'text-premium-purple' : 'text-gray-500 dark:text-gray-300'}`}>Total kW</p>
-                          <p className={`font-bold text-lg sm:text-2xl ${isPremium ? 'text-premium-teal' : 'text-blue-700 dark:text-blue-300'}`}>{formatKW(closer.totalKW)}</p>
-                          <p className={`text-xs sm:text-sm ${isPremium ? 'text-premium-purple' : 'text-gray-400 dark:text-gray-500'}`}>kW</p>
+                          
+                          <div className="leaderboard-right-section">
+                            <p className={`leaderboard-kw-label ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              Total kW
+                            </p>
+                            <p className={`leaderboard-kw-value ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              {formatKW(closer.totalKW)}
+                            </p>
+                            <p className={`leaderboard-kw-unit ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              kW
+                            </p>
+                          </div>
                         </div>
                       </div>
                     )
                   })}
                   {closers.length === 0 && (
-                    <div className="text-center p-8 text-gray-400 dark:text-gray-500">
+                    <div className={`leaderboard-empty ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
                       No closer data available for the selected date range.
                     </div>
                   )}
@@ -493,47 +562,75 @@ export default function LeaderboardPage() {
           </TabsContent>
 
           {/* Top Setters Tab Content */}
-          <TabsContent value="setters" className="space-y-4">
+          <TabsContent value="setters" className="leaderboard-container">
             <Card className={`${isPremium ? premiumCard : 'bg-white border border-gray-300 shadow-xl dark:bg-slate-900 dark:border-slate-800 dark:shadow-lg'}`} data-card>
-              <CardHeader>
-                <CardTitle className={`text-xl font-bold ${isPremium ? 'text-premium-purple' : 'text-gray-800 dark:text-white'}`}>Top Setters</CardTitle>
+              <CardHeader className="leaderboard-card-header">
+                <CardTitle className={`leaderboard-card-title ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                  Top Setters
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="leaderboard-container">
                   {setters.slice(0, 10).map((setter, index) => {
                     const displayName = setter.matchedProfile?.displayName || setter.name;
                     const avatarUrl = setter.matchedProfile?.photoURL;
+                    const isTopRank = index === 0;
+                    
                     return (
-                      <div key={setter.name} className={`flex items-center justify-between p-4 sm:p-6 border rounded-xl bg-gradient-to-r relative overflow-hidden ${isPremium ? (index === 0 ? 'from-premium-purple/40 to-premium-teal/20 ring-4 ring-premium-purple shadow-premium-purple scale-[1.06]' : 'from-premium-purple/10 to-premium-teal/5 border-premium-glow shadow-premium-purple') : (index === 0 ? 'from-blue-100 to-white ring-2 ring-blue-500 shadow-2xl scale-[1.04]' : 'from-white to-gray-50 shadow-lg dark:from-slate-900 dark:to-slate-800')} hover:shadow-2xl active:scale-[0.98] transition-all duration-200 cursor-pointer touch-manipulation`} style={index === 0 ? { zIndex: 2 } : {}}>
-                        <div className="flex items-center space-x-4 flex-1 min-w-0">
-                          <div className="shrink-0">
-                            {getRankBadge(index + 1)}
-                          </div>
-                          <Avatar className={`h-14 w-14 sm:h-16 sm:w-16 ring-2 ${isPremium ? 'ring-premium-teal' : 'ring-blue-300 dark:ring-blue-900'} bg-white shadow-lg`}>
-                            <AvatarImage src={avatarUrl || undefined} alt={displayName} />
-                            <AvatarFallback className={`text-lg font-bold ${isPremium ? 'text-premium-teal bg-premium-glass' : 'text-blue-700 bg-blue-50 dark:text-blue-300 dark:bg-slate-800'}`}>{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <p className={`font-bold text-lg sm:text-2xl mb-1 truncate ${isPremium ? 'text-glow' : 'text-gray-900 dark:text-white'}`}>{displayName}</p>
-                            <div className="hidden sm:block">
-                              <p className={`text-sm font-medium mb-1 ${isPremium ? 'text-premium-purple' : 'text-gray-500 dark:text-gray-300'}`}>Gross Deals</p>
-                              <p className={`font-bold text-xl ${isPremium ? 'text-premium-teal' : 'text-blue-700 dark:text-blue-300'}`}>{setter.totalLeads}</p>
+                      <div
+                        key={setter.name}
+                        className={`leaderboard-card ${isTopRank ? 'rank-1' : 'rank-other'} ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}
+                        style={isTopRank ? { zIndex: 2 } : {}}
+                      >
+                        <div className="leaderboard-content">
+                          <div className="leaderboard-left-section">
+                            <div className="shrink-0">
+                              <LeaderboardRankBadge rank={index + 1} />
                             </div>
-                            <div className="sm:hidden">
-                              <p className={`text-xs ${isPremium ? 'text-premium-purple' : 'text-gray-500 dark:text-gray-300'}`}>Gross Deals: <span className={`font-bold ${isPremium ? 'text-premium-teal' : 'text-blue-700 dark:text-blue-300'}`}>{setter.totalLeads}</span></p>
+                            
+                            <Avatar className={`leaderboard-avatar ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              <AvatarImage 
+                                src={avatarUrl || undefined} 
+                                alt={displayName} 
+                                className="leaderboard-avatar-image" 
+                              />
+                              <AvatarFallback className={`leaderboard-avatar-fallback ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                                {displayName.slice(0, 2).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            
+                            <div className="flex-1 min-w-0">
+                              <p className={`leaderboard-name ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                                {displayName}
+                              </p>
+                              <div className="leaderboard-metric-container">
+                                <p className={`leaderboard-metric-label ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                                  Gross Deals:
+                                </p>
+                                <p className={`leaderboard-metric-value ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                                  {setter.totalLeads}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="text-right shrink-0 ml-2">
-                          <p className={`text-xs sm:text-sm font-medium mb-1 ${isPremium ? 'text-premium-purple' : 'text-gray-500 dark:text-gray-300'}`}>Gross kW</p>
-                          <p className={`font-bold text-lg sm:text-2xl ${isPremium ? 'text-premium-teal' : 'text-blue-700 dark:text-blue-300'}`}>{formatKW(setter.grossKW)}</p>
-                          <p className={`text-xs sm:text-sm ${isPremium ? 'text-premium-purple' : 'text-gray-400 dark:text-gray-500'}`}>kW</p>
+                          
+                          <div className="leaderboard-right-section">
+                            <p className={`leaderboard-kw-label ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              Gross kW
+                            </p>
+                            <p className={`leaderboard-kw-value ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              {formatKW(setter.grossKW)}
+                            </p>
+                            <p className={`leaderboard-kw-unit ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              kW
+                            </p>
+                          </div>
                         </div>
                       </div>
                     )
                   })}
                   {setters.length === 0 && (
-                    <div className="text-center p-8 text-gray-400 dark:text-gray-500">
+                    <div className={`leaderboard-empty ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
                       No setter data available for the selected date range.
                     </div>
                   )}
@@ -543,47 +640,75 @@ export default function LeaderboardPage() {
           </TabsContent>
 
           {/* Top Self-Gen Tab Content */}
-          <TabsContent value="selfgen" className="space-y-4">
+          <TabsContent value="selfgen" className="leaderboard-container">
             <Card className={`${isPremium ? premiumCard : 'bg-white border border-gray-300 shadow-xl dark:bg-slate-900 dark:border-slate-800 dark:shadow-lg'}`} data-card>
-              <CardHeader>
-                <CardTitle className={`text-xl font-bold ${isPremium ? 'text-premium-purple' : 'text-gray-800 dark:text-white'}`}>Top Self-Gen</CardTitle>
+              <CardHeader className="leaderboard-card-header">
+                <CardTitle className={`leaderboard-card-title ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                  Top Self-Gen
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="leaderboard-container">
                   {selfGen.slice(0, 10).map((person, index) => {
                     const displayName = person.matchedProfile?.displayName || person.name;
                     const avatarUrl = person.matchedProfile?.photoURL;
+                    const isTopRank = index === 0;
+                    
                     return (
-                      <div key={person.name} className={`flex items-center justify-between p-4 sm:p-6 border rounded-xl bg-gradient-to-r relative overflow-hidden ${isPremium ? (index === 0 ? 'from-premium-purple/40 to-premium-teal/20 ring-4 ring-premium-purple shadow-premium-purple scale-[1.06]' : 'from-premium-purple/10 to-premium-teal/5 border-premium-glow shadow-premium-purple') : (index === 0 ? 'from-blue-100 to-white ring-2 ring-blue-500 shadow-2xl scale-[1.04]' : 'from-white to-gray-50 shadow-lg dark:from-slate-900 dark:to-slate-800')} hover:shadow-2xl active:scale-[0.98] transition-all duration-200 cursor-pointer touch-manipulation`} style={index === 0 ? { zIndex: 2 } : {}}>
-                        <div className="flex items-center space-x-4 flex-1 min-w-0">
-                          <div className="shrink-0">
-                            {getRankBadge(index + 1)}
-                          </div>
-                          <Avatar className={`h-14 w-14 sm:h-16 sm:w-16 ring-2 ${isPremium ? 'ring-premium-teal' : 'ring-blue-300 dark:ring-blue-900'} bg-white shadow-lg`}>
-                            <AvatarImage src={avatarUrl || undefined} alt={displayName} />
-                            <AvatarFallback className={`text-lg font-bold ${isPremium ? 'text-premium-teal bg-premium-glass' : 'text-blue-700 bg-blue-50 dark:text-blue-300 dark:bg-slate-800'}`}>{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <p className={`font-bold text-lg sm:text-2xl mb-1 truncate ${isPremium ? 'text-glow' : 'text-gray-900 dark:text-white'}`}>{displayName}</p>
-                            <div className="hidden sm:block">
-                              <p className={`text-sm font-medium mb-1 ${isPremium ? 'text-premium-purple' : 'text-gray-500 dark:text-gray-300'}`}>Net Self-Gen Deals</p>
-                              <p className={`font-bold text-xl ${isPremium ? 'text-premium-teal' : 'text-blue-700 dark:text-blue-300'}`}>{person.sales}</p>
+                      <div
+                        key={person.name}
+                        className={`leaderboard-card ${isTopRank ? 'rank-1' : 'rank-other'} ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}
+                        style={isTopRank ? { zIndex: 2 } : {}}
+                      >
+                        <div className="leaderboard-content">
+                          <div className="leaderboard-left-section">
+                            <div className="shrink-0">
+                              <LeaderboardRankBadge rank={index + 1} />
                             </div>
-                            <div className="sm:hidden">
-                              <p className={`text-xs ${isPremium ? 'text-premium-purple' : 'text-gray-500 dark:text-gray-300'}`}>Net Self-Gen Deals: <span className={`font-bold ${isPremium ? 'text-premium-teal' : 'text-blue-700 dark:text-blue-300'}`}>{person.sales}</span></p>
+                            
+                            <Avatar className={`leaderboard-avatar ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              <AvatarImage 
+                                src={avatarUrl || undefined} 
+                                alt={displayName} 
+                                className="leaderboard-avatar-image" 
+                              />
+                              <AvatarFallback className={`leaderboard-avatar-fallback ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                                {displayName.slice(0, 2).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            
+                            <div className="flex-1 min-w-0">
+                              <p className={`leaderboard-name ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                                {displayName}
+                              </p>
+                              <div className="leaderboard-metric-container">
+                                <p className={`leaderboard-metric-label ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                                  Net Self-Gen Deals:
+                                </p>
+                                <p className={`leaderboard-metric-value ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                                  {person.sales}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="text-right shrink-0 ml-2">
-                          <p className={`text-xs sm:text-sm font-medium mb-1 ${isPremium ? 'text-premium-purple' : 'text-gray-500 dark:text-gray-300'}`}>Total kW</p>
-                          <p className={`font-bold text-lg sm:text-2xl ${isPremium ? 'text-premium-teal' : 'text-blue-700 dark:text-blue-300'}`}>{formatKW(person.totalKW)}</p>
-                          <p className={`text-xs sm:text-sm ${isPremium ? 'text-premium-purple' : 'text-gray-400 dark:text-gray-500'}`}>kW</p>
+                          
+                          <div className="leaderboard-right-section">
+                            <p className={`leaderboard-kw-label ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              Total kW
+                            </p>
+                            <p className={`leaderboard-kw-value ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              {formatKW(person.totalKW)}
+                            </p>
+                            <p className={`leaderboard-kw-unit ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              kW
+                            </p>
+                          </div>
                         </div>
                       </div>
                     )
                   })}
                   {selfGen.length === 0 && (
-                    <div className="text-center p-8 text-gray-400 dark:text-gray-500">
+                    <div className={`leaderboard-empty ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
                       No self-gen data available for the selected date range.
                     </div>
                   )}
