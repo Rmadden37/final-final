@@ -4,6 +4,10 @@ import {useEffect} from "react";
 import {useRouter} from "next/navigation";
 import {useAuth} from "@/hooks/use-auth";
 import {Loader2} from "lucide-react";
+import PerformanceMetrics from "@/components/dashboard/performance-metrics";
+
+// In your JSX:
+<PerformanceMetrics />
 
 export default function HomePage() {
   const {user, loading} = useAuth();

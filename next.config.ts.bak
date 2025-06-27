@@ -1,0 +1,34 @@
+// Next.js config migrated from .cjs to ESM
+import withPWA from 'next-pwa';
+
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.pravatar.cc',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
+  // Remove any experimental flags that might be causing issues
+  experimental: {
+    // Only include if you're using Next.js 13+ App Router
+  },
+};
+
+export default withPWA({
+  ...nextConfig,
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  // Disable development mode for PWA to reduce console warnings
+  disable: process.env.NODE_ENV === 'development',
+});

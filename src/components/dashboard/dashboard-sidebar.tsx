@@ -148,7 +148,14 @@ function DashboardSidebarContent() {
       <SidebarHeader className="flex flex-col items-center justify-center py-4 no-horizontal-scroll">
         {/* Center logo at the top of the sidebar */}
         <div className="flex items-center w-full justify-center gap-2 no-horizontal-scroll">
-          <Image src="https://firebasestorage.googleapis.com/v0/b/leadflow-4lvrr.firebasestorage.app/o/Leadflow%20Logos%2FyhekQsF%20-%20Imgur.png?alt=media&token=c8226178-a128-4404-b727-f6c009e833e6" alt="LeadFlow Logo" width={40} height={40} priority />
+          <Image 
+            src="https://firebasestorage.googleapis.com/v0/b/leadflow-4lvrr.firebasestorage.app/o/Leadflow%20Logos%2FyhekQsF%20-%20Imgur.png?alt=media&token=c8226178-a128-4404-b727-f6c009e833e6" 
+            alt="LeadFlow Logo" 
+            width={40} 
+            height={40} 
+            priority 
+            onError={(e) => { e.currentTarget.src = '/default-avatar.png'; }}
+          />
         </div>
       </SidebarHeader>
       <SidebarContent className="mb-10 no-horizontal-scroll">
@@ -291,7 +298,7 @@ function DashboardSidebarContent() {
               <Link href="/dashboard/profile">
                 <Avatar className="h-8 w-8 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=expanded]:mr-3">
                   <AvatarImage 
-                    src={user?.avatarUrl || undefined} 
+                    src={user?.avatarUrl || "/default-avatar.png"} 
                     alt={user?.displayName || user?.email || 'User'} 
                   />
                   <AvatarFallback>

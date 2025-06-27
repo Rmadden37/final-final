@@ -1430,3 +1430,144 @@ body.dialog-scroll-locked {
   position: relative;
   z-index: 1;
 }
+/* Mobile Card Height Fix */
+@media (max-width: 768px) {
+  /* Dashboard Grid */
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  /* All dashboard cards */
+  .dashboard-card {
+    height: 75vh !important;
+    max-height: 75vh !important;
+    min-height: unset !important;
+    overflow: hidden;
+  }
+
+  /* Performance metrics - smaller on mobile */
+  .performance-metrics-card {
+    height: 50vh !important;
+    max-height: 50vh !important;
+  }
+
+  /* Metrics grid - 2x2 layout on mobile */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    height: calc(100% - 4rem);
+    overflow: hidden;
+  }
+
+  .metric-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 0;
+  }
+
+  /* Card content scrolling */
+  .card-content {
+    height: calc(100% - 4rem);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* Lead items - smaller on mobile */
+  .lead-item, .closer-item {
+    padding: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  /* Smaller text on mobile */
+  .lead-name, .closer-name {
+    font-size: 0.9rem !important;
+  }
+
+  .lead-company, .closer-status {
+    font-size: 0.8rem !important;
+  }
+
+  /* Avatar sizes */
+  .avatar {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+
+/* Performance Metrics Specific Styles */
+.performance-metrics-card .card-header {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  height: 100%;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.metric-icon {
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.metric-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.metric-content {
+  text-align: left;
+}
+
+.metric-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.25rem;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.25rem;
+}
+
+.metric-subtitle {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
