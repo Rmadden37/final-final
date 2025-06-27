@@ -2,10 +2,10 @@
 
 import type {User as FirebaseAuthUser} from "firebase/auth";
 import {onAuthStateChanged, signOut as firebaseSignOut} from "firebase/auth";
-import {doc, onSnapshot, setDoc, getDoc} from "firebase/firestore";
+import {doc, onSnapshot, setDoc} from "firebase/firestore";
 import {useRouter, usePathname} from "next/navigation";
 import type {ReactNode} from "react";
-import React, {createContext, useContext, useEffect, useState} from "react";
+import React, {createContext, useContext, useEffect, useState, useRef} from "react";
 import type {AppUser} from "@/types";
 import {auth, db} from "@/lib/firebase";
 import {Loader2} from "lucide-react";
@@ -25,133 +25,167 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseAuthUser | null>(null);
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const navigationRef = useRef<{ isNavigating: boolean }>({ isNavigating: false });
 
-  // Add timeout to prevent infinite loading
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      console.log('⏰ Auth loading timeout reached, forcing loading to false');
-      setLoading(false);
-    }, 5000); // 5 second timeout for real Firebase auth
-
-    return () => clearTimeout(timeout);
-  }, [firebaseUser, user]);
-
+  // Initialize auth listener only once
   useEffect(() => {
     console.log('🔥 Setting up Firebase auth listener');
+    
     const unsubscribeAuth = onAuthStateChanged(auth, async (fbUser) => {
-      console.log('🔥 Firebase auth state changed:', !!fbUser);
+      console.log('🔥 Firebase auth state changed:', !!fbUser, 'uid:', fbUser?.uid);
+      
+      // Prevent multiple rapid state changes
+      if (firebaseUser?.uid === fbUser?.uid && authInitialized) {
+        console.log('🔄 Same user, skipping update');
+        return;
+      }
+      
       setFirebaseUser(fbUser);
+      setAuthInitialized(true);
+      
       if (!fbUser) {
         setUser(null);
         setLoading(false);
+        
+        // Handle navigation for logout
+        if (pathname !== "/login" && !navigationRef.current.isNavigating) {
+          navigationRef.current.isNavigating = true;
+          console.log('🚪 Redirecting to login');
+          router.replace("/login");
+          setTimeout(() => {
+            navigationRef.current.isNavigating = false;
+          }, 1000);
+        }
       }
-      // If fbUser exists, the other useEffect will handle fetching AppUser
     });
+
+    // Cleanup
     return () => {
       console.log('🔥 Cleaning up Firebase auth listener');
       unsubscribeAuth();
     };
-  }, []);
+  }, []); // Empty deps - only run once
 
+  // Handle user document subscription
   useEffect(() => {
     let unsubscribeUserDoc: (() => void) | undefined;
 
-    if (firebaseUser) {
+    if (firebaseUser && authInitialized) {
       console.log('👤 Setting up user document listener for:', firebaseUser.uid);
-      setLoading(true);
       const userDocRef = doc(db, "users", firebaseUser.uid);
 
-      unsubscribeUserDoc = onSnapshot(userDocRef, async (docSnap) => {
-        console.log('📄 User document changed, exists:', docSnap.exists());
-        if (docSnap.exists()) {
-          const appUserData = {uid: firebaseUser.uid, ...docSnap.data()} as AppUser;
-          setUser(appUserData);
-          console.log('✅ User set:', appUserData.email, appUserData.role);
-        } else {
-          // User document not found - expected for new users
-          console.log('❌ User document not found, creating default user doc');
-          // Create a default user doc
-          const defaultUser = {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email || null,
-            displayName: firebaseUser.displayName || null,
-            role: "setter", // default role, adjust as needed
-            teamId: "default", // or set to a sensible default/team selection logic
-            avatarUrl: firebaseUser.photoURL || null,
-            phoneNumber: firebaseUser.phoneNumber || null,
-            status: "On Duty"
-          };
-          try {
-            await setDoc(userDocRef, defaultUser, {merge: true});
-            setUser(defaultUser as AppUser);
-            console.log('✅ Default user doc created');
-          } catch (err) {
-            console.error('🚨 Failed to create user doc:', err);
-            setUser(null);
+      unsubscribeUserDoc = onSnapshot(
+        userDocRef,
+        async (docSnap) => {
+          console.log('📄 User document snapshot received, exists:', docSnap.exists());
+          
+          if (docSnap.exists()) {
+            const appUserData = {uid: firebaseUser.uid, ...docSnap.data()} as AppUser;
+            setUser(appUserData);
+            setLoading(false);
+            console.log('✅ User data loaded:', appUserData.email, appUserData.role);
+            
+            // Handle navigation for login
+            if (pathname === "/login" && !navigationRef.current.isNavigating) {
+              navigationRef.current.isNavigating = true;
+              console.log('🏠 Redirecting to dashboard');
+              router.replace("/dashboard");
+              setTimeout(() => {
+                navigationRef.current.isNavigating = false;
+              }, 1000);
+            }
+          } else {
+            // Create default user document for new users
+            console.log('📝 Creating default user document');
+            const defaultUser = {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || "",
+              displayName: firebaseUser.displayName || "",
+              role: "setter" as const,
+              teamId: "default",
+              avatarUrl: firebaseUser.photoURL || null,
+              phoneNumber: firebaseUser.phoneNumber || null,
+              status: "On Duty" as const,
+              createdAt: new Date().toISOString(),
+            };
+            
+            try {
+              await setDoc(userDocRef, defaultUser);
+              setUser(defaultUser as AppUser);
+              setLoading(false);
+              console.log('✅ Default user document created');
+            } catch (error) {
+              console.error('❌ Failed to create user document:', error);
+              setUser(null);
+              setLoading(false);
+            }
           }
+        },
+        (error) => {
+          console.error('❌ User document listener error:', error);
+          setUser(null);
+          setLoading(false);
         }
-        setLoading(false);
-      }, (error) => {
-        // Auth error - set to null and continue
-        console.log('🚨 User document error:', error);
-        setUser(null);
-        setLoading(false);
-      });
-    } else {
-      console.log('🚫 No Firebase user, clearing app user');
+      );
+    } else if (!firebaseUser && authInitialized) {
       setUser(null);
       setLoading(false);
     }
+
     return () => {
       if (unsubscribeUserDoc) {
         console.log('🧹 Cleaning up user document listener');
         unsubscribeUserDoc();
       }
     };
-  }, [firebaseUser]);
+  }, [firebaseUser, authInitialized, pathname, router]);
 
-
-  useEffect(() => {
-    // Prevent navigation during initial load or if already loading
-    if (loading) return;
-    
-    // Only redirect if we're certain about the auth state
-    if (!user && pathname !== "/login") {
-      router.replace("/login");
-    } else if (user && pathname === "/login") {
-      router.replace("/dashboard");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, loading, pathname]);
-
+  // Logout function
   const logout = async () => {
+    console.log('👋 Logging out');
+    navigationRef.current.isNavigating = true;
     setLoading(true);
-    await firebaseSignOut(auth);
-    setUser(null);
-    setFirebaseUser(null);
-    // router.push will be handled by the effect above
-    setLoading(false);
+    
+    try {
+      await firebaseSignOut(auth);
+      setUser(null);
+      setFirebaseUser(null);
+      router.replace("/login");
+    } catch (error) {
+      console.error('❌ Logout error:', error);
+    } finally {
+      setLoading(false);
+      setTimeout(() => {
+        navigationRef.current.isNavigating = false;
+      }, 1000);
+    }
   };
 
-  // Avoid rendering children if loading and not on login page without a user
-  // This prevents a flash of content before redirect
-  if (loading && pathname !== "/login" && !user) {
+  // Show loading spinner while checking auth
+  if (loading && !authInitialized) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
       </div>
     );
   }
 
-  const contextValue = {firebaseUser, user, loading, teamId: user?.teamId || null, role: user?.role || null, logout};
+  const contextValue: AuthContextType = {
+    firebaseUser,
+    user,
+    loading,
+    teamId: user?.teamId || null,
+    role: user?.role || null,
+    logout,
+  };
 
-  return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

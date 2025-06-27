@@ -1,4 +1,3 @@
-
 "use client";
 
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -20,6 +19,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {useToast} from "@/hooks/use-toast";
 import {useState} from "react";
 import {Loader2} from "lucide-react";
+import {FirebaseError} from "firebase/app";
 
 const formSchema = z.object({
   email: z.string().email({message: "Invalid email address."}),
@@ -39,34 +39,82 @@ export default function LoginForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    // Prevent multiple submissions
+    if (isLoading) return;
+    
     setIsLoading(true);
+    
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      console.log('🔐 Attempting login for:', values.email);
+      
+      const userCredential = await signInWithEmailAndPassword(
+        auth, 
+        values.email, 
+        values.password
+      );
+      
+      console.log('✅ Login successful:', userCredential.user.uid);
+      
       toast({
         title: "Login Successful",
         description: "Welcome back!",
       });
-      // Navigation is handled by useAuth hook
-    } catch (error: any) {
+      
+      // Navigation is handled by the AuthProvider
+      // No need to manually redirect here
+      
+    } catch (error) {
+      console.error('❌ Login error:', error);
+      
+      let errorMessage = "An unexpected error occurred.";
+      
+      if (error instanceof FirebaseError) {
+        switch (error.code) {
+          case 'auth/user-not-found':
+            errorMessage = "No account found with this email address.";
+            break;
+          case 'auth/wrong-password':
+            errorMessage = "Incorrect password.";
+            break;
+          case 'auth/invalid-email':
+            errorMessage = "Invalid email address.";
+            break;
+          case 'auth/user-disabled':
+            errorMessage = "This account has been disabled.";
+            break;
+          case 'auth/too-many-requests':
+            errorMessage = "Too many failed attempts. Please try again later.";
+            break;
+          case 'auth/network-request-failed':
+            errorMessage = "Network error. Please check your connection.";
+            break;
+          default:
+            errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Login Failed",
-        description: error.message || "An unexpected error occurred.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
+      // Ensure loading state is cleared
       setIsLoading(false);
     }
   }
 
   return (
     <Card className="w-full max-w-md shadow-xl">
-      <CardHeader>
-        <CardTitle className="font-headline text-2xl">Login</CardTitle>
-        <CardDescription>Enter your credentials to access LeadFlow.</CardDescription>
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-headline">Welcome back</CardTitle>
+        <CardDescription>
+          Enter your credentials to access your LeadFlow dashboard
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="email"
@@ -74,7 +122,13 @@ export default function LoginForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="you@example.com" {...field} />
+                    <Input 
+                      placeholder="you@example.com" 
+                      type="email"
+                      autoComplete="email"
+                      disabled={isLoading}
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -87,17 +141,51 @@ export default function LoginForm() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input 
+                      type="password" 
+                      placeholder="••••••••" 
+                      autoComplete="current-password"
+                      disabled={isLoading}
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : "Login"}
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                "Sign in"
+              )}
             </Button>
           </form>
         </Form>
+        
+        {/* Optional: Add forgot password link */}
+        <div className="mt-4 text-center">
+          <a 
+            href="#" 
+            className="text-sm text-muted-foreground hover:text-primary"
+            onClick={(e) => {
+              e.preventDefault();
+              toast({
+                title: "Coming soon",
+                description: "Password reset functionality will be available soon.",
+              });
+            }}
+          >
+            Forgot your password?
+          </a>
+        </div>
       </CardContent>
     </Card>
   );
