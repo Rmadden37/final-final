@@ -6,7 +6,7 @@ import { doc, updateDoc, serverTimestamp, Timestamp, collection, query, where, o
 import { Loader2 } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
-import useAuth from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { db } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
 import { LeadNotifications } from "@/lib/notification-service";
