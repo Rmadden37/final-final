@@ -1,0 +1,2188 @@
+/* Tailwind CSS directives */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* ===== ROOT VARIABLES & BASE STYLES ===== */
+@layer base {
+  /* iOS Safe Area Support */
+  :root {
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-right: env(safe-area-inset-right);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    --safe-area-inset-left: env(safe-area-inset-left);
+    
+    /* Light theme variables */
+    --background: 213 33% 95%;
+    --foreground: 215 25% 17%;
+    --background-gradient-from: 213 33% 97%;
+    --background-gradient-to: 213 33% 93%;
+    --muted: 216 12% 84%;
+    --muted-foreground: 216 12% 44%;
+    --popover: 213 33% 95%;
+    --popover-foreground: 215 25% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 17%;
+    --border: 216 12% 84%;
+    --input: 216 12% 84%;
+    --primary: 185 85% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-gradient-from: 185 85% 45%;
+    --primary-gradient-to: 185 85% 38%;
+    --secondary: 216 12% 90%;
+    --secondary-foreground: 215 25% 17%;
+    --accent: 200 80% 48%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 358 75% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --ring: 185 85% 45%;
+    --radius: 0.5rem;
+    
+    /* Chart colors */
+    --chart-1: 185 85% 45%;
+    --chart-2: 200 80% 48%;
+    --chart-3: 220 85% 55%;
+    --chart-4: 210 8% 55%;
+    --chart-5: 210 8% 42%;
+    
+    /* Sidebar variables */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 185 85% 45%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 185 85% 45%;
+  }
+
+  /* Dark theme */
+  .dark {
+    --background: 220 13% 7%;
+    --foreground: 220 10% 92%;
+    --background-gradient-from: 220 13% 7%;
+    --background-gradient-to: 220 13% 10%;
+    --muted: 220 10% 18%;
+    --muted-foreground: 220 8% 60%;
+    --popover: 220 13% 10%;
+    --popover-foreground: 220 10% 92%;
+    --card: 220 10% 16%;
+    --card-foreground: 220 10% 92%;
+    --border: 220 10% 22%;
+    --input: 220 10% 18%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-gradient-from: 217 91% 60%;
+    --primary-gradient-to: 217 91% 50%;
+    --secondary: 220 10% 18%;
+    --secondary-foreground: 220 10% 92%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 358 75% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --ring: 217 91% 60%;
+    
+    --sidebar-background: 220 13% 7%;
+    --sidebar-foreground: 220 10% 92%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 10% 18%;
+    --sidebar-accent-foreground: 217 91% 60%;
+    --sidebar-border: 220 10% 22%;
+    --sidebar-ring: 217 91% 60%;
+  }
+
+  /* Premium theme */
+  .premium {
+    --background: 224 71% 4%;
+    --foreground: 0 0% 97%;
+    --background-gradient-from: 224 71% 4%;
+    --background-gradient-to: 225 50% 6%;
+    --muted: 225 25% 10%;
+    --muted-foreground: 0 0% 82%;
+    --popover: 225 40% 8%;
+    --popover-foreground: 0 0% 97%;
+    --card: 225 40% 8%;
+    --card-foreground: 0 0% 97%;
+    --border: 0 0% 100% / 0.18;
+    --input: 225 40% 10%;
+    --primary: 264 100% 76%;
+    --primary-foreground: 225 40% 8%;
+    --primary-gradient-from: 264 100% 76%;
+    --primary-gradient-to: 174 100% 62%;
+    --secondary: 225 40% 12%;
+    --secondary-foreground: 0 0% 97%;
+    --accent: 174 100% 62%;
+    --accent-foreground: 225 40% 8%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --ring: 264 100% 76%;
+    
+    --chart-1: 264 100% 76%;
+    --chart-2: 174 100% 62%;
+    --chart-3: 280 100% 70%;
+    --chart-4: 160 100% 50%;
+    --chart-5: 45 100% 60%;
+    
+    --sidebar-background: 225 40% 8%;
+    --sidebar-foreground: 0 0% 97%;
+    --sidebar-primary: 264 100% 76%;
+    --sidebar-primary-foreground: 225 40% 8%;
+    --sidebar-accent: 225 40% 12%;
+    --sidebar-accent-foreground: 0 0% 97%;
+    --sidebar-border: 0 0% 100% / 0.1;
+    --sidebar-ring: 264 100% 76%;
+  }
+
+  /* Base styling optimization */
+  * {
+    border-color: hsl(var(--border));
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    width: 100%;
+  }
+  
+  body {
+    color: hsl(var(--foreground));
+    font-family: var(--font-body);
+    background: linear-gradient(135deg, 
+      hsl(var(--background-gradient-from)) 0%, 
+      hsl(var(--background-gradient-to)) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    overflow-x: hidden;
+    width: 100%;
+    
+    /* iOS Safe Area */
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Touch optimization for mobile */
+  button, [role="button"], [role="tab"], [role="menuitem"] {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Container constraints */
+  .container, main, section, article, div {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+/* ===== MOBILE-FIRST RESPONSIVE OPTIMIZATIONS ===== */
+@media (max-width: 768px) {
+  /* Enhanced touch targets for mobile */
+  button, [role="button"], [role="tab"], [role="menuitem"] {
+    min-height: 48px;
+    min-width: 48px;
+    padding: 0.75rem 1rem;
+  }
+  
+  body {
+    font-size: 16px; /* Prevent zoom on iOS */
+    line-height: 1.5;
+  }
+  
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Card optimizations */
+  [class*="card"] {
+    margin: 0.5rem 0;
+    border-radius: 0.75rem;
+  }
+  
+  /* Input optimizations */
+  input, textarea, select {
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+  }
+
+  /* Header optimization - MAIN MOBILE FIX */
+  header {
+    min-height: 48px !important;
+    padding: 0.5rem 0.75rem !important;
+    backdrop-blur: 8px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    display: flex !important;
+    align-items: center !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .dark header {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .premium header {
+    background: rgba(20, 20, 35, 0.9) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Sidebar trigger optimization */
+  [data-sidebar="trigger"] {
+    min-height: 36px !important;
+    min-width: 36px !important;
+    padding: 0.5rem !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 0.375rem !important;
+    transition: all 0.2s ease !important;
+  }
+
+  [data-sidebar="trigger"]:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: scale(1.05) !important;
+  }
+
+  /* Header content optimization */
+  header .flex {
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  header span {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Main content optimization */
+  main {
+    padding: 0.75rem !important;
+    height: calc(100vh - 48px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Dashboard cards - optimized sizing */
+  .dashboard-card,
+  [data-dashboard-card],
+  .mobile-75vh {
+    height: calc(100vh - 60px) !important;
+    max-height: calc(100vh - 60px) !important;
+    margin-bottom: 0.75rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Card headers - compact */
+  .card-header,
+  [class*="card"] .card-header {
+    padding: 0.75rem !important;
+    padding-bottom: 0.5rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Card titles - appropriate sizing */
+  .card-title,
+  [class*="card"] h1,
+  [class*="card"] h2,
+  [class*="card"] h3 {
+    font-size: 1.125rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  /* Card content - maximize space */
+  .card-content,
+  [class*="card"] .card-content {
+    padding: 0.5rem 0.75rem 0.75rem !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Dashboard grid - single column */
+  .dashboard-page-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+    padding: 0 !important;
+    height: auto !important;
+  }
+
+  /* Sidebar width */
+  [data-sidebar="sidebar"] {
+    width: 280px !important;
+    max-width: 85vw !important;
+  }
+
+  /* Performance metrics - compact on mobile */
+  .performance-metrics-card {
+    height: 50vh !important;
+    max-height: 50vh !important;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    height: calc(100% - 4rem);
+    overflow: hidden;
+  }
+
+  .metric-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 0;
+  }
+
+  /* Lead items - optimized for mobile */
+  .lead-item, .closer-item {
+    padding: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .lead-name, .closer-name {
+    font-size: 0.9rem !important;
+  }
+
+  .lead-company, .closer-status {
+    font-size: 0.8rem !important;
+  }
+
+  .avatar {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  /* Icon sizing */
+  .h-8.w-8 {
+    height: 1.5rem !important;
+    width: 1.5rem !important;
+  }
+
+  .h-6.w-6 {
+    height: 1.25rem !important;
+    width: 1.25rem !important;
+  }
+
+  /* Floating elements */
+  .floating-chat-button {
+    bottom: 1rem !important;
+    right: 1rem !important;
+    height: 3rem !important;
+    width: 3rem !important;
+  }
+}
+
+/* Extra small mobile optimization */
+@media (max-width: 480px) {
+  header {
+    min-height: 44px !important;
+    padding: 0.375rem 0.5rem !important;
+  }
+
+  main {
+    padding: 0.5rem !important;
+    height: calc(100vh - 44px) !important;
+  }
+
+  .dashboard-card,
+  [data-dashboard-card],
+  .mobile-75vh {
+    height: calc(100vh - 56px) !important;
+    max-height: calc(100vh - 56px) !important;
+  }
+
+  .card-header {
+    padding: 0.5rem !important;
+    padding-bottom: 0.375rem !important;
+  }
+
+  .card-content {
+    padding: 0.375rem 0.5rem 0.5rem !important;
+  }
+
+  .card-title {
+    font-size: 1rem !important;
+  }
+
+  header span {
+    font-size: 0.8rem !important;
+  }
+
+  [data-sidebar="trigger"] {
+    min-height: 32px !important;
+    min-width: 32px !important;
+    padding: 0.375rem !important;
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 600px) {
+  header {
+    min-height: 40px !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  main {
+    height: calc(100vh - 40px) !important;
+    padding: 0.5rem !important;
+  }
+
+  .dashboard-card,
+  [data-dashboard-card] {
+    height: calc(100vh - 52px) !important;
+    max-height: calc(100vh - 52px) !important;
+  }
+
+  .card-header {
+    padding: 0.5rem !important;
+  }
+
+  .card-content {
+    height: calc(100% - 2.5rem) !important;
+  }
+}
+
+/* ===== THEME-SPECIFIC OPTIMIZATIONS ===== */
+@layer utilities {
+  /* Grid patterns */
+  .bg-grid-slate-100 {
+    background-image: radial-gradient(circle at 1px 1px, rgba(148, 163, 184, 0.15) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+  
+  .bg-grid-slate-700 {
+    background-image: radial-gradient(circle at 1px 1px, rgba(51, 65, 85, 0.3) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+
+  /* Dark theme card styling */
+  .dark .card-glass {
+    background: hsla(210 18% 9% / 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsla(185 85% 45% / 0.15);
+  }
+  
+  .dark .glow-turquoise {
+    box-shadow: 0 0 20px hsla(185 85% 45% / 0.2);
+  }
+  
+  .dark .glow-cyan {
+    box-shadow: 0 0 15px hsla(200 80% 48% / 0.25);
+  }
+  
+  .dark .text-glow {
+    text-shadow: 0 0 10px hsla(185 85% 45% / 0.4);
+  }
+
+  /* Dark mode card styling - consolidated */
+  .dark .bg-card,
+  .dark [class*="card"]:not(.bg-transparent),
+  .dark .rounded-xl.bg-white,
+  .dark .bg-white:not(.bg-transparent) {
+    background: linear-gradient(135deg, #232532 60%, #1a233a 100%) !important;
+    color: hsl(220 10% 92%) !important;
+    border: 1px solid hsl(220 10% 22%) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.45) !important;
+  }
+
+  .dark .bg-card *:not(.text-muted-foreground),
+  .dark [class*="card"]:not(.bg-transparent) *:not(.text-muted-foreground) {
+    color: hsl(220 10% 92%) !important;
+  }
+
+  .dark .bg-card h1, .dark .bg-card h2, .dark .bg-card h3, 
+  .dark .bg-card h4, .dark .bg-card h5, .dark .bg-card h6,
+  .dark [class*="card"] h1, .dark [class*="card"] h2, .dark [class*="card"] h3,
+  .dark [class*="card"] h4, .dark [class*="card"] h5, .dark [class*="card"] h6 {
+    color: hsl(220 10% 98%) !important;
+    font-weight: 600 !important;
+  }
+
+  .dark .bg-card .text-muted-foreground,
+  .dark [class*="card"] .text-muted-foreground {
+    color: hsl(220 8% 60%) !important;
+  }
+
+  .dark .bg-card:hover,
+  .dark [class*="card"]:not(.bg-transparent):hover {
+    background: linear-gradient(135deg, #232532 40%, #2542a3 100%) !important;
+    border-color: hsl(217 91% 60%) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.45) !important;
+    transform: translateY(-1px) !important;
+    transition: all 0.2s ease-in-out !important;
+  }
+
+  /* Dark mode inputs and buttons */
+  .dark button:not(.bg-transparent) {
+    background: hsl(217 91% 60%) !important;
+    color: #fff !important;
+    border: none !important;
+    font-weight: 500 !important;
+  }
+
+  .dark button:not(.bg-transparent):hover {
+    background: hsl(217 91% 65%) !important;
+    box-shadow: 0 3px 12px hsla(217, 91%, 60%, 0.25) !important;
+  }
+
+  .dark .bg-secondary {
+    background: hsl(220 10% 18%) !important;
+    color: hsl(220 10% 92%) !important;
+    border: 1px solid hsl(220 10% 22%) !important;
+  }
+
+  .dark .bg-secondary:hover {
+    background: hsl(220 10% 22%) !important;
+    border-color: hsl(217 91% 60%) !important;
+  }
+
+  .dark input, .dark textarea, .dark select {
+    background: hsl(220 10% 18%) !important;
+    border: 1px solid hsl(220 10% 22%) !important;
+    color: hsl(220 10% 92%) !important;
+  }
+
+  .dark input:focus, .dark textarea:focus, .dark select:focus {
+    border-color: hsl(217 91% 60%) !important;
+    box-shadow: 0 0 0 2px hsla(217 91% 60% / 0.2) !important;
+    outline: none !important;
+  }
+
+  /* Scrollbar styling */
+  .dark ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background: hsl(220 13% 7%);
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: hsl(220 10% 25%);
+    border-radius: 3px;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: hsl(217 91% 60%);
+  }
+
+  /* Premium theme animations */
+  @keyframes bg-fire-move {
+    0% { background-position: 45% 85%, center center; }
+    50% { background-position: 55% 95%, 100% 100%; }
+    100% { background-position: 45% 85%, center center; }
+  }
+
+  @keyframes bg-smoke-move {
+    0% { background-position: center center; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: center center; }
+  }
+
+  @keyframes premium-glow-rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Premium body background */
+  .premium body {
+    background-color: #050510 !important;
+    background-image:
+      radial-gradient(circle at 70% 20%, rgba(40, 40, 60, 0.3), transparent 80%),
+      radial-gradient(circle at 30% 80%, rgba(40, 40, 60, 0.3), transparent 80%),
+      radial-gradient(circle at 50% 90%, rgba(187, 134, 252, 0.2), transparent 50%),
+      radial-gradient(circle at 60% 85%, rgba(3, 218, 198, 0.75), transparent 75%) !important;
+    
+    background-size: 500% 500%, 550% 550%, 350% 350%, 350% 350% !important;
+    background-position: center center, center center, 45% 85%, 45% 85% !important;
+    background-repeat: no-repeat !important;
+    animation: bg-smoke-move 80s infinite ease-in-out, bg-fire-move 10s infinite ease-in-out !important;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .premium body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: linear-gradient(135deg, #181830, #281835, #183035);
+    opacity: 0.9;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* Premium glass morphism cards */
+  .premium [data-card], 
+  .premium .rounded-xl,
+  .premium .bg-white,
+  .premium .bg-slate-800 {
+    background: rgba(20, 20, 35, 0.8) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 28px !important;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6) !important;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  }
+
+  .premium [data-card]:hover,
+  .premium .rounded-xl:hover {
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9) !important;
+    background: rgba(30, 30, 50, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.35) !important;
+  }
+
+  /* Premium text styling */
+  .premium .text-glow {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.25), 0 0 40px rgba(187, 134, 252, 0.15) !important;
+  }
+
+  .premium .stat-glow {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.25), 0 0 40px rgba(187, 134, 252, 0.15) !important;
+    font-weight: 900;
+    color: #F8F8F8;
+  }
+
+  .premium .text-foreground,
+  .premium .text-slate-900,
+  .premium .text-slate-100,
+  .premium h1, .premium h2, .premium h3, .premium h4, .premium h5, .premium h6,
+  .premium .font-bold,
+  .premium .font-semibold {
+    color: #F8F8F8 !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2) !important;
+  }
+
+  .premium .text-muted-foreground,
+  .premium .text-gray-400,
+  .premium .text-gray-500,
+  .premium .text-gray-600,
+  .premium .text-slate-400,
+  .premium .text-slate-500,
+  .premium .text-slate-600 {
+    color: #FAFAFA !important;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.22)) brightness(1.22) !important;
+    text-shadow: 0 0 10px rgba(255,255,255,0.22) !important;
+  }
+
+  .premium svg.text-muted-foreground,
+  .premium svg.text-gray-400,
+  .premium svg.text-gray-500,
+  .premium svg.text-gray-600,
+  .premium svg.text-slate-400,
+  .premium svg.text-slate-500,
+  .premium svg.text-slate-600 {
+    stroke: #FAFAFA !important;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.22)) brightness(1.22) !important;
+  }
+
+  /* Premium transparency overrides */
+  .premium .bg-transparent,
+  .dark .bg-transparent {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* ===== NAVIGATION IMPROVEMENTS ===== */
+.dark .nav-item {
+  color: hsl(220, 8%, 62%) !important;
+  background: transparent !important;
+  border-left: 3px solid transparent !important;
+  font-weight: 500;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+
+.dark .nav-item.active,
+.dark .nav-item[aria-current="page"],
+.dark .nav-item[data-active="true"] {
+  color: #e6f0ff !important;
+  background: linear-gradient(90deg, #1a2640 80%, #223a6b 100%) !important;
+  border-left: 3px solid #3574F2 !important;
+  box-shadow: 0 2px 8px 0 rgba(53,116,242,0.08) !important;
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+
+/* Light mode nav items */
+.nav-item {
+  color: hsl(215, 25%, 17%) !important;
+  background: transparent !important;
+  font-weight: 500;
+  transition: background 0.18s, color 0.18s;
+}
+
+.nav-item.active,
+.nav-item[aria-current="page"],
+.nav-item[data-active="true"] {
+  color: hsl(215, 100%, 50%) !important;
+  background: hsla(215, 100%, 50%, 0.08) !important;
+  font-weight: 600;
+}
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+/* Performance Metrics Specific Styles */
+.performance-metrics-card .card-header {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  height: 100%;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.metric-icon {
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.metric-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.metric-content {
+  text-align: left;
+}
+
+.metric-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.25rem;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.25rem;
+}
+
+.metric-subtitle {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ===== TEAM MANAGEMENT MOBILE STYLES ===== */
+@media (max-width: 600px) {
+  .team-management-card,
+  .team-management-container,
+  .team-management-section {
+    padding: 1.25rem 0.75rem !important;
+    border-radius: 1.25rem !important;
+    margin: 0.5rem 0 !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10) !important;
+    min-width: 0 !important;
+  }
+  
+  .team-management-card h1,
+  .team-management-card h2,
+  .team-management-card h3,
+  .team-management-card h4,
+  .team-management-card h5,
+  .team-management-card h6,
+  .team-management-container h1,
+  .team-management-container h2,
+  .team-management-container h3 {
+    font-size: 1.1rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .team-management-card input,
+  .team-management-card select,
+  .team-management-card button,
+  .team-management-container input,
+  .team-management-container select,
+  .team-management-container button {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 1rem !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 0.75rem !important;
+    box-sizing: border-box !important;
+  }
+  
+  .team-management-search {
+    width: 100% !important;
+    margin-bottom: 1rem !important;
+    font-size: 1rem !important;
+  }
+  
+  .team-member-list {
+    margin-top: 1rem !important;
+    gap: 0.75rem !important;
+  }
+  
+  .team-member-list > * {
+    margin-bottom: 0.5rem !important;
+    border-radius: 0.75rem !important;
+    padding: 0.75rem !important;
+  }
+  
+  .team-management-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  
+  .team-management-card,
+  .team-management-container {
+    overflow-x: hidden !important;
+  }
+}
+
+/* ===== SPECIAL BUTTON STYLES ===== */
+.invite-user-prominent-btn {
+  background: linear-gradient(90deg, #3574F2 0%, #5096F2 100%) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border: 2px solid #3574F2 !important;
+  box-shadow: 0 4px 24px 0 rgba(53,116,242,0.18), 0 1.5px 6px 0 rgba(53,116,242,0.10) !important;
+  padding: 0.85rem 2.25rem !important;
+  font-size: 1.1rem !important;
+  border-radius: 1rem !important;
+  letter-spacing: 0.01em;
+  transition: all 0.18s cubic-bezier(.4,0,.2,1);
+}
+
+.invite-user-prominent-btn:hover, 
+.invite-user-prominent-btn:focus {
+  background: linear-gradient(90deg, #2552a3 0%, #3574F2 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 32px 0 rgba(53,116,242,0.28), 0 2px 8px 0 rgba(53,116,242,0.18) !important;
+  border-color: #2552a3 !important;
+}
+
+.dark .invite-user-prominent-btn {
+  background: linear-gradient(90deg, #0a2240 0%, #3574F2 100%) !important;
+  color: #e0eaff !important;
+  border-color: #3574F2 !important;
+  box-shadow: 0 4px 24px 0 rgba(53,116,242,0.22), 0 1.5px 6px 0 rgba(53,116,242,0.14) !important;
+}
+
+.dark .invite-user-prominent-btn:hover, 
+.dark .invite-user-prominent-btn:focus {
+  background: linear-gradient(90deg, #183a6d 0%, #2552a3 100%) !important;
+  color: #fff !important;
+  border-color: #2552a3 !important;
+  box-shadow: 0 8px 32px 0 rgba(53,116,242,0.32), 0 2px 8px 0 rgba(53,116,242,0.22) !important;
+}
+
+/* ===== CALENDAR SPECIFIC STYLES ===== */
+.scheduled-calendar-day.selected, 
+.scheduled-calendar-day[data-selected="true"], 
+.scheduled-calendar-day.selected:focus, 
+.scheduled-calendar-day.selected:active {
+  background: #8b5cf6 !important;
+  color: white !important;
+}
+
+/* ===== MISCELLANEOUS IMPROVEMENTS ===== */
+/* Prevent background scroll */
+body.dialog-scroll-locked {
+  overflow: hidden !important;
+}
+
+/* Card border radius polish */
+[data-card], 
+.rounded-xl, 
+.card-glass, 
+.dashboard-card-mobile, 
+[data-dashboard-card] {
+  border-radius: 1.25rem !important;
+  overflow: hidden !important;
+  box-shadow: 0 10px 40px 0 rgba(30,30,60,0.18), 0 4px 16px 0 rgba(30,30,60,0.12) !important;
+}
+
+.premium [data-card], 
+.premium .rounded-xl, 
+.premium .card-glass {
+  border-radius: 1.75rem !important;
+  overflow: hidden !important;
+  box-shadow: 0 18px 64px 0 rgba(53,116,242,0.22), 0 6px 24px 0 rgba(53,116,242,0.14) !important;
+}
+
+[data-card] *, 
+.rounded-xl *, 
+.card-glass * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Tables */
+@media (max-width: 768px) {
+  table {
+    min-width: 100% !important;
+    table-layout: auto !important;
+  }
+
+  .grid {
+    grid-template-columns: 1fr !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+}
+/* ===== HEADER AND BANNER COMPLETE FIX ===== */
+
+/* Remove the problematic banner/header that's taking up space */
+.SidebarWithTrigger header,
+header[class*="sticky"],
+header[class*="border-b"] {
+  /* Dramatically reduce header size */
+  min-height: 40px !important;
+  height: 40px !important;
+  max-height: 40px !important;
+  padding: 0.25rem 0.5rem !important;
+  margin: 0 !important;
+  
+  /* Better background */
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  
+  /* Positioning */
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  
+  /* Layout */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0.5rem !important;
+  
+  /* Prevent overflow */
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+/* Dark theme header */
+.dark .SidebarWithTrigger header,
+.dark header[class*="sticky"],
+.dark header[class*="border-b"] {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Premium theme header */
+.premium .SidebarWithTrigger header,
+.premium header[class*="sticky"],
+.premium header[class*="border-b"] {
+  background: rgba(20, 20, 35, 0.85) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Header content - compact and clean */
+header .flex,
+header > div {
+  height: 100% !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0.5rem !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+}
+
+/* Sidebar trigger - much smaller */
+[data-sidebar="trigger"] {
+  min-height: 32px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  width: 32px !important;
+  padding: 0.25rem !important;
+  
+  /* Better styling */
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(4px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 0.375rem !important;
+  transition: all 0.15s ease !important;
+  
+  /* Center the icon */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+[data-sidebar="trigger"]:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: scale(1.02) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Header title - smaller and cleaner */
+header span,
+header .text-sm {
+  font-size: 0.75rem !important; /* 12px */
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  color: rgba(0, 0, 0, 0.7) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  flex-shrink: 1 !important;
+  min-width: 0 !important;
+}
+
+.dark header span,
+.dark header .text-sm {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.premium header span,
+.premium header .text-sm {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Main content area - reclaim space from smaller header */
+main,
+.SidebarWithTrigger main {
+  height: calc(100vh - 40px) !important;
+  max-height: calc(100vh - 40px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 0.75rem !important;
+  margin: 0 !important;
+}
+
+/* Dashboard cards - more space now */
+.dashboard-card,
+[data-dashboard-card],
+.mobile-75vh {
+  height: calc(100vh - 52px) !important; /* 40px header + 12px padding */
+  max-height: calc(100vh - 52px) !important;
+  margin-bottom: 0.75rem !important;
+}
+
+/* Dashboard grid - clean layout */
+.dashboard-page-grid {
+  height: auto !important;
+  gap: 0.75rem !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* ===== MOBILE SPECIFIC HEADER FIXES ===== */
+@media (max-width: 768px) {
+  /* Even smaller header on mobile */
+  .SidebarWithTrigger header,
+  header[class*="sticky"],
+  header[class*="border-b"] {
+    min-height: 36px !important;
+    height: 36px !important;
+    max-height: 36px !important;
+    padding: 0.125rem 0.375rem !important;
+  }
+
+  /* Tiny sidebar trigger on mobile */
+  [data-sidebar="trigger"] {
+    min-height: 28px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    width: 28px !important;
+    padding: 0.125rem !important;
+  }
+
+  /* Even smaller header text */
+  header span,
+  header .text-sm {
+    font-size: 0.625rem !important; /* 10px */
+    font-weight: 400 !important;
+  }
+
+  /* Main content - more space */
+  main,
+  .SidebarWithTrigger main {
+    height: calc(100vh - 36px) !important;
+    max-height: calc(100vh - 36px) !important;
+    padding: 0.5rem !important;
+  }
+
+  /* Dashboard cards - maximized space */
+  .dashboard-card,
+  [data-dashboard-card],
+  .mobile-75vh {
+    height: calc(100vh - 44px) !important; /* 36px header + 8px padding */
+    max-height: calc(100vh - 44px) !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  /* Dashboard grid mobile */
+  .dashboard-page-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+    padding: 0 !important;
+  }
+
+  /* Card headers - more compact */
+  .card-header,
+  [class*="card"] .card-header {
+    padding: 0.5rem !important;
+    padding-bottom: 0.25rem !important;
+  }
+
+  /* Card content - maximize usable space */
+  .card-content,
+  [class*="card"] .card-content {
+    padding: 0.25rem 0.5rem 0.5rem !important;
+    height: calc(100% - 2.5rem) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Card titles - appropriately sized */
+  .card-title,
+  [class*="card"] h1,
+  [class*="card"] h2,
+  [class*="card"] h3 {
+    font-size: 1rem !important;
+    line-height: 1.2 !important;
+    margin-bottom: 0.125rem !important;
+  }
+
+  /* Card subtitles */
+  .card-subtitle,
+  [class*="card"] p:not(.text-foreground) {
+    font-size: 0.75rem !important;
+    line-height: 1.1 !important;
+    margin-bottom: 0.25rem !important;
+  }
+}
+
+/* ===== VERY SMALL MOBILE OPTIMIZATION ===== */
+@media (max-width: 480px) {
+  /* Minimal header on tiny screens */
+  .SidebarWithTrigger header,
+  header[class*="sticky"],
+  header[class*="border-b"] {
+    min-height: 32px !important;
+    height: 32px !important;
+    max-height: 32px !important;
+    padding: 0.125rem 0.25rem !important;
+  }
+
+  [data-sidebar="trigger"] {
+    min-height: 24px !important;
+    min-width: 24px !important;
+    height: 24px !important;
+    width: 24px !important;
+    padding: 0.125rem !important;
+  }
+
+  header span,
+  header .text-sm {
+    font-size: 0.625rem !important;
+    display: none !important; /* Hide text on very small screens */
+  }
+
+  main,
+  .SidebarWithTrigger main {
+    height: calc(100vh - 32px) !important;
+    padding: 0.375rem !important;
+  }
+
+  .dashboard-card,
+  [data-dashboard-card],
+  .mobile-75vh {
+    height: calc(100vh - 38px) !important;
+    max-height: calc(100vh - 38px) !important;
+  }
+}
+
+/* ===== LANDSCAPE MOBILE OPTIMIZATION ===== */
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 600px) {
+  .SidebarWithTrigger header,
+  header[class*="sticky"],
+  header[class*="border-b"] {
+    min-height: 28px !important;
+    height: 28px !important;
+    max-height: 28px !important;
+    padding: 0.125rem 0.25rem !important;
+  }
+
+  [data-sidebar="trigger"] {
+    min-height: 22px !important;
+    min-width: 22px !important;
+    height: 22px !important;
+    width: 22px !important;
+  }
+
+  main,
+  .SidebarWithTrigger main {
+    height: calc(100vh - 28px) !important;
+    padding: 0.25rem !important;
+  }
+
+  .dashboard-card,
+  [data-dashboard-card] {
+    height: calc(100vh - 32px) !important;
+    max-height: calc(100vh - 32px) !important;
+  }
+}
+
+/* ===== PREVENT OVERFLOW AND LAYOUT ISSUES ===== */
+/* Ensure no element causes horizontal scroll */
+* {
+  max-width: 100vw !important;
+}
+
+/* Header and main container constraints */
+header, main, .dashboard-page-grid, [data-dashboard-card] {
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+}
+
+/* Sidebar constraints */
+[data-sidebar="sidebar"] {
+  max-width: min(280px, 85vw) !important;
+}
+
+/* Fix flex and grid containers */
+.flex, .grid, .dashboard-page-grid {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* Ensure main content area doesn't overflow */
+.SidebarWithTrigger {
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+}
+
+.SidebarWithTrigger > div {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* ===== FINAL LAYOUT POLISH ===== */
+/* Remove any problematic margins or padding that cause issues */
+body, html {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+}
+
+/* Ensure cards don't break layout */
+[data-card], .rounded-xl, .card-glass {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+}
+/* ===== FINAL LAYOUT AND SPACING FIXES ===== */
+
+/* Remove the silver/gray banner completely */
+.SidebarWithTrigger header,
+header[class*="sticky"],
+header[class*="border-b"],
+.sticky.top-0,
+.border-b {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Main content - full height without header */
+main,
+.SidebarWithTrigger main,
+.flex-1.flex.flex-col {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  padding: 0.75rem !important;
+  margin: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Dashboard cards - maximize space, minimize empty areas */
+.dashboard-card,
+[data-dashboard-card],
+.mobile-75vh,
+.h-full.flex.flex-col {
+  height: calc(100vh - 1.5rem) !important; /* Account for main padding only */
+  max-height: calc(100vh - 1.5rem) !important;
+  margin-bottom: 0.75rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+/* Card headers - compact but readable */
+.card-header,
+[class*="card"] .card-header,
+.pb-4.px-6.pt-6 {
+  padding: 0.75rem 1rem !important;
+  padding-bottom: 0.5rem !important;
+  flex-shrink: 0 !important;
+  min-height: auto !important;
+}
+
+/* Card titles - appropriate sizing */
+.card-title,
+[class*="card"] h1,
+[class*="card"] h2,
+[class*="card"] h3,
+.text-xl.sm\\:text-2xl {
+  font-size: 1.25rem !important; /* 20px */
+  line-height: 1.3 !important;
+  margin-bottom: 0.25rem !important;
+  font-weight: 600 !important;
+}
+
+/* Card subtitles */
+.card-subtitle,
+.text-sm.font-normal,
+[class*="card"] p {
+  font-size: 0.875rem !important; /* 14px */
+  line-height: 1.2 !important;
+  margin-bottom: 0 !important;
+  opacity: 0.8;
+}
+
+/* Card content - maximize usable space, eliminate empty areas */
+.card-content,
+[class*="card"] .card-content,
+.flex-grow.overflow-hidden,
+.px-6.pb-6 {
+  flex: 1 !important;
+  padding: 0.5rem 1rem 1rem !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+/* Scroll areas - tighter spacing */
+.scroll-area,
+.h-80,
+.h-\\[calc\\(100vh-20rem\\)\\],
+.h-\\[calc\\(100vh-18rem\\)\\] {
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow-y: auto !important;
+  padding-right: 0.5rem !important;
+}
+
+/* Lead/closer items - reduce spacing */
+.space-y-4 > * + *,
+.space-y-3 > * + * {
+  margin-top: 0.5rem !important;
+}
+
+.lead-item,
+.closer-item,
+[class*="item"] {
+  padding: 0.75rem !important;
+  margin-bottom: 0.5rem !important;
+  border-radius: 0.75rem !important;
+}
+
+/* Empty state containers - center properly without wasting space */
+.flex.h-full.items-center.justify-center,
+.flex.h-64.items-center.justify-center,
+.queue-empty-state {
+  height: auto !important;
+  min-height: 200px !important;
+  padding: 2rem 1rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Icons in empty states */
+.h-12.w-12,
+.h-8.w-8 {
+  height: 2rem !important;
+  width: 2rem !important;
+  margin-bottom: 1rem !important;
+}
+
+/* ===== FLOATING CHAT BUTTON FIX ===== */
+/* Move floating button to not interfere with content */
+.floating-chat-button,
+.fixed.bottom-5.right-1,
+.fixed.bottom-\\[5rem\\].right-1 {
+  position: fixed !important;
+  bottom: 1rem !important;
+  right: 1rem !important;
+  z-index: 50 !important;
+  
+  /* Smaller button */
+  height: 3rem !important;
+  width: 3rem !important;
+  min-height: 3rem !important;
+  min-width: 3rem !important;
+  
+  /* Better styling */
+  border-radius: 50% !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  
+  /* Ensure it doesn't block content */
+  pointer-events: auto !important;
+}
+
+/* Add padding to main content to account for floating button */
+main {
+  padding-bottom: 5rem !important; /* Space for floating button */
+}
+
+/* ===== MOBILE SPECIFIC FIXES ===== */
+@media (max-width: 768px) {
+  /* No header on mobile */
+  .SidebarWithTrigger header,
+  header {
+    display: none !important;
+    height: 0 !important;
+  }
+
+  /* Full height main content */
+  main,
+  .SidebarWithTrigger main {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    padding: 0.5rem !important;
+    padding-bottom: 4rem !important; /* Space for floating button */
+  }
+
+  /* Dashboard cards - full utilization */
+  .dashboard-card,
+  [data-dashboard-card],
+  .mobile-75vh {
+    height: calc(100vh - 1rem) !important; /* Just main padding */
+    max-height: calc(100vh - 1rem) !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  /* Tighter card spacing */
+  .card-header {
+    padding: 0.5rem 0.75rem !important;
+    padding-bottom: 0.25rem !important;
+  }
+
+  .card-content {
+    padding: 0.25rem 0.75rem 0.75rem !important;
+  }
+
+  /* Smaller titles on mobile */
+  .card-title {
+    font-size: 1.125rem !important; /* 18px */
+  }
+
+  /* Floating button - smaller on mobile */
+  .floating-chat-button {
+    height: 2.5rem !important;
+    width: 2.5rem !important;
+    bottom: 0.75rem !important;
+    right: 0.75rem !important;
+  }
+
+  /* Dashboard grid - single column, tight spacing */
+  .dashboard-page-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+    height: auto !important;
+  }
+
+  /* Lead items - more compact */
+  .lead-item,
+  .closer-item {
+    padding: 0.5rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  /* Avatars - smaller on mobile */
+  .avatar,
+  .h-14.w-14,
+  .h-16.w-16 {
+    height: 2rem !important;
+    width: 2rem !important;
+  }
+
+  /* Empty state - more compact */
+  .flex.h-full.items-center.justify-center {
+    min-height: 150px !important;
+    padding: 1rem !important;
+  }
+
+  .h-12.w-12 {
+    height: 1.5rem !important;
+    width: 1.5rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+}
+
+/* ===== VERY SMALL MOBILE ===== */
+@media (max-width: 480px) {
+  main {
+    padding: 0.375rem !important;
+    padding-bottom: 3.5rem !important;
+  }
+
+  .dashboard-card,
+  [data-dashboard-card] {
+    height: calc(100vh - 0.75rem) !important;
+    margin-bottom: 0.375rem !important;
+  }
+
+  .card-header {
+    padding: 0.375rem 0.5rem !important;
+    padding-bottom: 0.125rem !important;
+  }
+
+  .card-content {
+    padding: 0.125rem 0.5rem 0.5rem !important;
+  }
+
+  .card-title {
+    font-size: 1rem !important;
+  }
+
+  .floating-chat-button {
+    height: 2.25rem !important;
+    width: 2.25rem !important;
+    bottom: 0.5rem !important;
+    right: 0.5rem !important;
+  }
+}
+
+/* ===== PERFORMANCE METRICS SPECIFIC FIXES ===== */
+/* Performance metrics card - eliminate empty space */
+.performance-metrics-card {
+  height: auto !important;
+  max-height: 50vh !important;
+  min-height: 300px !important;
+}
+
+.metrics-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+  gap: 0.75rem !important;
+  height: auto !important;
+  min-height: 200px !important;
+  padding: 0.5rem !important;
+}
+
+.metric-card {
+  padding: 0.75rem !important;
+  min-height: 100px !important;
+  height: auto !important;
+}
+
+@media (max-width: 768px) {
+  .performance-metrics-card {
+    height: auto !important;
+    max-height: 40vh !important;
+    min-height: 250px !important;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+    padding: 0.25rem !important;
+  }
+
+  .metric-card {
+    padding: 0.5rem !important;
+    min-height: 80px !important;
+  }
+}
+
+/* ===== SIDEBAR TRIGGER (since header is hidden) ===== */
+/* Add a small sidebar trigger in the sidebar itself or make it accessible */
+.SidebarWithTrigger .sidebar-content::before {
+  content: '';
+  /* We'll handle sidebar access through the sidebar itself */
+}
+
+/* Make sure sidebar is accessible on mobile without header trigger */
+@media (max-width: 768px) {
+  /* Add a subtle indicator that sidebar can be accessed */
+  .SidebarWithTrigger::before {
+    content: '';
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    width: 4px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    z-index: 1000;
+    pointer-events: none;
+  }
+}
+
+/* ===== FINAL CLEANUP ===== */
+/* Remove any remaining problematic spacing */
+.container {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Ensure no horizontal overflow anywhere */
+* {
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+body, html {
+  overflow-x: hidden !important;
+  width: 100%;
+  max-width: 100vw;
+}
+/* Add these styles to your global CSS or create a new CSS file */
+
+/* Mobile-first responsive dashboard */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  min-height: 0; /* Important for proper scrolling */
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    padding: 2rem;
+  }
+}
+
+/* Ensure cards don't exceed viewport height on mobile */
+.dashboard-card {
+  height: auto;
+  max-height: calc(100vh - 12rem); /* Account for header and padding */
+  min-height: 16rem; /* Minimum usable height */
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .dashboard-card {
+    max-height: calc(100vh - 8rem);
+    min-height: 20rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-card {
+    max-height: calc(100vh - 6rem);
+    min-height: 24rem;
+  }
+}
+
+/* Mobile container adjustments */
+.mobile-container {
+  padding: 0.75rem;
+  overflow-x: hidden;
+}
+
+@media (min-width: 768px) {
+  .mobile-container {
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mobile-container {
+    padding: 1.5rem;
+  }
+}
+
+/* Prevent horizontal scroll on mobile */
+.no-horizontal-scroll {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Mobile-specific card content */
+.card-content-mobile {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Mobile ScrollArea adjustments */
+.scroll-area-mobile {
+  flex: 1;
+  min-height: 0;
+}
+
+.scroll-area-mobile [data-radix-scroll-area-content] {
+  min-height: 100%;
+}
+
+/* Mobile tabs content */
+.tabs-content-mobile {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.tabs-content-mobile[data-state="inactive"] {
+  display: none;
+}
+
+/* Mobile chat adjustments */
+.chat-dialog-mobile {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  margin: 0;
+  border-radius: 0;
+}
+
+@media (min-width: 768px) {
+  .chat-dialog-mobile {
+    width: 90vw;
+    height: 85vh;
+    max-width: 1200px;
+    max-height: 800px;
+    margin: auto;
+    border-radius: 0.5rem;
+  }
+}
+
+.chat-layout-mobile {
+  height: 100%;
+  overflow: hidden;
+}
+
+.chat-sidebar-mobile {
+  border-right: 1px solid hsl(var(--border));
+}
+
+@media (max-width: 767px) {
+  .chat-sidebar-mobile.hidden {
+    display: none;
+  }
+}
+
+.chat-main-mobile {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-header-mobile {
+  border-bottom: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+}
+
+.chat-input-mobile {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-button-mobile {
+  flex-shrink: 0;
+}
+
+/* Mobile message styling */
+.chat-message-mobile {
+  margin-bottom: 0.75rem;
+}
+
+.message-bubble-mobile {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Mobile navigation */
+.back-button-mobile {
+  margin-right: 0.5rem;
+}
+
+/* Channel list mobile */
+.channel-list-mobile {
+  padding: 0.75rem;
+}
+
+.channel-item-mobile {
+  padding: 0.75rem;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+/* Avatar sizing for mobile */
+.avatar-mobile {
+  flex-shrink: 0;
+}
+
+/* Mobile emoji picker */
+.emoji-picker-mobile {
+  position: absolute;
+  bottom: 3.5rem;
+  left: 0.75rem;
+  right: 0.75rem;
+  width: auto;
+  z-index: 50;
+}
+
+@media (min-width: 768px) {
+  .emoji-picker-mobile {
+    position: absolute;
+    bottom: 3.5rem;
+    left: 0.75rem;
+    right: auto;
+    width: 20rem;
+  }
+}
+
+/* Mobile responsive titles */
+.chat-title-mobile {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+@media (max-width: 640px) {
+  .chat-title-mobile {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
+/* Floating button adjustments */
+.floating-chat-button {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 40;
+}
+
+@media (min-width: 768px) {
+  .floating-chat-button {
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+}
+
+/* Mobile lead card adjustments */
+.lead-card-mobile {
+  margin-bottom: 0.75rem;
+}
+
+.lead-card-mobile:last-child {
+  margin-bottom: 0;
+}
+
+/* Touch targets for mobile */
+@media (max-width: 767px) {
+  button, 
+  [role="button"],
+  .clickable {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Ensure proper spacing in mobile grid layouts */
+.mobile-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .mobile-grid {
+    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .mobile-grid {
+    gap: 1.5rem;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Responsive text sizing */
+.responsive-text-sm {
+  font-size: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .responsive-text-sm {
+    font-size: 0.875rem;
+  }
+}
+
+.responsive-text-base {
+  font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .responsive-text-base {
+    font-size: 1rem;
+  }
+}
+/* Add these additional CSS rules to your globals.css file */
+
+/* Fix for desktop tab content visibility */
+@media (min-width: 1024px) {
+  .dashboard-card {
+    height: auto;
+    max-height: calc(100vh - 10rem); /* Increased from 6rem to 10rem for better desktop spacing */
+    min-height: 28rem; /* Increased minimum height for desktop */
+  }
+}
+
+/* Ensure tabs content is fully visible */
+[role="tabpanel"] {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+[role="tabpanel"][data-state="inactive"] {
+  display: none !important;
+}
+
+[role="tabpanel"][data-state="active"] {
+  display: flex !important;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Fix for TabsList to ensure proper contrast on active tabs */
+[role="tablist"] [role="tab"][data-state="active"] {
+  background-color: white !important;
+  color: rgb(15 23 42) !important; /* slate-900 */
+  font-weight: 600;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+[role="tablist"] [role="tab"][data-state="inactive"] {
+  background-color: transparent;
+  color: rgb(100 116 139); /* slate-500 */
+  font-weight: 500;
+}
+
+[role="tablist"] [role="tab"][data-state="inactive"]:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: rgb(71 85 105); /* slate-600 */
+}
+
+/* Dark mode tab styling */
+.dark [role="tablist"] [role="tab"][data-state="active"] {
+  background-color: rgb(51 65 85) !important; /* slate-700 */
+  color: white !important;
+}
+
+.dark [role="tablist"] [role="tab"][data-state="inactive"] {
+  color: rgb(148 163 184); /* slate-400 */
+}
+
+.dark [role="tablist"] [role="tab"][data-state="inactive"]:hover {
+  background-color: rgba(51, 65, 85, 0.5); /* slate-700 with opacity */
+  color: rgb(203 213 225); /* slate-300 */
+}
+
+/* Premium theme tab styling */
+.premium [role="tablist"] [role="tab"][data-state="active"] {
+  background: linear-gradient(to right, rgba(147, 51, 234, 0.2), rgba(20, 184, 166, 0.1)) !important;
+  border: 1px solid rgba(147, 51, 234, 0.3) !important;
+  color: white !important;
+}
+
+/* Fix for scroll areas in tabs */
+[data-radix-scroll-area-viewport] {
+  height: 100% !important;
+}
+
+/* Ensure proper spacing for cards */
+.dashboard-card .space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.dashboard-card .space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+/* Better responsive card padding */
+@media (min-width: 640px) {
+  .dashboard-card {
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-card {
+    padding: 1.5rem;
+  }
+}
+
+/* Fix for closer card sizing */
+.closer-card-container {
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .closer-card-container {
+    padding: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .closer-card-container {
+    padding: 1.5rem;
+  }
+}
+
+/* Ensure proper avatar scaling */
+.closer-avatar {
+  transition: all 0.3s ease;
+}
+
+.closer-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Better text scaling for closer names */
+.closer-name {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .closer-name {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .closer-name {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+}
+
+/* Fix for dashboard grid spacing on larger screens */
+@media (min-width: 1536px) {
+  .dashboard-grid {
+    gap: 2.5rem;
+    padding: 2.5rem;
+  }
+  
+  .dashboard-card {
+    min-height: 32rem;
+    max-height: calc(100vh - 8rem);
+  }
+}
+
+/* Ensure tabs are properly sized */
+[role="tablist"] {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+}
+
+.dark [role="tablist"] {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+[role="tab"] {
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+@media (min-width: 640px) {
+  [role="tab"] {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  [role="tab"] {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+/* ===== END OF OPTIMIZATIONS ===== */
