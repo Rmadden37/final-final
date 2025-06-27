@@ -16,7 +16,9 @@ import AIAssistantTab from "./AIAssistantTab";
 // import SettersTab from "./SettersTab";
 
 export default function AnalyticsDashboard() {
-  const { user } = useAuth();
+  // Define a type for user that includes teamId and role
+  type AuthUser = { teamId?: string; role: string };
+  const { user } = useAuth() as { user: AuthUser };
   const { toast } = useToast();
   
   const [analytics, setAnalytics] = useState<AnalyticsData>({
