@@ -7,7 +7,7 @@ import {useAuth} from "@/hooks/use-auth";
 import {useToast} from "@/hooks/use-toast";
 import {db} from "@/lib/firebase";
 import {collection, query, where, onSnapshot, orderBy, limit} from "firebase/firestore";
-import LeadCard from "@/components/dashboard/lead-card";
+import LeadCard from "@/components/performance-dashboard.tsx/lead-card";
 import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card";
 import {History, Loader2} from "lucide-react";
 import {ScrollArea} from "@/components/ui/scroll-area";

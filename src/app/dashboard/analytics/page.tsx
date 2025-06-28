@@ -1,6 +1,6 @@
 "use client";
 
-import AnalyticsDashboard from "@/components/dashboard/analytics-dashboard";
+import AnalyticsDashboard from "@/components/performance-dashboard.tsx/analytics-dashboard";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";

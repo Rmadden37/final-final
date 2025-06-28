@@ -3,7 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import type { Lead } from "@/types";
-import LeadCard from "@/components/dashboard/lead-card";
+import LeadCard from "@/components/performance-dashboard.tsx/lead-card";
 
 interface LeadFormWithCalendarProps {
   scheduledLeads?: Lead[];

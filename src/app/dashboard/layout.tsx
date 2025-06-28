@@ -1,8 +1,8 @@
+// src/app/dashboard/layout.tsx - Enhanced mobile-first layout
 "use client";
 
 import React from "react";
 import DashboardSidebar from "@/components/dashboard/dashboard-sidebar";
-// Remove AuthProvider import - it's already in root layout
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -10,6 +10,12 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <DashboardSidebar>{children}</DashboardSidebar>
+    <div className="h-screen overflow-hidden">
+      <DashboardSidebar>
+        <div className="h-full overflow-auto">
+          {children}
+        </div>
+      </DashboardSidebar>
+    </div>
   );
 }

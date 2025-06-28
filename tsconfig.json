@@ -35,7 +35,7 @@
     ".next/types/**/*.ts",
     "next-env.d.ts",
     "out/types/**/*.ts"
-  ],
+, "src/components/performance-dashboard.tsx"  ],
   "exclude": [
     "node_modules",
     "functions/**/*",

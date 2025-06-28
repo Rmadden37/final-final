@@ -1,4 +1,4 @@
-import QuickLeadCleanup from "@/components/dashboard/quick-lead-cleanup";
+import QuickLeadCleanup from "@/components/performance-dashboard.tsx/quick-lead-cleanup";
 
 export default function QuickCleanupPage() {
   return (

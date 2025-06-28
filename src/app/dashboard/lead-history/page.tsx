@@ -50,7 +50,7 @@ import {
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {useRouter} from "next/navigation";
 import {format} from "date-fns";
-import VerifiedCheckbox from "@/components/dashboard/verified-checkbox";
+import VerifiedCheckbox from "@/components/performance-dashboard.tsx/verified-checkbox";
 
 export default function LeadManagementPage() {
   const {user, loading: authLoading} = useAuth();

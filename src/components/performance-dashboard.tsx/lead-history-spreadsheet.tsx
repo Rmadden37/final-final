@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import VerifiedCheckbox from "@/components/dashboard/verified-checkbox";
+import VerifiedCheckbox from "@/components/performance-dashboard.tsx/verified-checkbox";
 import {
   Activity,
   CheckCircle2,

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { 
   LogOut, 
   ClipboardList,
@@ -13,11 +14,12 @@ import {
   Users,
   Trophy,
   Brain,
-  Menu
+  Menu,
+  X
 } from "lucide-react";
 import AvailabilityToggle from "./availability-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
 import dynamic from "next/dynamic";
 import FloatingChatButton from "./floating-ai-button";
@@ -65,13 +67,19 @@ function AppSidebar() {
   const { user, logout, loading } = useAuth();
   const [isCreateLeadModalOpen, setIsCreateLeadModalOpen] = useState(false);
   const pathname = usePathname();
-  const { setOpenMobile, isMobile } = useSidebar();
+  const { setOpenMobile, isMobile, open, setOpen } = useSidebar();
 
   if (loading || !user) {
     return (
       <Sidebar>
         <SidebarContent>
-          <div className="p-4">Loading...</div>
+          <div className="p-4">
+            <div className="animate-pulse space-y-4">
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+            </div>
+          </div>
         </SidebarContent>
       </Sidebar>
     );
@@ -91,28 +99,26 @@ function AppSidebar() {
 
   return (
     <>
-      <Sidebar>
-        <SidebarHeader className="border-b">
-          <div className="flex h-16 items-center justify-center">
-            <Image 
-              src="/logo.png" 
-              alt="LeadFlow" 
-              width={40} 
-              height={40}
-              onError={(e) => { 
-                e.currentTarget.style.display = 'none';
-                // Don't manipulate innerHTML directly - let React handle fallbacks
-              }}
-            />
+      <Sidebar className="border-r border-border bg-sidebar">
+        <SidebarHeader className="border-b border-sidebar-border bg-sidebar">
+          <div className="flex h-16 items-center justify-center px-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-sm">LF</span>
+              </div>
+              {!isMobile && (
+                <span className="font-semibold text-sidebar-foreground">LeadFlow</span>
+              )}
+            </div>
           </div>
         </SidebarHeader>
 
-        <SidebarContent>
+        <SidebarContent className="bg-sidebar">
           <SidebarMenu>
             {/* Main Navigation */}
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={pathname === "/dashboard"}>
-                <Link href="/dashboard" onClick={handleNav}>
+                <Link href="/dashboard" onClick={handleNav} className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                   <Home className="h-5 w-5" />
                   <span>Dashboard</span>
                 </Link>
@@ -125,9 +131,9 @@ function AppSidebar() {
                 <SidebarMenuButton 
                   onClick={() => {
                     setIsCreateLeadModalOpen(true);
-                    handleNav(); // This will close the sidebar on mobile
+                    handleNav();
                   }}
-                  className="text-green-600 hover:text-green-700 dark:text-green-400"
+                  className="text-green-600 hover:text-green-700 dark:text-green-400 hover:bg-sidebar-accent"
                 >
                   <PlusCircle className="h-5 w-5" />
                   <span>Create New Lead</span>
@@ -138,7 +144,7 @@ function AppSidebar() {
             {/* Leaderboard */}
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={pathname === "/dashboard/leaderboard"}>
-                <Link href="/dashboard/leaderboard" onClick={handleNav}>
+                <Link href="/dashboard/leaderboard" onClick={handleNav} className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                   <Trophy className="h-5 w-5 text-yellow-500" />
                   <span>Leaderboard</span>
                 </Link>
@@ -148,10 +154,10 @@ function AppSidebar() {
             {/* Manager/Admin Tools Section */}
             {isManagerOrAdmin && (
               <>
-                <SidebarSeparator className="my-4" />
+                <SidebarSeparator className="my-4 bg-sidebar-border" />
                 
                 <div className="px-3 py-2">
-                  <h3 className="mb-2 text-xs font-semibold uppercase text-muted-foreground flex items-center gap-2">
+                  <h3 className="mb-2 text-xs font-semibold uppercase text-sidebar-foreground/70 flex items-center gap-2">
                     <Users className="h-4 w-4" />
                     <span>Manager Tools</span>
                   </h3>
@@ -159,7 +165,7 @@ function AppSidebar() {
 
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname === "/dashboard/lead-history"}>
-                    <Link href="/dashboard/lead-history" onClick={handleNav}>
+                    <Link href="/dashboard/lead-history" onClick={handleNav} className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                       <ClipboardList className="h-5 w-5" />
                       <span>Lead History</span>
                     </Link>
@@ -168,7 +174,7 @@ function AppSidebar() {
 
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname === "/dashboard/performance-analytics"}>
-                    <Link href="/dashboard/performance-analytics" onClick={handleNav}>
+                    <Link href="/dashboard/performance-analytics" onClick={handleNav} className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                       <Brain className="h-5 w-5 text-blue-500" />
                       <span>Analytics</span>
                     </Link>
@@ -179,18 +185,18 @@ function AppSidebar() {
                   <>
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild isActive={pathname === "/dashboard/manage-teams"}>
-                        <Link href="/dashboard/manage-teams" onClick={handleNav}>
+                        <Link href="/dashboard/manage-teams" onClick={handleNav} className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                           <Users className="h-5 w-5" />
                           <span>Manage Teams</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
 
-                    <SidebarSeparator className="my-4" />
+                    <SidebarSeparator className="my-4 bg-sidebar-border" />
 
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild isActive={pathname === "/dashboard/admin-tools"}>
-                        <Link href="/dashboard/admin-tools" onClick={handleNav}>
+                        <Link href="/dashboard/admin-tools" onClick={handleNav} className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                           <Settings className="h-5 w-5" />
                           <span>Admin Tools</span>
                         </Link>
@@ -204,7 +210,7 @@ function AppSidebar() {
             {/* Availability Toggle for Closers */}
             {isCloser && (
               <>
-                <SidebarSeparator className="my-4" />
+                <SidebarSeparator className="my-4 bg-sidebar-border" />
                 <SidebarMenuItem>
                   <div className="px-3 py-2">
                     <AvailabilityToggle />
@@ -215,15 +221,15 @@ function AppSidebar() {
           </SidebarMenu>
         </SidebarContent>
 
-        <SidebarFooter className="border-t">
+        <SidebarFooter className="border-t border-sidebar-border bg-sidebar">
           <SidebarMenu>
             {/* User Profile */}
             <SidebarMenuItem>
               <SidebarMenuButton asChild size="lg" isActive={pathname === "/dashboard/profile"}>
-                <Link href="/dashboard/profile" onClick={handleNav}>
+                <Link href="/dashboard/profile" onClick={handleNav} className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={user?.avatarUrl || ""} />
-                    <AvatarFallback>
+                    <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground">
                       {user?.displayName?.substring(0, 2).toUpperCase() || 
                        user?.email?.substring(0, 2).toUpperCase() || 
                        "U"}
@@ -233,7 +239,7 @@ function AppSidebar() {
                     <span className="text-sm font-medium truncate">
                       {user?.displayName || user?.email?.split('@')[0] || 'User'}
                     </span>
-                    <span className="text-xs text-muted-foreground capitalize">
+                    <span className="text-xs text-sidebar-foreground/70 capitalize">
                       {user?.role || 'User'}
                     </span>
                   </div>
@@ -250,7 +256,7 @@ function AppSidebar() {
 
             {/* Logout */}
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={logout}>
+              <SidebarMenuButton onClick={logout} className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                 <LogOut className="h-5 w-5" />
                 <span>Logout</span>
               </SidebarMenuButton>
@@ -272,6 +278,17 @@ function AppSidebar() {
 
 function Header() {
   const pathname = usePathname();
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   const getPageTitle = () => {
     const titles: Record<string, string> = {
@@ -288,10 +305,24 @@ function Header() {
 
   return (
     <header className="sticky top-0 z-50 flex h-14 items-center gap-4 border-b bg-background px-6">
-      <SidebarTrigger className="md:hidden">
-        <Menu className="h-5 w-5" />
-      </SidebarTrigger>
-      <h1 className="text-lg font-semibold">{getPageTitle()}</h1>
+      {/* Mobile menu button */}
+      {isMobile && (
+        <SidebarTrigger className="md:hidden">
+          <Menu className="h-5 w-5" />
+        </SidebarTrigger>
+      )}
+      
+      {/* Page title - centered on mobile */}
+      <div className={`${isMobile ? 'flex-1 text-center' : ''}`}>
+        <h1 className="text-lg font-semibold text-foreground">{getPageTitle()}</h1>
+      </div>
+      
+      {/* Desktop sidebar trigger - hidden on mobile */}
+      {!isMobile && (
+        <SidebarTrigger className="hidden md:flex">
+          <Menu className="h-5 w-5" />
+        </SidebarTrigger>
+      )}
     </header>
   );
 }

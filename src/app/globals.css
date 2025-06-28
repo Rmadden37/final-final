@@ -1,4 +1,4 @@
-/* Enhanced global styles with proper sidebar spacing */
+/* FILE: src/app/globals.css - Enhanced global styles with proper sidebar spacing and mobile fixes */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -45,6 +45,16 @@
     --warning-foreground: 48 96% 89%;
     --info: 199 89% 48%;
     --info-foreground: 210 40% 98%;
+    
+    /* Sidebar variables */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 221 83% 53%;
   }
 
   /* Dark theme */
@@ -68,6 +78,15 @@
     --border: 217 32% 17%;
     --input: 217 32% 17%;
     --ring: 224 71% 4%;
+    
+    --sidebar-background: 222 84% 4.9%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 222 84% 4.9%;
+    --sidebar-accent: 217 32% 17%;
+    --sidebar-accent-foreground: 217 91% 60%;
+    --sidebar-border: 217 32% 17%;
+    --sidebar-ring: 217 91% 60%;
   }
 
   /* Enhanced base styles */
@@ -118,20 +137,65 @@
   }
 }
 
-/* CRITICAL SIDEBAR LAYOUT FIXES */
+/* CRITICAL LAYOUT FIXES */
 @layer utilities {
-  /* Main content area with PROPER sidebar spacing */
-  .main-content {
-    margin-left: var(--sidebar-width-collapsed);
-    transition: margin-left 0.3s ease;
-    min-height: 100vh;
-    width: calc(100% - var(--sidebar-width-collapsed));
+  /* ===== DESKTOP LAYOUT ===== */
+  @media (min-width: 769px) {
+    /* Main content area with PROPER sidebar spacing */
+    .main-content {
+      margin-left: var(--sidebar-width-collapsed);
+      transition: margin-left 0.3s ease;
+      min-height: 100vh;
+      width: calc(100% - var(--sidebar-width-collapsed));
+    }
+
+    /* When sidebar is expanded */
+    .sidebar-expanded .main-content {
+      margin-left: var(--sidebar-width-expanded);
+      width: calc(100% - var(--sidebar-width-expanded));
+    }
+
+    /* Dashboard layout */
+    .dashboard-layout {
+      margin-left: var(--sidebar-width-collapsed);
+      transition: margin-left 0.3s ease;
+      min-height: 100vh;
+      background: #f8fafc;
+    }
+
+    .sidebar-expanded .dashboard-layout {
+      margin-left: var(--sidebar-width-expanded);
+    }
   }
 
-  /* When sidebar is expanded */
-  .sidebar-expanded .main-content {
-    margin-left: var(--sidebar-width-expanded);
-    width: calc(100% - var(--sidebar-width-expanded));
+  /* ===== MOBILE LAYOUT - CRITICAL FIXES ===== */
+  @media (max-width: 768px) {
+    /* Remove ALL sidebar margins on mobile */
+    .main-content,
+    .dashboard-layout {
+      margin-left: 0 !important;
+      width: 100% !important;
+      padding-top: 60px; /* Account for mobile header */
+    }
+    
+    .sidebar-expanded .main-content,
+    .sidebar-expanded .dashboard-layout {
+      margin-left: 0 !important;
+      width: 100% !important;
+    }
+
+    /* Mobile body adjustments */
+    body {
+      padding-top: 0;
+    }
+
+    /* Mobile dashboard container */
+    .dashboard-container {
+      padding-top: 0;
+      margin-top: 0;
+      width: 100%;
+      overflow-x: hidden;
+    }
   }
 
   /* Page title styling */
@@ -142,19 +206,7 @@
     margin-bottom: 1.5rem;
   }
 
-  /* MOBILE RESPONSIVE - Remove sidebar margin */
   @media (max-width: 768px) {
-    .main-content {
-      margin-left: 0 !important;
-      width: 100% !important;
-      padding-top: 70px; /* Account for mobile header */
-    }
-    
-    .sidebar-expanded .main-content {
-      margin-left: 0 !important;
-      width: 100% !important;
-    }
-    
     .page-title {
       font-size: 1.5rem;
       margin-bottom: 1rem;
@@ -176,24 +228,6 @@
       max-width: 1400px;
       padding-right: 2rem;
       padding-left: 2rem;
-    }
-  }
-
-  /* Dashboard specific layout fixes */
-  .dashboard-layout {
-    margin-left: var(--sidebar-width-collapsed);
-    transition: margin-left 0.3s ease;
-    min-height: 100vh;
-    background: #f8fafc;
-  }
-
-  .sidebar-expanded .dashboard-layout {
-    margin-left: var(--sidebar-width-expanded);
-  }
-
-  @media (max-width: 768px) {
-    .dashboard-layout {
-      margin-left: 0;
     }
   }
 
@@ -263,6 +297,66 @@
     color: rgb(96 165 250);
     border-color: rgb(30 58 138);
   }
+
+  /* Dashboard specific grid fixes */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    min-height: calc(100vh - 60px);
+    box-sizing: border-box;
+  }
+
+  @media (min-width: 1024px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      padding: 2rem;
+      min-height: calc(100vh - 3.5rem);
+    }
+  }
+
+  /* Card component fixes */
+  .dashboard-card {
+    background: white;
+    border: 1px solid hsl(var(--border));
+    border-radius: 12px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .dashboard-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+
+  /* Card grid items */
+  .card-grid-item {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .card-grid-item > .dashboard-card {
+    flex: 1;
+  }
+
+  /* Scroll area fixes */
+  .scroll-area-mobile {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .scroll-area-mobile {
+      max-height: 60vh;
+    }
+  }
 }
 
 /* Enhanced component styles */
@@ -281,19 +375,30 @@
     backdrop-filter: blur(8px);
     border-bottom: 1px solid hsl(var(--border));
     transition: all 0.3s ease;
-    margin-left: var(--sidebar-width-collapsed);
-    width: calc(100% - var(--sidebar-width-collapsed));
   }
 
-  .sidebar-expanded .app-header {
-    margin-left: var(--sidebar-width-expanded);
-    width: calc(100% - var(--sidebar-width-expanded));
+  @media (min-width: 769px) {
+    .app-header {
+      margin-left: var(--sidebar-width-collapsed);
+      width: calc(100% - var(--sidebar-width-collapsed));
+    }
+
+    .sidebar-expanded .app-header {
+      margin-left: var(--sidebar-width-expanded);
+      width: calc(100% - var(--sidebar-width-expanded));
+    }
   }
 
   @media (max-width: 768px) {
     .app-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
       margin-left: 0;
       width: 100%;
+      height: 60px;
+      z-index: 100;
     }
   }
 
@@ -371,6 +476,23 @@
     padding: 1.5rem;
     padding-top: 0;
   }
+
+  /* Mobile card adjustments */
+  @media (max-width: 768px) {
+    .card-header {
+      padding: 1rem;
+    }
+
+    .card-content {
+      padding: 1rem;
+      padding-top: 0;
+    }
+
+    .card-footer {
+      padding: 1rem;
+      padding-top: 0;
+    }
+  }
 }
 
 /* Loading spinner */
@@ -414,38 +536,73 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: hsl(var(--foreground));
 }
-/* Add this to the END of your src/app/globals.css file */
 
-/* Hide only the title in the header area, not the main page title */
-@layer utilities {
-  /* Target the header sticky element specifically */
-  header.sticky h1,
-  header.sticky h2,
-  header.sticky span,
-  .sticky.top-0 h1,
-  .sticky.top-0 h2,
-  .sticky.top-0 span[class*="title"],
-  .sticky.top-0 span[class*="text-"],
-  .sticky.top-0 div[class*="title"] {
-    display: none !important;
+/* Mobile specific fixes for dashboard */
+@media (max-width: 768px) {
+  /* Ensure dashboard content doesn't get clipped */
+  .dashboard-page {
+    padding-top: 60px;
+    min-height: 100vh;
   }
 
-  /* More specific targeting for header content */
-  .sticky.top-0.flex h1,
-  .sticky.top-0.flex h2,
-  .sticky.top-0.flex span:not([class*="button"]):not([class*="icon"]) {
-    display: none !important;
+  /* Mobile dashboard grid */
+  .dashboard-mobile-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
   }
 
-  /* Target text in the header gap area */
-  .sticky.top-0 .gap-4 h1,
-  .sticky.top-0 .gap-4 h2,
-  .sticky.top-0 .gap-4 span:first-child {
-    display: none !important;
+  /* Mobile card heights */
+  .mobile-card-container {
+    min-height: 300px;
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
   }
-}
 
-/* Alternative: Target only elements in the header that could be titles */
-header h1, header h2, header .title {
-  display: none !important;
+  /* Mobile scroll fixes */
+  .mobile-scroll-container {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobile-scroll-content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Touch-friendly buttons */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+
+  /* Mobile text sizes */
+  .mobile-text-base {
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .mobile-text-sm {
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+
+  /* Prevent zoom on input focus (iOS) */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  textarea,
+  select {
+    font-size: 16px;
+  }
 }

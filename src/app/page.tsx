@@ -4,7 +4,7 @@ import {useEffect} from "react";
 import {useRouter} from "next/navigation";
 import {useAuth} from "@/hooks/use-auth";
 import {Loader2} from "lucide-react";
-import PerformanceMetrics from "@/components/dashboard/performance-metrics";
+import PerformanceMetrics from "@/components/performance-dashboard.tsx/performance-metrics";
 
 // In your JSX:
 <PerformanceMetrics />

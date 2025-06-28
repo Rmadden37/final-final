@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Brain, Sparkles, Sun, Crown } from "lucide-react";
-import BotChat from "@/components/dashboard/bot-chat";
+import BotChat from "@/components/performance-dashboard.tsx/bot-chat";
 import { Button } from "@/components/ui/button";
 
 export default function AnalyticsAIPage() {
