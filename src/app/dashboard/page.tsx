@@ -1,4 +1,4 @@
-// src/app/dashboard/page.tsx
+// src/app/dashboard/page.tsx - COMPLETE fixed version with proper layout
 "use client";
 
 import { useAuth } from "@/hooks/use-auth";

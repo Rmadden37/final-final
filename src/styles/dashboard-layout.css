@@ -1,238 +1,510 @@
-/* Dashboard Layout Fixes - Add to your global CSS or create new file */
-/* Fixes height, overflow, and scroll issues */
+/* Dashboard Layout Fixes - Complete Overhaul */
+/* Replace the content of src/styles/dashboard-styles.css with this */
 
-/* Dashboard main container */
+/* ===== ROOT LAYOUT FIXES ===== */
 .dashboard-container {
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 0;
+  margin: 0;
+  width: 100%;
 }
 
-/* Fix for main layout grid */
+/* ===== MAIN CONTENT AREA FIXES ===== */
+.main-content {
+  margin-left: 70px; /* Collapsed sidebar width */
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  width: calc(100% - 70px);
+  padding: 0;
+  background: #f8fafc;
+}
+
+.sidebar-expanded .main-content {
+  margin-left: 280px; /* Expanded sidebar width */
+  width: calc(100% - 280px);
+}
+
+/* ===== DASHBOARD GRID SYSTEM ===== */
 .dashboard-main-grid {
-  height: calc(100vh - 3.5rem); /* Account for header */
-  overflow: hidden;
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
   padding: 1.5rem;
+  min-height: calc(100vh - 3.5rem);
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 1024px) {
   .dashboard-main-grid {
     grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 2rem;
   }
 }
 
-/* Fix for card containers */
-.dashboard-card-container {
+@media (min-width: 1440px) {
+  .dashboard-main-grid {
+    gap: 2.5rem;
+    padding: 2.5rem;
+  }
+}
+
+/* ===== CARD COMPONENTS ===== */
+.dashboard-card,
+.card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
   height: 100%;
-  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-/* In-process leads specific fixes */
-.in-process-leads-card {
+.dashboard-card:hover,
+.card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+/* ===== CARD HEADERS ===== */
+.card-header,
+.dashboard-card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.card-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0.5rem 0 0 0;
+}
+
+/* ===== CARD CONTENT ===== */
+.card-content,
+.dashboard-card-content {
+  padding: 1.5rem;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== SCROLLABLE AREAS ===== */
+.scroll-area {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.scroll-area-viewport {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.scroll-area-content {
+  padding-right: 0.5rem;
+}
+
+/* Custom scrollbar */
+.scroll-area-viewport::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-area-viewport::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.scroll-area-viewport::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.scroll-area-viewport::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ===== LEAD COMPONENTS ===== */
+.lead-card,
+.lead-item {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.lead-card:hover,
+.lead-item:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.lead-card:last-child,
+.lead-item:last-child {
+  margin-bottom: 0;
+}
+
+/* ===== GRID COLUMN FIXES ===== */
+.dashboard-grid-left,
+.dashboard-grid-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: 0;
+}
+
+/* Ensure equal height columns on desktop */
+@media (min-width: 1024px) {
+  .dashboard-grid-left,
+  .dashboard-grid-right {
+    height: calc(100vh - 7rem);
+  }
+}
+
+/* ===== IN-PROCESS LEADS SPECIFIC ===== */
+.in-process-leads-container {
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  min-height: 400px;
 }
 
 .in-process-leads-header {
   flex-shrink: 0;
-  border-bottom: 1px solid hsl(var(--border));
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+  border-bottom: 1px solid #e0e7ff;
 }
 
 .in-process-leads-content {
   flex: 1;
-  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* ===== LEAD QUEUE SPECIFIC ===== */
+.lead-queue-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+.lead-queue-header {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+  border-bottom: 1px solid #e0e7ff;
+}
+
+.lead-queue-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== CLOSER LINEUP SPECIFIC ===== */
+.closer-lineup-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+.closer-lineup-header {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #f3e8ff 0%, #ffffff 100%);
+  border-bottom: 1px solid #e9d5ff;
+}
+
+.closer-lineup-content {
+  flex: 1;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* ===== TABS COMPONENT ===== */
+.tabs-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs-list {
+  flex-shrink: 0;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.tabs-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs-content > div {
+  height: 100%;
   overflow: hidden;
 }
 
-/* ScrollArea fixes for better visibility */
-.scroll-area-viewport {
-  height: 100% !important;
-}
+/* ===== MOBILE RESPONSIVE FIXES ===== */
+@media (max-width: 768px) {
+  /* CRITICAL: Remove sidebar margin on mobile */
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding-top: 60px; /* Space for mobile header */
+  }
 
-.scroll-area-content {
-  min-height: 100%;
-}
+  .sidebar-expanded .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
 
-/* Lead card spacing and visibility */
-.lead-card {
-  margin-bottom: 0.75rem;
-  border-radius: 0.75rem;
-  border: 1px solid hsl(var(--border));
-  background: hsl(var(--card));
-  transition: all 0.2s ease;
-}
-
-.lead-card:hover {
-  border-color: hsl(var(--primary));
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.lead-card:last-child {
-  margin-bottom: 0;
-}
-
-/* Fix for lead card content overflow */
-.lead-card-content {
-  padding: 1rem;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-/* Responsive fixes for mobile */
-@media (max-width: 1023px) {
+  /* Mobile grid - single column */
   .dashboard-main-grid {
     grid-template-columns: 1fr;
-    height: auto;
-    min-height: calc(100vh - 3.5rem);
-    overflow-y: auto;
+    gap: 1rem;
+    padding: 1rem;
+    min-height: auto;
   }
-  
-  .dashboard-card-container {
+
+  /* Mobile card adjustments */
+  .dashboard-card,
+  .card {
+    margin-bottom: 1rem;
+    border-radius: 8px;
+  }
+
+  .card-header,
+  .dashboard-card-header {
+    padding: 1rem;
+  }
+
+  .card-content,
+  .dashboard-card-content {
+    padding: 1rem;
+  }
+
+  /* Mobile heights - auto sizing */
+  .dashboard-grid-left,
+  .dashboard-grid-right {
     height: auto;
     min-height: 300px;
     max-height: 60vh;
   }
-  
-  .in-process-leads-card {
-    height: auto;
-    min-height: 400px;
+
+  .in-process-leads-container,
+  .lead-queue-container,
+  .closer-lineup-container {
+    min-height: 300px;
     max-height: 60vh;
   }
+
+  /* Mobile lead cards */
+  .lead-card,
+  .lead-item {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  /* Mobile tabs */
+  .tabs-list button {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  /* Ensure mobile scroll areas work */
+  .scroll-area-viewport {
+    max-height: 50vh;
+  }
 }
 
-/* Active leads simplified view styles */
-.active-lead-summary {
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
+/* ===== SMALL MOBILE DEVICES ===== */
+@media (max-width: 480px) {
+  .dashboard-main-grid {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
 
-.active-lead-summary:hover {
-  background-color: hsl(var(--muted));
-  border-color: hsl(var(--primary));
-}
-
-.active-lead-name {
-  font-weight: 600;
-  color: hsl(var(--primary));
-  transition: color 0.2s ease;
-}
-
-.active-lead-name:hover {
-  color: hsl(var(--primary)) / 0.8;
-}
-
-.active-lead-status-indicator {
-  width: 4px;
-  background: linear-gradient(to bottom, hsl(var(--success)), hsl(var(--success)) / 0.7);
-  border-radius: 2px;
-}
-
-/* Mobile-specific active leads styles */
-@media (max-width: 768px) {
-  .active-lead-summary {
+  .card-header,
+  .dashboard-card-header {
     padding: 0.75rem;
   }
-  
-  .active-lead-name {
-    font-size: 0.9rem;
+
+  .card-content,
+  .dashboard-card-content {
+    padding: 0.75rem;
   }
-  
-  .active-lead-meta {
-    font-size: 0.8rem;
+
+  .card-title {
+    font-size: 1.125rem;
+  }
+
+  .lead-card,
+  .lead-item {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 }
 
-/* Badge positioning fixes */
-.lead-badge {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  z-index: 10;
+/* ===== LARGE DESKTOP OPTIMIZATIONS ===== */
+@media (min-width: 1600px) {
+  .dashboard-main-grid {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 3rem;
+    gap: 3rem;
+  }
+
+  .card-header,
+  .dashboard-card-header {
+    padding: 2rem;
+  }
+
+  .card-content,
+  .dashboard-card-content {
+    padding: 2rem;
+  }
 }
 
-/* Loading state improvements */
+/* ===== LOADING STATES ===== */
 .dashboard-loading {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  min-height: 200px;
+  height: 200px;
+  color: #6b7280;
+  font-size: 0.875rem;
 }
 
-/* Empty state improvements */
+.loading-spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 0.75rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== EMPTY STATES ===== */
 .dashboard-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
-  min-height: 300px;
+  min-height: 200px;
   padding: 2rem;
   text-align: center;
+  color: #6b7280;
 }
 
-/* Debug styles - remove in production */
-.debug-container {
-  border: 2px dashed red;
-  position: relative;
+.dashboard-empty-state h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 1rem 0 0.5rem 0;
 }
 
-.debug-container::before {
-  content: "DEBUG: " attr(data-debug);
-  position: absolute;
-  top: -20px;
-  left: 0;
-  background: red;
-  color: white;
-  padding: 2px 6px;
-  font-size: 10px;
-  font-weight: bold;
-  z-index: 9999;
+.dashboard-empty-state p {
+  font-size: 0.875rem;
+  margin: 0;
+  max-width: 300px;
 }
 
-/* Ensure proper stacking and visibility */
-.dashboard-grid-item {
-  position: relative;
-  z-index: 1;
+/* ===== UTILITY CLASSES ===== */
+.h-full {
+  height: 100%;
 }
 
-.dashboard-sidebar-column {
-  position: relative;
-  z-index: 2;
+.min-h-0 {
+  min-height: 0;
 }
 
-/* Fix for scroll indicators */
-.scroll-indicator {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: linear-gradient(to bottom, transparent, hsl(var(--primary)), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
+.overflow-hidden {
+  overflow: hidden;
 }
 
-.scroll-area:hover .scroll-indicator {
-  opacity: 0.6;
+.flex-1 {
+  flex: 1;
 }
 
-/* Performance optimization for large lists */
-.lead-list-container {
-  contain: layout style;
-  will-change: scroll-position;
+.flex-shrink-0 {
+  flex-shrink: 0;
 }
 
-.lead-item {
-  contain: layout;
-  transform: translateZ(0);
+/* ===== DARK MODE SUPPORT ===== */
+.dark .dashboard-container,
+.dark .main-content {
+  background: #0f172a;
+}
+
+.dark .dashboard-card,
+.dark .card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.dark .card-header,
+.dark .dashboard-card-header {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-bottom-color: #475569;
+}
+
+.dark .card-title {
+  color: #f1f5f9;
+}
+
+.dark .card-description {
+  color: #94a3b8;
+}
+
+.dark .lead-card,
+.dark .lead-item {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.dark .scroll-area-viewport::-webkit-scrollbar-track {
+  background: #334155;
+}
+
+.dark .scroll-area-viewport::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+.dark .scroll-area-viewport::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }

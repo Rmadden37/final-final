@@ -359,3 +359,369 @@
     background: contrast;
   }
 }
+
+/* Mobile and Sidebar Layout Fixes */
+/* Add this to src/styles/mobile-fixes.css or create a new file */
+
+/* ===== CRITICAL MOBILE LAYOUT FIXES ===== */
+
+/* Ensure main content doesn't have sidebar margins on mobile */
+@media (max-width: 768px) {
+  /* Reset ALL sidebar-related margins and widths on mobile */
+  .main-content,
+  .dashboard-layout,
+  .app-main,
+  [data-main-content] {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    padding-top: 60px; /* Space for mobile header */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    transition: none !important;
+  }
+
+  /* Ensure sidebar is properly hidden off-screen on mobile */
+  [data-sidebar="sidebar"],
+  .sidebar {
+    position: fixed !important;
+    left: -100% !important;
+    top: 0 !important;
+    width: 280px !important;
+    height: 100vh !important;
+    z-index: 50 !important;
+    transition: left 0.3s ease !important;
+    transform: none !important;
+  }
+
+  /* Show sidebar when open */
+  [data-sidebar="sidebar"][data-state="open"],
+  [data-sidebar="sidebar"].open,
+  .sidebar.open {
+    left: 0 !important;
+  }
+
+  /* Sidebar overlay for mobile */
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 49;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Remove any expanded sidebar styles on mobile */
+  .sidebar-expanded .main-content,
+  .sidebar-expanded .dashboard-layout,
+  .sidebar-expanded .app-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Mobile header fixes */
+  .app-header,
+  .dashboard-header,
+  header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    z-index: 100 !important;
+    height: 60px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 1rem !important;
+    background: white !important;
+    border-bottom: 1px solid #e5e7eb !important;
+  }
+
+  /* Mobile body padding to account for fixed header */
+  body {
+    padding-top: 0 !important;
+  }
+
+  /* Dashboard container mobile fixes */
+  .dashboard-container {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Mobile dashboard grid */
+  .dashboard-main-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+    margin: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Mobile grid columns - stack vertically */
+  .dashboard-grid-left,
+  .dashboard-grid-right {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 300px !important;
+    max-height: none !important;
+  }
+
+  /* Mobile card heights */
+  .in-process-leads-container,
+  .lead-queue-container,
+  .closer-lineup-container {
+    height: auto !important;
+    min-height: 300px !important;
+    max-height: 60vh !important;
+  }
+
+  /* Mobile scroll areas */
+  .scroll-area-viewport {
+    max-height: 40vh !important;
+  }
+
+  /* Mobile card spacing */
+  .card,
+  .dashboard-card {
+    margin-bottom: 1rem !important;
+    border-radius: 8px !important;
+  }
+
+  /* Mobile touch targets */
+  button,
+  [role="button"],
+  .btn {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  /* Mobile text sizes */
+  .card-title {
+    font-size: 1.125rem !important;
+  }
+
+  .card-description {
+    font-size: 0.875rem !important;
+  }
+
+  /* Mobile lead items */
+  .lead-card,
+  .lead-item {
+    padding: 0.75rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  /* Mobile tabs */
+  .tabs-list button {
+    padding: 0.75rem 0.5rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Hide any desktop-only elements */
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Mobile navigation spacing */
+  .mobile-nav-spacer {
+    height: 60px;
+    flex-shrink: 0;
+  }
+}
+
+/* ===== TABLET RESPONSIVE (768px - 1024px) ===== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .main-content {
+    margin-left: 70px !important;
+    width: calc(100% - 70px) !important;
+  }
+
+  .sidebar-expanded .main-content {
+    margin-left: 280px !important;
+    width: calc(100% - 280px) !important;
+  }
+
+  .dashboard-main-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+    padding: 1.5rem !important;
+  }
+
+  .dashboard-grid-left,
+  .dashboard-grid-right {
+    height: auto !important;
+    min-height: 400px !important;
+  }
+}
+
+/* ===== SMALL MOBILE (480px and below) ===== */
+@media (max-width: 480px) {
+  .dashboard-main-grid {
+    padding: 0.75rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .card-header,
+  .dashboard-card-header {
+    padding: 0.75rem !important;
+  }
+
+  .card-content,
+  .dashboard-card-content {
+    padding: 0.75rem !important;
+  }
+
+  .lead-card,
+  .lead-item {
+    padding: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .app-header,
+  .dashboard-header {
+    padding: 0 0.75rem !important;
+  }
+
+  .card-title {
+    font-size: 1rem !important;
+  }
+
+  /* Smaller scroll areas on very small screens */
+  .scroll-area-viewport {
+    max-height: 35vh !important;
+  }
+}
+
+/* ===== LANDSCAPE MOBILE ===== */
+@media (max-height: 480px) and (orientation: landscape) {
+  .main-content {
+    padding-top: 50px !important;
+  }
+
+  .app-header,
+  .dashboard-header {
+    height: 50px !important;
+  }
+
+  .dashboard-main-grid {
+    padding: 0.5rem !important;
+  }
+
+  .scroll-area-viewport {
+    max-height: 25vh !important;
+  }
+}
+
+/* ===== DESKTOP LAYOUT RESTORATION ===== */
+@media (min-width: 1025px) {
+  /* Restore proper desktop layout */
+  .main-content {
+    margin-left: 70px;
+    width: calc(100% - 70px);
+    padding-top: 0;
+  }
+
+  .sidebar-expanded .main-content {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+  }
+
+  .dashboard-main-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  .dashboard-grid-left,
+  .dashboard-grid-right {
+    height: calc(100vh - 7rem);
+  }
+
+  .app-header,
+  .dashboard-header {
+    position: sticky;
+    margin-left: 70px;
+    width: calc(100% - 70px);
+  }
+
+  .sidebar-expanded .app-header,
+  .sidebar-expanded .dashboard-header {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+  }
+}
+
+/* ===== UTILITY CLASSES FOR MOBILE ===== */
+.mobile-only {
+  display: block;
+}
+
+.desktop-only {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none;
+  }
+
+  .desktop-only {
+    display: block;
+  }
+}
+
+/* ===== MOBILE MENU BUTTON ===== */
+.mobile-menu-button {
+  display: none;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 101;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* ===== SAFE AREA INSETS FOR MOBILE ===== */
+@supports (padding: env(safe-area-inset-top)) {
+  @media (max-width: 768px) {
+    .main-content {
+      padding-top: calc(60px + env(safe-area-inset-top)) !important;
+      padding-left: env(safe-area-inset-left) !important;
+      padding-right: env(safe-area-inset-right) !important;
+      padding-bottom: env(safe-area-inset-bottom) !important;
+    }
+
+    .app-header,
+    .dashboard-header {
+      padding-top: env(safe-area-inset-top) !important;
+      padding-left: calc(1rem + env(safe-area-inset-left)) !important;
+      padding-right: calc(1rem + env(safe-area-inset-right)) !important;
+      height: calc(60px + env(safe-area-inset-top)) !important;
+    }
+  }
+}
