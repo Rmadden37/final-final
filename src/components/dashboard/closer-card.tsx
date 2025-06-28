@@ -14,7 +14,9 @@ import {
   Crown,
   Shield,
   CheckCircle,
-  Clock
+  Clock,
+  ChevronUp,
+  ChevronDown
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -22,13 +24,18 @@ import { db } from "@/lib/firebase";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 
 interface CloserCardProps {
-  closer: Closer;
+  closer: Closer | null | undefined;
   assignedLeadName?: string;
   allowInteractiveToggle?: boolean;
   position?: number;
   onLeadClick?: () => void;
   showStatusToggle?: boolean;
   compact?: boolean;
+  showMoveControls?: boolean;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
+  onMove?: (direction: "up" | "down") => void;
+  isUpdatingOrder?: boolean;
 }
 
 export default function CloserCard({
@@ -38,17 +45,42 @@ export default function CloserCard({
   position,
   onLeadClick,
   showStatusToggle = true,
-  compact = false
+  compact = false,
+  showMoveControls = false,
+  canMoveUp = false,
+  canMoveDown = false,
+  onMove,
+  isUpdatingOrder = false
 }: CloserCardProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isUpdating, setIsUpdating] = useState(false);
 
+  // Early return if closer is null or undefined
+  if (!closer) {
+    return (
+      <Card className="shadow-md transition-shadow duration-200 opacity-50">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-12 w-12 flex-shrink-0">
+              <AvatarFallback className="bg-gray-100 text-gray-400">
+                ?
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <div className="text-gray-500">Loading closer data...</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const canToggleStatus = allowInteractiveToggle && 
     (user?.role === "manager" || user?.role === "admin" || user?.uid === closer.uid);
 
   const handleStatusToggle = async () => {
-    if (!canToggleStatus || isUpdating) return;
+    if (!canToggleStatus || isUpdating || !closer?.uid) return;
 
     setIsUpdating(true);
     try {
@@ -62,7 +94,7 @@ export default function CloserCard({
 
       toast({
         title: "Status Updated",
-        description: `${closer.name} is now ${newStatus}`,
+        description: `${closer.name || 'User'} is now ${newStatus}`,
       });
     } catch (error) {
       console.error("Error updating closer status:", error);
@@ -77,21 +109,21 @@ export default function CloserCard({
   };
 
   const getStatusIcon = () => {
-    if (closer.status === "On Duty") {
+    if (closer?.status === "On Duty") {
       return <Power className="h-3 w-3 text-green-600" />;
     }
     return <PowerOff className="h-3 w-3 text-gray-400" />;
   };
 
   const getStatusColor = () => {
-    if (closer.status === "On Duty") {
+    if (closer?.status === "On Duty") {
       return "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400";
     }
     return "bg-gray-100 text-gray-600 dark:bg-gray-900/50 dark:text-gray-400";
   };
 
   const getRoleIcon = () => {
-    switch (closer.role) {
+    switch (closer?.role) {
       case "admin":
         return <Crown className="h-3 w-3 text-purple-600" />;
       case "manager":
@@ -103,14 +135,30 @@ export default function CloserCard({
     }
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map(word => word.charAt(0))
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+  // Safe getInitials function with comprehensive null checks
+  const getInitials = (name?: string | null) => {
+    if (!name || typeof name !== 'string' || name.trim() === '') {
+      return "U"; // Default fallback
+    }
+    
+    try {
+      return name
+        .trim()
+        .split(" ")
+        .filter(word => word && word.length > 0) // Filter out empty strings and null values
+        .map(word => word.charAt(0))
+        .join("")
+        .toUpperCase()
+        .slice(0, 2) || "U"; // Fallback if no valid characters
+    } catch (error) {
+      console.error("Error generating initials:", error);
+      return "U";
+    }
   };
+
+  // Safe display values
+  const displayName = closer?.name || 'Unknown User';
+  const displayStatus = closer?.status || 'Unknown';
 
   if (compact) {
     return (
@@ -124,9 +172,17 @@ export default function CloserCard({
 
         {/* Avatar */}
         <Avatar className="h-10 w-10 flex-shrink-0">
-          {closer.avatarUrl && <AvatarImage src={closer.avatarUrl} alt={closer.name} />}
+          {closer?.avatarUrl && (
+            <AvatarImage 
+              src={closer.avatarUrl} 
+              alt={displayName}
+              onError={(e) => {
+                console.error("Avatar image failed to load:", e);
+              }}
+            />
+          )}
           <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
-            {getInitials(closer.name)}
+            {getInitials(closer?.name)}
           </AvatarFallback>
         </Avatar>
 
@@ -134,11 +190,11 @@ export default function CloserCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h4 className="font-semibold text-slate-900 dark:text-slate-100 truncate">
-              {closer.name}
+              {displayName}
             </h4>
             <Badge variant="secondary" className={`text-xs ${getStatusColor()}`}>
               {getStatusIcon()}
-              <span className="ml-1">{closer.status}</span>
+              <span className="ml-1">{displayStatus}</span>
             </Badge>
           </div>
           
@@ -162,6 +218,30 @@ export default function CloserCard({
             </div>
           )}
         </div>
+
+        {/* Move Controls for compact view */}
+        {showMoveControls && (
+          <div className="flex flex-col gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onMove?.("up")}
+              disabled={!canMoveUp || isUpdatingOrder}
+              className="h-6 w-6 p-0"
+            >
+              <ChevronUp className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onMove?.("down")}
+              disabled={!canMoveDown || isUpdatingOrder}
+              className="h-6 w-6 p-0"
+            >
+              <ChevronDown className="h-3 w-3" />
+            </Button>
+          </div>
+        )}
       </div>
     );
   }
@@ -177,11 +257,19 @@ export default function CloserCard({
             </div>
           )}
 
-          {/* Avatar */}
+          {/* Avatar with comprehensive error handling */}
           <Avatar className="h-12 w-12 flex-shrink-0 ring-2 ring-blue-200 dark:ring-blue-900">
-            {closer.avatarUrl && <AvatarImage src={closer.avatarUrl} alt={closer.name} />}
+            {closer?.avatarUrl && (
+              <AvatarImage 
+                src={closer.avatarUrl} 
+                alt={displayName}
+                onError={(e) => {
+                  console.error("Avatar image failed to load:", e);
+                }}
+              />
+            )}
             <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
-              {getInitials(closer.name)}
+              {getInitials(closer?.name)}
             </AvatarFallback>
           </Avatar>
 
@@ -189,7 +277,7 @@ export default function CloserCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100 truncate">
-                {closer.name}
+                {displayName}
               </h3>
               {getRoleIcon()}
             </div>
@@ -198,9 +286,9 @@ export default function CloserCard({
             <div className="flex items-center gap-2 mb-2">
               <Badge variant="secondary" className={`text-xs ${getStatusColor()}`}>
                 {getStatusIcon()}
-                <span className="ml-1">{closer.status}</span>
+                <span className="ml-1">{displayStatus}</span>
               </Badge>
-              {closer.lineupOrder && (
+              {closer?.lineupOrder && (
                 <Badge variant="outline" className="text-xs">
                   Order: {closer.lineupOrder}
                 </Badge>
@@ -208,7 +296,7 @@ export default function CloserCard({
             </div>
 
             {/* Phone Number */}
-            {closer.phone && (
+            {closer?.phone && (
               <div className="flex items-center text-sm text-muted-foreground mb-2">
                 <Phone className="h-3 w-3 mr-2 flex-shrink-0" />
                 <span>{closer.phone}</span>
@@ -218,7 +306,7 @@ export default function CloserCard({
             {/* Assigned Lead */}
             {assignedLeadName && (
               <div className="flex items-center text-sm mb-2">
-                {closer.status === "On Duty" ? (
+                {closer?.status === "On Duty" ? (
                   <CheckCircle className="h-3 w-3 mr-2 text-green-500 flex-shrink-0" />
                 ) : (
                   <Clock className="h-3 w-3 mr-2 text-yellow-500 flex-shrink-0" />
@@ -247,7 +335,7 @@ export default function CloserCard({
             {showStatusToggle && canToggleStatus && (
               <div className="mt-3">
                 <Button
-                  variant={closer.status === "On Duty" ? "destructive" : "default"}
+                  variant={closer?.status === "On Duty" ? "destructive" : "default"}
                   size="sm"
                   onClick={handleStatusToggle}
                   disabled={isUpdating}
@@ -258,7 +346,7 @@ export default function CloserCard({
                       <Clock className="h-3 w-3 mr-2 animate-spin" />
                       Updating...
                     </>
-                  ) : closer.status === "On Duty" ? (
+                  ) : closer?.status === "On Duty" ? (
                     <>
                       <PowerOff className="h-3 w-3 mr-2" />
                       Set Off Duty
@@ -273,6 +361,30 @@ export default function CloserCard({
               </div>
             )}
           </div>
+
+          {/* Move Controls for full view */}
+          {showMoveControls && (
+            <div className="flex flex-col gap-2 ml-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onMove?.("up")}
+                disabled={!canMoveUp || isUpdatingOrder}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronUp className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onMove?.("down")}
+                disabled={!canMoveDown || isUpdatingOrder}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

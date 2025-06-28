@@ -56,7 +56,8 @@ export default function CloserLineup() {
         setAssignedLeadCloserIds(assignedCloserIds);
         setIsLoadingAssignedCloserIds(false);
       },
-      (_error) => {
+      (error) => {
+        console.error("Failed to load assigned closers:", error);
         toast({
           title: "Error",
           description: "Failed to load assigned closers. Please refresh the page.",
@@ -98,20 +99,24 @@ export default function CloserLineup() {
       (querySnapshot) => {
         const allOnDutyClosers = querySnapshot.docs.map((doc) => {
           const data = doc.data();
-          return {
+          
+          // Ensure we have all required fields with safe defaults
+          const closer: Closer = {
             uid: doc.id,
-            name: data.name,
-            status: data.status as "On Duty" | "Off Duty",
-            teamId: data.teamId,
-            role: data.role,
-            avatarUrl: data.avatarUrl,
-            phone: data.phone,
-            lineupOrder: data.lineupOrder,
-          } as Closer;
+            name: data.name || "Unknown User",
+            status: (data.status as "On Duty" | "Off Duty") || "Off Duty",
+            teamId: data.teamId || "",
+            role: data.role || "closer",
+            avatarUrl: data.avatarUrl || null,
+            phone: data.phone || null,
+            lineupOrder: typeof data.lineupOrder === "number" ? data.lineupOrder : null,
+          };
+          
+          return closer;
         });
 
         const availableClosers = allOnDutyClosers.filter(
-          (closer) => !assignedLeadCloserIds.has(closer.uid)
+          (closer) => closer.uid && !assignedLeadCloserIds.has(closer.uid)
         );
 
         const sortedAvailableClosers = availableClosers
@@ -128,7 +133,7 @@ export default function CloserLineup() {
             if (orderA !== orderB) {
               return orderA - orderB;
             }
-            return a.name.localeCompare(b.name);
+            return (a.name || "").localeCompare(b.name || "");
           });
 
         const sortedAllOnDutyClosers = allOnDutyClosers
@@ -145,14 +150,15 @@ export default function CloserLineup() {
             if (orderA !== orderB) {
               return orderA - orderB;
             }
-            return a.name.localeCompare(b.name);
+            return (a.name || "").localeCompare(b.name || "");
           });
 
         setClosersInLineup(sortedAvailableClosers);
         setAllOnDutyClosers(sortedAllOnDutyClosers);
         setIsLoadingClosersForLineup(false);
       },
-      (_error) => {
+      (error) => {
+        console.error("Failed to load closer lineup:", error);
         toast({
           title: "Error",
           description: "Failed to load closer lineup. Please refresh the page.",
@@ -306,6 +312,12 @@ export default function CloserLineup() {
             <ScrollArea className="h-full">
               <div className="p-4 space-y-3">
                 {displayClosers.map((closer, index) => {
+                  // Validate closer data before rendering
+                  if (!closer || !closer.uid) {
+                    console.warn(`Invalid closer data at index ${index}:`, closer);
+                    return null;
+                  }
+                  
                   const isCurrentUser = closer.uid === user?.uid;
                   const isAssigned = assignedLeadCloserIds.has(closer.uid);
                   
@@ -324,6 +336,7 @@ export default function CloserLineup() {
                             assignedLeadName={
                               isAssigned ? "Working on lead" : undefined
                             }
+                            compact={true}
                           />
                         </div>
                       </div>
@@ -336,7 +349,7 @@ export default function CloserLineup() {
                       )}
                     </div>
                   );
-                })}
+                }).filter(Boolean)} {/* Filter out null entries */}
               </div>
             </ScrollArea>
           )}

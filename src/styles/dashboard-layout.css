@@ -1,137 +1,238 @@
-/* Dashboard Layout CSS - Complete layout system */
-/* File: src/styles/dashboard-layout.css */
+/* Dashboard Layout Fixes - Add to your global CSS or create new file */
+/* Fixes height, overflow, and scroll issues */
 
-/* Main dashboard page container with sidebar offset */
-.dashboard-page {
-  margin-left: 60px; /* Collapsed sidebar width */
-  transition: margin-left 0.3s ease;
-  min-height: 100vh;
-  padding: 1rem;
-  background: #f8fafc;
+/* Dashboard main container */
+.dashboard-container {
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
 }
 
-/* When sidebar is expanded */
-.sidebar-expanded .dashboard-page {
-  margin-left: 240px; /* Expanded sidebar width */
-}
-
-/* Dashboard title section */
-.dashboard-title-section {
-  margin-bottom: 2rem;
-  padding-left: 1rem;
-}
-
-.dashboard-title-section h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.dashboard-subtitle {
-  font-size: 1rem;
-  color: #6b7280;
-  margin: 0.5rem 0 0 0;
-}
-
-/* Dashboard grid layout */
-.dashboard-grid {
+/* Fix for main layout grid */
+.dashboard-main-grid {
+  height: calc(100vh - 3.5rem); /* Account for header */
+  overflow: hidden;
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
-  margin-top: 0;
-}
-
-@media (min-width: 768px) {
-  .dashboard-grid {
-    grid-template-columns: 2fr 1fr;
-  }
+  padding: 1.5rem;
 }
 
 @media (min-width: 1024px) {
-  .dashboard-grid {
-    grid-template-columns: 2fr 1fr;
-    gap: 2rem;
+  .dashboard-main-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
-/* Card positioning */
-.lead-queue-card {
-  grid-column: 1;
+/* Fix for card containers */
+.dashboard-card-container {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.closer-lineup-card {
-  grid-column: 2;
+/* In-process leads specific fixes */
+.in-process-leads-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* Mobile responsive layout */
+.in-process-leads-header {
+  flex-shrink: 0;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.in-process-leads-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ScrollArea fixes for better visibility */
+.scroll-area-viewport {
+  height: 100% !important;
+}
+
+.scroll-area-content {
+  min-height: 100%;
+}
+
+/* Lead card spacing and visibility */
+.lead-card {
+  margin-bottom: 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  transition: all 0.2s ease;
+}
+
+.lead-card:hover {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.lead-card:last-child {
+  margin-bottom: 0;
+}
+
+/* Fix for lead card content overflow */
+.lead-card-content {
+  padding: 1rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Responsive fixes for mobile */
+@media (max-width: 1023px) {
+  .dashboard-main-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: calc(100vh - 3.5rem);
+    overflow-y: auto;
+  }
+  
+  .dashboard-card-container {
+    height: auto;
+    min-height: 300px;
+    max-height: 60vh;
+  }
+  
+  .in-process-leads-card {
+    height: auto;
+    min-height: 400px;
+    max-height: 60vh;
+  }
+}
+
+/* Active leads simplified view styles */
+.active-lead-summary {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.active-lead-summary:hover {
+  background-color: hsl(var(--muted));
+  border-color: hsl(var(--primary));
+}
+
+.active-lead-name {
+  font-weight: 600;
+  color: hsl(var(--primary));
+  transition: color 0.2s ease;
+}
+
+.active-lead-name:hover {
+  color: hsl(var(--primary)) / 0.8;
+}
+
+.active-lead-status-indicator {
+  width: 4px;
+  background: linear-gradient(to bottom, hsl(var(--success)), hsl(var(--success)) / 0.7);
+  border-radius: 2px;
+}
+
+/* Mobile-specific active leads styles */
 @media (max-width: 768px) {
-  .dashboard-page {
-    margin-left: 0;
-    padding: 1rem;
-    padding-top: 5rem; /* Space for mobile header */
+  .active-lead-summary {
+    padding: 0.75rem;
   }
   
-  .sidebar-expanded .dashboard-page {
-    margin-left: 0;
+  .active-lead-name {
+    font-size: 0.9rem;
   }
   
-  .dashboard-title-section {
-    padding-left: 0;
-    margin-bottom: 1.5rem;
-  }
-  
-  .dashboard-title-section h1 {
-    font-size: 1.5rem;
-  }
-  
-  .lead-queue-card,
-  .closer-lineup-card {
-    grid-column: 1;
-  }
-  
-  /* Mobile header */
-  .mobile-dashboard-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4rem;
-    background: white;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    align-items: center;
-    padding: 0 1rem;
-    z-index: 100;
-  }
-  
-  .mobile-menu-toggle {
-    background: none;
-    border: none;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    color: #6b7280;
-    cursor: pointer;
-    margin-right: 1rem;
-  }
-  
-  .mobile-menu-toggle:hover {
-    background: #f3f4f6;
-    color: #374151;
-  }
-  
-  .mobile-dashboard-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0;
+  .active-lead-meta {
+    font-size: 0.8rem;
   }
 }
 
-/* Hide mobile header on desktop */
-@media (min-width: 769px) {
-  .mobile-dashboard-header {
-    display: none;
-  }
+/* Badge positioning fixes */
+.lead-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 10;
+}
+
+/* Loading state improvements */
+.dashboard-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 200px;
+}
+
+/* Empty state improvements */
+.dashboard-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 300px;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Debug styles - remove in production */
+.debug-container {
+  border: 2px dashed red;
+  position: relative;
+}
+
+.debug-container::before {
+  content: "DEBUG: " attr(data-debug);
+  position: absolute;
+  top: -20px;
+  left: 0;
+  background: red;
+  color: white;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: bold;
+  z-index: 9999;
+}
+
+/* Ensure proper stacking and visibility */
+.dashboard-grid-item {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-sidebar-column {
+  position: relative;
+  z-index: 2;
+}
+
+/* Fix for scroll indicators */
+.scroll-indicator {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(to bottom, transparent, hsl(var(--primary)), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.scroll-area:hover .scroll-indicator {
+  opacity: 0.6;
+}
+
+/* Performance optimization for large lists */
+.lead-list-container {
+  contain: layout style;
+  will-change: scroll-position;
+}
+
+.lead-item {
+  contain: layout;
+  transform: translateZ(0);
 }
