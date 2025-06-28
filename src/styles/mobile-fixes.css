@@ -1,2 +1,228 @@
-/* Moved from styles/styles/mobile-fixes.css */
-// ...existing code from mobile-fixes.css...
+/* Mobile-specific fixes and optimizations */
+/* Ensures optimal mobile experience across devices */
+
+/* Touch-friendly interactions */
+@media (max-width: 768px) {
+  /* Minimum touch target sizes */
+  button,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem 1rem;
+  }
+
+  /* Improved spacing for mobile */
+  .mobile-spacing {
+    padding: 1rem;
+    margin: 0.5rem 0;
+  }
+
+  /* Mobile-optimized text sizes */
+  .mobile-text-lg {
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+
+  .mobile-text-base {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .mobile-text-sm {
+    font-size: 0.875rem;
+    line-height: 1.3;
+  }
+
+  /* Mobile navigation fixes */
+  .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: hsl(var(--background));
+    border-top: 1px solid hsl(var(--border));
+    padding: env(safe-area-inset-bottom);
+    z-index: 1000;
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    min-height: 48px;
+    text-decoration: none;
+    color: hsl(var(--muted-foreground));
+    transition: color 0.2s ease;
+  }
+
+  .mobile-nav-item.active {
+    color: hsl(var(--primary));
+  }
+
+  /* Modal adjustments for mobile */
+  .mobile-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: hsl(var(--background));
+    z-index: 1000;
+    overflow-y: auto;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  /* Card optimizations for mobile */
+  .mobile-card {
+    border-radius: 0.75rem;
+    margin: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Input field improvements */
+  .mobile-input {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    width: 100%;
+  }
+
+  /* Table responsive behavior */
+  .mobile-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .mobile-table-stack {
+    display: block;
+  }
+
+  .mobile-table-stack tr {
+    display: block;
+    border: 1px solid hsl(var(--border));
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .mobile-table-stack td {
+    display: block;
+    text-align: left;
+    border: none;
+    padding: 0.25rem 0;
+  }
+
+  .mobile-table-stack td::before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+  }
+}
+
+/* iOS-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* Fix for iOS Safari */
+  .ios-fix {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* iOS safe area handling */
+  .ios-safe-area {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* iOS input fixes */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea {
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
+}
+
+/* Android-specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .android-fix {
+    /* Android Chrome fixes */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Small screen optimizations */
+@media (max-width: 480px) {
+  /* Ultra-small screen adjustments */
+  .xs-text {
+    font-size: 0.75rem;
+  }
+
+  .xs-padding {
+    padding: 0.5rem;
+  }
+
+  .xs-margin {
+    margin: 0.25rem;
+  }
+
+  /* Compact layouts */
+  .xs-compact {
+    gap: 0.5rem;
+  }
+
+  .xs-compact-card {
+    padding: 0.75rem;
+    margin: 0.25rem;
+  }
+}
+
+/* Landscape mobile optimizations */
+@media (max-height: 480px) and (orientation: landscape) {
+  .landscape-compact {
+    padding: 0.5rem;
+  }
+
+  .landscape-nav {
+    position: static;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+}
+
+/* Touch gesture improvements */
+.touch-action-pan-y {
+  touch-action: pan-y;
+}
+
+.touch-action-pan-x {
+  touch-action: pan-x;
+}
+
+.touch-action-manipulation {
+  touch-action: manipulation;
+}
+
+/* Accessibility improvements for mobile */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-no-animation {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+  .mobile-high-contrast {
+    border: 2px solid;
+    background: contrast;
+  }
+}
