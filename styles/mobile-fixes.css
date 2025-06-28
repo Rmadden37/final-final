@@ -1,0 +1,280 @@
+/* Mobile UI Fixes for LeadFlow */
+/* Add this to your styles folder or include in globals.css */
+
+/* ===== SIDEBAR VISIBILITY FIXES ===== */
+/* Make sidebar trigger more prominent - target the specific icon button */
+[data-sidebar="trigger"],
+.sidebar-trigger,
+button[aria-label*="sidebar"],
+button[aria-label*="menu"],
+/* Target the menu icon specifically */
+button:has(svg.lucide-menu),
+button:has(svg[class*="menu"]),
+/* Target by position if needed */
+header button:first-child,
+.fixed.top-4.left-4 {
+  /* Ensure proper positioning */
+  position: fixed !important;
+  top: 1rem !important;
+  left: 1rem !important;
+  z-index: 9999 !important;
+  
+  /* Make it more visible with white background */
+  background: white !important;
+  color: #1f2937 !important;
+  border: 2px solid #e5e7eb !important;
+  border-radius: 0.75rem !important;
+  padding: 0.625rem !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  width: 44px !important;
+  height: 44px !important;
+  
+  /* Add strong shadow for visibility */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 
+              0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  
+  /* Ensure it's clickable */
+  cursor: pointer !important;
+  touch-action: manipulation !important;
+  
+  /* Make sure the icon is visible */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Make the icon inside darker */
+[data-sidebar="trigger"] svg,
+.sidebar-trigger svg,
+button:has(svg.lucide-menu) svg {
+  color: #1f2937 !important;
+  width: 24px !important;
+  height: 24px !important;
+  stroke-width: 2.5 !important;
+}
+
+/* Hover/Active states */
+[data-sidebar="trigger"]:active,
+.sidebar-trigger:active,
+button:has(svg.lucide-menu):active {
+  background: #f3f4f6 !important;
+  transform: scale(0.95) !important;
+}
+
+/* Dark mode sidebar trigger */
+.dark [data-sidebar="trigger"],
+.dark .sidebar-trigger,
+.dark button:has(svg.lucide-menu) {
+  background: white !important;
+  color: #1f2937 !important;
+  border-color: #e5e7eb !important;
+}
+
+.dark [data-sidebar="trigger"] svg,
+.dark button:has(svg.lucide-menu) svg {
+  color: #1f2937 !important;
+}
+
+/* ===== HEADER SPACING FIX ===== */
+/* Add padding to main content to account for floating sidebar button */
+main,
+.main-content,
+[role="main"] {
+  padding-top: 5rem !important; /* Space for sidebar button */
+}
+
+/* Dashboard header adjustments */
+.dashboard-header,
+header:not([data-sidebar="trigger"]) {
+  margin-left: 4rem !important; /* Avoid overlap with sidebar button */
+  padding-top: 1rem !important;
+}
+
+@media (max-width: 768px) {
+  .dashboard-header,
+  header:not([data-sidebar="trigger"]) {
+    margin-left: 0 !important;
+    padding-left: 5rem !important; /* Space for sidebar button */
+  }
+}
+
+/* ===== CALENDAR SELECTION FIXES ===== */
+/* Selected calendar day - More specific selectors for your calendar */
+.scheduled-calendar-day.selected,
+.calendar-day.selected,
+[data-selected="true"],
+[aria-selected="true"],
+button[data-state="selected"],
+/* Target the specific calendar buttons */
+[role="gridcell"] button[aria-pressed="true"],
+[role="gridcell"] button.bg-primary,
+[role="gridcell"] button.bg-blue-500,
+[role="gridcell"] button.ring-2,
+/* Target buttons with specific classes */
+button.ring-primary,
+button.ring-blue-500 {
+  background: #3b82f6 !important; /* Solid blue background */
+  color: white !important;
+  font-weight: 700 !important;
+  border: 2px solid #1d4ed8 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+  outline: none !important;
+}
+
+/* Override any ring-only styles */
+button.ring-2:not(.bg-primary) {
+  background: #3b82f6 !important;
+  color: white !important;
+}
+
+/* Today's date with selection */
+.scheduled-calendar-day.today.selected,
+.calendar-day.today.selected {
+  background: #8b5cf6 !important; /* Purple for today + selected */
+  color: white !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Calendar button improvements - more specific targeting */
+.calendar-day,
+.scheduled-calendar-day,
+[role="gridcell"] button,
+/* Target the actual calendar grid buttons */
+[role="grid"] button,
+.grid button[class*="rounded"] {
+  position: relative !important;
+  min-height: 48px !important;
+  min-width: 48px !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.2s ease !important;
+  border: 2px solid transparent !important;
+  font-weight: 500 !important;
+  /* Ensure text is visible */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Force selected state to be visible */
+[role="gridcell"] button[aria-selected="true"],
+[role="gridcell"] button[data-selected="true"],
+[role="grid"] button.ring-2.ring-primary,
+[role="grid"] button.ring-2.ring-offset-2 {
+  background-color: #3b82f6 !important;
+  color: white !important;
+  border-color: #1d4ed8 !important;
+  font-weight: 700 !important;
+  /* Remove ring styles that might interfere */
+  --tw-ring-offset-width: 0px !important;
+  --tw-ring-color: transparent !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Hover state for calendar */
+.calendar-day:hover:not(.selected),
+.scheduled-calendar-day:hover:not(.selected) {
+  background: rgba(59, 130, 246, 0.1) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Active/pressed state */
+.calendar-day:active,
+.scheduled-calendar-day:active {
+  transform: scale(0.95) !important;
+}
+
+/* Today indicator (when not selected) */
+.calendar-day.today:not(.selected),
+.scheduled-calendar-day.today:not(.selected) {
+  background: rgba(139, 92, 246, 0.1) !important;
+  border-color: #8b5cf6 !important;
+  font-weight: 600 !important;
+}
+
+/* ===== MOBILE SPECIFIC FIXES ===== */
+@media (max-width: 768px) {
+  /* Ensure sidebar is above everything */
+  [data-sidebar="sidebar"] {
+    z-index: 10000 !important;
+  }
+  
+  /* Sidebar overlay backdrop */
+  [data-sidebar="overlay"] {
+    z-index: 9998 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+  }
+  
+  /* Fix card headers on mobile */
+  .card-header {
+    padding-left: 1rem !important;
+    min-height: 3rem !important;
+  }
+  
+  /* Calendar container on mobile */
+  .calendar-container {
+    padding: 0.5rem !important;
+    margin-top: 1rem !important;
+  }
+  
+  /* Calendar grid spacing */
+  .calendar-grid,
+  [role="grid"] {
+    gap: 0.25rem !important;
+  }
+}
+
+/* ===== FLOATING ELEMENTS Z-INDEX ===== */
+/* Ensure proper layering */
+.floating-chat-button {
+  z-index: 1000 !important; /* Below sidebar */
+}
+
+.modal-overlay,
+.dialog-overlay {
+  z-index: 10001 !important; /* Above sidebar */
+}
+
+.modal-content,
+.dialog-content {
+  z-index: 10002 !important;
+}
+
+/* ===== PREMIUM THEME ADJUSTMENTS ===== */
+.premium [data-sidebar="trigger"],
+.premium .sidebar-trigger {
+  background: linear-gradient(135deg, #9333ea 0%, #14b8a6 100%) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  color: white !important;
+}
+
+.premium .scheduled-calendar-day.selected {
+  background: linear-gradient(135deg, #9333ea 0%, #14b8a6 100%) !important;
+  color: white !important;
+  border: 2px solid #9333ea !important;
+}
+
+/* ===== ACCESSIBILITY IMPROVEMENTS ===== */
+/* Focus indicators */
+[data-sidebar="trigger"]:focus-visible,
+.calendar-day:focus-visible,
+.scheduled-calendar-day:focus-visible {
+  outline: 3px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  [data-sidebar="trigger"] {
+    background: black !important;
+    color: white !important;
+    border: 3px solid white !important;
+  }
+  
+  .scheduled-calendar-day.selected {
+    background: black !important;
+    color: white !important;
+    border: 3px solid white !important;
+  }
+}

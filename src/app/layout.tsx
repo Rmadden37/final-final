@@ -1,15 +1,15 @@
-// src/app/layout.tsx (or app/layout.tsx)
-
+// src/app/layout.tsx
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import './globals.css' // ← This import stays here
-import { AuthProvider } from "@/hooks/use-auth";
+import './globals.css'
+import './theme-styles.css' // Import theme styles directly
+import { AuthProvider } from "@/hooks/use-auth"
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Your App Name',
-  description: 'Your app description',
+  title: 'LeadFlow',
+  description: 'Lead management system',
 }
 
 export default function RootLayout({
@@ -18,15 +18,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <head>
-        {/* Add this preload link for theme styles */}
-        <link 
-          rel="preload" 
-          href="/styles/theme-styles.css" 
-          as="style"
-        />
-      </head>
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <AuthProvider>
           {children}

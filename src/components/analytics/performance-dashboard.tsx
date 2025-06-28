@@ -43,6 +43,7 @@ const chartConfig = {
   sold: { label: "Sold Leads", color: "hsl(145 65% 50%)" }, // Success green
   no_sale: { label: "No Sale Leads", color: "hsl(25 75% 55%)" }, // Orange
   credit_fail: { label: "Credit Failed Leads", color: "hsl(280 50% 55%)" }, // Muted purple
+  avgNetPPW: { label: "Average Net PPW", color: "hsl(145 85% 45%)" }, // Green for PPW chart
 };
 
 export default function PerformanceDashboard({ className }: PerformanceDashboardProps) {

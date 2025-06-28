@@ -191,19 +191,26 @@
     background: hsl(var(--card));
     color: hsl(var(--card-foreground));
   }
-
-  /* Loading spinner */
-  .spinner {
-    display: inline-block;
-    width: 1.5rem;
-    height: 1.5rem;
-    border: 2px solid hsl(var(--border));
-    border-top-color: hsl(var(--primary));
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
 }
+
+/* Loading spinner */
+.spinner {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid hsl(var(--border));
+  border-top-color: hsl(var(--primary));
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Import additional styles */
+@import '../../styles/theme-styles.css';
+@import '../../styles/dashboard-styles.css';
+@import '../../styles/components-styles.css';
+@import '../../styles/mobile-fixes.css';
+@import '../../styles/sidebar-fixes.css';

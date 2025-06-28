@@ -14,7 +14,8 @@ import {useAuth} from "@/hooks/use-auth";
 import {db} from "@/lib/firebase";
 import {doc, updateDoc, serverTimestamp as _serverTimestamp, Timestamp as _Timestamp} from "firebase/firestore";
 import {useToast} from "@/hooks/use-toast";
-import {useState} from "react";
+import {useState, useEffect} from "react";
+import { getPhotoUrlByName } from "@/utils/photo-vlookup";
 
 interface CloserCardProps {
   closer: Closer;
@@ -53,6 +54,7 @@ export default function CloserCard({
   const {toast} = useToast();
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [photoVlookupUrl, setPhotoVlookupUrl] = useState<string | undefined>(undefined);
   
   const isAcceptedLead = currentLeadStatus === "accepted";
   const isScheduledLead = currentLeadStatus === "scheduled";
@@ -60,6 +62,17 @@ export default function CloserCard({
 
   const canUserManagerOrSelfToggle = user && (user.role === "manager" || user.role === "admin" || (user.role === "closer" && user.uid === closer.uid));
   const showInteractiveSwitch = canUserManagerOrSelfToggle && allowInteractiveToggle && !assignedLeadName;
+
+  // Try to fetch vlookup photo if no avatarUrl
+  useEffect(() => {
+    let ignore = false;
+    if (!closer.avatarUrl && closer.name) {
+      getPhotoUrlByName(closer.name).then(url => {
+        if (!ignore) setPhotoVlookupUrl(url);
+      });
+    }
+    return () => { ignore = true; };
+  }, [closer.avatarUrl, closer.name]);
 
   const handleToggleCloserAvailability = async (checked: boolean) => {
     if (!user || !canUserManagerOrSelfToggle || assignedLeadName) return;
@@ -88,7 +101,7 @@ export default function CloserCard({
   };
 
   const currentStatusIsOnDuty = closer.status === "On Duty";
-  const avatarSrc = closer.avatarUrl || `https://ui-avatars.com/api/?name=${(closer.name || "User").replace(/\s+/g, "+")}&background=random&color=fff`;
+  const avatarSrc = closer.avatarUrl || photoVlookupUrl || `https://ui-avatars.com/api/?name=${(closer.name || "User").replace(/\s+/g, "+")}&background=random&color=fff`;
   const avatarDataAiHint = closer.avatarUrl ? undefined : (closer.name?.split(" ")[0]?.toLowerCase() || "person");
 
   return (

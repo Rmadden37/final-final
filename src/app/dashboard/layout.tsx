@@ -2,7 +2,7 @@
 
 import React from "react";
 import DashboardSidebar from "@/components/dashboard/dashboard-sidebar";
-import { AuthProvider } from "@/hooks/use-auth";
+// Remove AuthProvider import - it's already in root layout
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -10,8 +10,6 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <AuthProvider>
-      <DashboardSidebar>{children}</DashboardSidebar>
-    </AuthProvider>
+    <DashboardSidebar>{children}</DashboardSidebar>
   );
 }

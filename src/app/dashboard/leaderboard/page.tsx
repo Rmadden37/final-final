@@ -1,3 +1,6 @@
+// Mobile-Optimized Performance Leaderboard Page
+// src/app/dashboard/leaderboard/page.tsx
+
 'use client'
 
 import '../../../styles/leaderboard.css'
@@ -46,30 +49,30 @@ interface SetterData {
 const LeaderboardRankBadge = ({ rank }: { rank: number }) => {
   if (rank === 1) {
     return (
-      <Badge className="rank-badge gold">
-        <Trophy className="rank-icon gold" />
+      <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900 border-yellow-300 font-bold shadow-lg px-3 py-2 text-sm">
+        <Trophy className="w-4 h-4 mr-1 text-yellow-700" />
         <span>1st</span>
       </Badge>
     )
   }
   if (rank === 2) {
     return (
-      <Badge className="rank-badge silver">
-        <Medal className="rank-icon silver" />
+      <Badge className="bg-gradient-to-r from-gray-300 to-gray-500 text-gray-800 border-gray-400 font-bold shadow-lg px-3 py-2 text-sm">
+        <Medal className="w-4 h-4 mr-1 text-gray-600" />
         <span>2nd</span>
       </Badge>
     )
   }
   if (rank === 3) {
     return (
-      <Badge className="rank-badge bronze">
-        <Medal className="rank-icon bronze" />
+      <Badge className="bg-gradient-to-r from-amber-600 to-amber-800 text-amber-100 border-amber-500 font-bold shadow-lg px-3 py-2 text-sm">
+        <Medal className="w-4 h-4 mr-1 text-amber-200" />
         <span>3rd</span>
       </Badge>
     )
   }
   return (
-    <Badge variant="outline" className="rank-badge other">
+    <Badge variant="outline" className="font-semibold px-3 py-2 text-sm border-2">
       #{rank}
     </Badge>
   )
@@ -100,13 +103,14 @@ export default function LeaderboardPage() {
   
   const startOfLastWeek = new Date(startOfWeek)
   startOfLastWeek.setDate(startOfWeek.getDate() - 7)
+  const endOfLastWeek = new Date(startOfWeek.getTime() - 1) // End of last week
   
   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate())
 
   const dateFilters = [
     { label: 'Today', value: 'today', start: startOfToday },
     { label: 'Yesterday', value: 'yesterday', start: yesterday, end: yesterday },
-    { label: 'LW (Last Week)', value: 'lw', start: startOfLastWeek, end: new Date(startOfWeek.getTime() - 1) },
+    { label: 'Last Week', value: 'last_week', start: startOfLastWeek, end: endOfLastWeek },
     { label: 'WTD', value: 'wtd', start: startOfWeek },
     { label: 'MTD', value: 'mtd', start: startOfMonth },
     { label: 'YTD', value: 'ytd', start: startOfYTD },
@@ -374,30 +378,25 @@ export default function LeaderboardPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-3 sm:p-4 lg:p-6">
-        <div className="flex items-center justify-center h-32 sm:h-64">
+      <div className="container mx-auto p-3">
+        <div className="flex items-center justify-center h-32">
           <div className="text-center">
-            <RefreshCw className="w-6 h-6 sm:w-8 sm:h-8 animate-spin mx-auto mb-2" />
-            <span className="text-sm sm:text-base">Loading leaderboard...</span>
+            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
+            <span className="text-sm">Loading leaderboard...</span>
           </div>
         </div>
       </div>
     )
   }
 
-  // Premium card class helpers
-  const premiumCard = 'premium card-glass shadow-premium-purple border-premium-glow bg-premium-glass';
-  const premiumStat = 'stat-glow';
-  const premiumTab = 'bg-gradient-to-r from-premium-purple/20 to-premium-teal/10 border border-premium-glow glow-premium';
-
   return (
-    <div className={`min-h-screen w-full ${isPremium ? 'premium bg-premium-glass' : 'bg-[#f8fafc] dark:bg-slate-950'}`}>
-      <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-5xl">
+    <div className="min-h-screen w-full bg-[#f8fafc] dark:bg-slate-950">
+      <div className="container mx-auto p-3 max-w-4xl">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-2 mb-6">
+        <div className="flex flex-col gap-3 mt-2 mb-4">
           <div className="flex-1 min-w-0">
-            <h1 className={`text-3xl sm:text-4xl font-extrabold mb-1 tracking-tight ${isPremium ? 'text-glow text-white' : 'text-gray-900 dark:text-white'}`}>Performance Leaderboard</h1>
-            <p className={`text-base ${isPremium ? 'text-muted-foreground' : 'text-gray-500 dark:text-gray-300'}`}>Track top performers across setters and closers</p>
+            <h1 className="text-2xl sm:text-3xl font-extrabold mb-1 tracking-tight text-gray-900 dark:text-white">Performance Leaderboard</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-300">Track top performers across setters and closers</p>
             {error && (
               <p className="text-sm text-red-600 mt-1">{error}</p>
             )}
@@ -405,35 +404,35 @@ export default function LeaderboardPage() {
           <Button
             onClick={loadData}
             variant="default"
-            className={`font-semibold shadow-md px-6 py-2 rounded-lg transition-all ${isPremium ? 'bg-premium-glass border border-premium-glow text-premium-purple hover:bg-premium-glass/80' : 'bg-blue-600 hover:bg-blue-700 text-white dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white'}`}
+            className="w-full font-semibold shadow-md px-4 py-3 rounded-lg transition-all bg-blue-600 hover:bg-blue-700 text-white"
             disabled={loading}
           >
-            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''} mr-2 ${isPremium ? 'text-premium-purple' : ''}`} />
+            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''} mr-2`} />
             Refresh
           </Button>
         </div>
 
         {/* Date Filter */}
-        <Card className={`mb-6 ${isPremium ? premiumCard : 'bg-white border border-gray-300 shadow-lg dark:bg-slate-900 dark:border-slate-800 dark:shadow-lg'}`} data-card>
-          <CardContent className="py-4">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-              <div className="flex items-center gap-2 shrink-0">
-                <Calendar className={`h-5 w-5 ${isPremium ? 'text-premium-purple' : 'text-gray-400 dark:text-gray-300'}`} />
-                <span className={`text-base font-medium ${isPremium ? 'text-premium-purple' : 'text-gray-700 dark:text-white'}`}>Date Range:</span>
+        <Card className="mb-4 bg-white border border-gray-300 shadow-lg">
+          <CardContent className="py-3">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-gray-400" />
+                <span className="text-sm font-medium text-gray-700">Date Range:</span>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className={`min-w-[140px] font-medium shadow-none ${isPremium ? 'bg-premium-glass border-premium-glow text-premium-purple' : 'bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:hover:bg-slate-700'}`}>
+                  <Button variant="outline" className="w-full justify-between font-medium shadow-none bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100">
                     <span className="truncate">{dateFilters.find(f => f.value === dateFilter)?.label || 'Select Range'}</span>
                     <ChevronDown className="ml-2 h-4 w-4 shrink-0" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-[180px]">
+                <DropdownMenuContent align="start" className="w-full">
                   {dateFilters.map(filter => (
                     <DropdownMenuItem
                       key={filter.value}
                       onClick={() => setDateFilter(filter.value)}
-                      className={dateFilter === filter.value ? (isPremium ? 'bg-premium-glass text-premium-purple font-semibold' : 'bg-blue-50 text-blue-700 font-semibold dark:bg-slate-800 dark:text-blue-400') : ''}
+                      className={dateFilter === filter.value ? 'bg-blue-50 text-blue-700 font-semibold' : ''}
                     >
                       {filter.label}
                     </DropdownMenuItem>
@@ -444,115 +443,76 @@ export default function LeaderboardPage() {
           </CardContent>
         </Card>
 
-        {/* Summary Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          <Card className={`${isPremium ? premiumCard : 'bg-white border border-gray-300 shadow-lg dark:bg-slate-900 dark:border-slate-800 dark:shadow-lg'}`} data-card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className={`text-base font-semibold ${isPremium ? 'text-premium-purple' : 'text-gray-700 dark:text-white'}`}>Total Setters</CardTitle>
-              <Users className={`h-5 w-5 ${isPremium ? 'text-premium-teal' : 'text-gray-400 dark:text-gray-300'}`} />
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${isPremium ? premiumStat : 'text-gray-900 dark:text-white'}`}>{setters.length}</div>
-            </CardContent>
-          </Card>
-          <Card className={`${isPremium ? premiumCard : 'bg-white border border-gray-300 shadow-lg dark:bg-slate-900 dark:border-slate-800 dark:shadow-lg'}`} data-card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className={`text-base font-semibold ${isPremium ? 'text-premium-purple' : 'text-gray-700 dark:text-white'}`}>Total Closers</CardTitle>
-              <Target className={`h-5 w-5 ${isPremium ? 'text-premium-teal' : 'text-gray-400 dark:text-gray-300'}`} />
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${isPremium ? premiumStat : 'text-gray-900 dark:text-white'}`}>{closers.length}</div>
-            </CardContent>
-          </Card>
-          <Card className={`${isPremium ? premiumCard : 'bg-white border border-gray-300 shadow-lg dark:bg-slate-900 dark:border-slate-800 dark:shadow-lg'}`} data-card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className={`text-base font-semibold ${isPremium ? 'text-premium-purple' : 'text-gray-700 dark:text-white'}`}>Total kW (Net Deals)</CardTitle>
-              <TrendingUp className={`h-5 w-5 ${isPremium ? 'text-premium-teal' : 'text-gray-400 dark:text-gray-300'}`} />
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${isPremium ? premiumStat : 'text-gray-900 dark:text-white'}`}>{formatKW(closers.reduce((sum, c) => sum + c.totalKW, 0))} kW</div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Leaderboard Tabs */}
         <Tabs defaultValue="closers" className="w-full">
-          <TabsList className={`grid w-full grid-cols-3 h-auto rounded-lg mb-4 ${isPremium ? premiumTab : 'bg-gray-100 dark:bg-slate-800'}`}>
-            <TabsTrigger value="closers" className={`text-base font-semibold py-2 rounded-lg data-[state=active]:shadow-md data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-400 ${isPremium ? 'data-[state=active]:bg-premium-glass data-[state=active]:text-premium-purple' : 'data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900'}`}>Top Closers</TabsTrigger>
-            <TabsTrigger value="setters" className={`text-base font-semibold py-2 rounded-lg data-[state=active]:shadow-md data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-400 ${isPremium ? 'data-[state=active]:bg-premium-glass data-[state=active]:text-premium-purple' : 'data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900'}`}>Top Setters</TabsTrigger>
-            <TabsTrigger value="selfgen" className={`text-base font-semibold py-2 rounded-lg data-[state=active]:shadow-md data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-400 ${isPremium ? 'data-[state=active]:bg-premium-glass data-[state=active]:text-premium-purple' : 'data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900'}`}>Top Self-Gen</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 h-auto rounded-lg mb-4 bg-gray-100">
+            <TabsTrigger value="closers" className="text-sm font-semibold py-2 rounded-lg data-[state=active]:shadow-md data-[state=active]:text-blue-700 data-[state=active]:bg-white">Top Closers</TabsTrigger>
+            <TabsTrigger value="setters" className="text-sm font-semibold py-2 rounded-lg data-[state=active]:shadow-md data-[state=active]:text-blue-700 data-[state=active]:bg-white">Top Setters</TabsTrigger>
+            <TabsTrigger value="selfgen" className="text-sm font-semibold py-2 rounded-lg data-[state=active]:shadow-md data-[state=active]:text-blue-700 data-[state=active]:bg-white">Top Self-Gen</TabsTrigger>
           </TabsList>
 
           {/* Top Closers Tab Content */}
-          <TabsContent value="closers" className="leaderboard-container">
-            <Card className={`${isPremium ? premiumCard : 'bg-white border border-gray-300 shadow-xl dark:bg-slate-900 dark:border-slate-800 dark:shadow-lg'}`} data-card>
-              <CardHeader className="leaderboard-card-header">
-                <CardTitle className={`leaderboard-card-title ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                  Top Closers
-                </CardTitle>
+          <TabsContent value="closers">
+            <Card className="bg-white border border-gray-300 shadow-xl">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl font-bold text-gray-800">Top Closers</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="leaderboard-container">
+                <div className="space-y-3">
                   {closers.slice(0, 10).map((closer, index) => {
                     const displayName = closer.matchedProfile?.displayName || closer.name;
                     const avatarUrl = closer.matchedProfile?.photoURL;
-                    const isTopRank = index === 0;
                     
                     return (
                       <div
                         key={closer.name}
-                        className={`leaderboard-card ${isTopRank ? 'rank-1' : 'rank-other'} ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}
-                        style={isTopRank ? { zIndex: 2 } : {}}
+                        className={`p-4 border-2 rounded-xl transition-all duration-200 ${
+                          index === 0 
+                            ? 'bg-gradient-to-r from-blue-100 to-white border-blue-300 shadow-lg' 
+                            : 'bg-gradient-to-r from-blue-50 to-white border-blue-200 hover:shadow-md'
+                        }`}
                       >
-                        <div className="leaderboard-content">
-                          <div className="leaderboard-left-section">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3 flex-1 min-w-0">
                             <div className="shrink-0">
                               <LeaderboardRankBadge rank={index + 1} />
                             </div>
                             
-                            <Avatar className={`leaderboard-avatar ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                            <Avatar className={`ring-2 ring-blue-300 bg-white shadow-lg ${index === 0 ? 'h-20 w-20' : 'h-14 w-14'}`}>
                               <AvatarImage 
-                                src={avatarUrl || undefined} 
+                                src={avatarUrl} 
                                 alt={displayName} 
-                                className="leaderboard-avatar-image" 
+                                className="object-cover" 
                               />
-                              <AvatarFallback className={`leaderboard-avatar-fallback ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              <AvatarFallback className={`font-bold text-blue-700 bg-blue-50 ${index === 0 ? 'text-lg' : 'text-sm'}`}>
                                 {displayName.slice(0, 2).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                             
                             <div className="flex-1 min-w-0">
-                              <p className={`leaderboard-name ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              <p className={`font-bold text-gray-900 truncate ${index === 0 ? 'text-xl' : 'text-base'}`}>
                                 {displayName}
                               </p>
-                              <div className="leaderboard-metric-container">
-                                <p className={`leaderboard-metric-label ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                                  Net Deals:
-                                </p>
-                                <p className={`leaderboard-metric-value ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                                  {closer.sales}
-                                </p>
+                              <div className={`flex items-center gap-1 ${index === 0 ? 'text-sm' : 'text-xs'}`}>
+                                <span className="text-gray-500">Net Deals:</span>
+                                <span className="font-bold text-blue-700">{closer.sales}</span>
                               </div>
                             </div>
                           </div>
                           
-                          <div className="leaderboard-right-section">
-                            <p className={`leaderboard-kw-label ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                              Total kW
-                            </p>
-                            <p className={`leaderboard-kw-value ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                          <div className="text-right shrink-0 ml-3">
+                            <p className={`text-gray-500 mb-1 ${index === 0 ? 'text-sm' : 'text-xs'}`}>Total kW</p>
+                            <p className={`font-bold text-blue-700 ${index === 0 ? 'text-2xl' : 'text-lg'}`}>
                               {formatKW(closer.totalKW)}
                             </p>
-                            <p className={`leaderboard-kw-unit ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                              kW
-                            </p>
+                            <p className={`text-gray-400 ${index === 0 ? 'text-sm' : 'text-xs'}`}>kW</p>
                           </div>
                         </div>
                       </div>
                     )
                   })}
                   {closers.length === 0 && (
-                    <div className={`leaderboard-empty ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                    <div className="text-center p-8 text-gray-400">
                       No closer data available for the selected date range.
                     </div>
                   )}
@@ -562,75 +522,67 @@ export default function LeaderboardPage() {
           </TabsContent>
 
           {/* Top Setters Tab Content */}
-          <TabsContent value="setters" className="leaderboard-container">
-            <Card className={`${isPremium ? premiumCard : 'bg-white border border-gray-300 shadow-xl dark:bg-slate-900 dark:border-slate-800 dark:shadow-lg'}`} data-card>
-              <CardHeader className="leaderboard-card-header">
-                <CardTitle className={`leaderboard-card-title ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                  Top Setters
-                </CardTitle>
+          <TabsContent value="setters">
+            <Card className="bg-white border border-gray-300 shadow-xl">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl font-bold text-gray-800">Top Setters</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="leaderboard-container">
+                <div className="space-y-3">
                   {setters.slice(0, 10).map((setter, index) => {
                     const displayName = setter.matchedProfile?.displayName || setter.name;
                     const avatarUrl = setter.matchedProfile?.photoURL;
-                    const isTopRank = index === 0;
                     
                     return (
                       <div
                         key={setter.name}
-                        className={`leaderboard-card ${isTopRank ? 'rank-1' : 'rank-other'} ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}
-                        style={isTopRank ? { zIndex: 2 } : {}}
+                        className={`p-4 border-2 rounded-xl transition-all duration-200 ${
+                          index === 0 
+                            ? 'bg-gradient-to-r from-green-100 to-white border-green-300 shadow-lg' 
+                            : 'bg-gradient-to-r from-green-50 to-white border-green-200 hover:shadow-md'
+                        }`}
                       >
-                        <div className="leaderboard-content">
-                          <div className="leaderboard-left-section">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3 flex-1 min-w-0">
                             <div className="shrink-0">
                               <LeaderboardRankBadge rank={index + 1} />
                             </div>
                             
-                            <Avatar className={`leaderboard-avatar ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                            <Avatar className={`ring-2 ring-green-300 bg-white shadow-lg ${index === 0 ? 'h-20 w-20' : 'h-14 w-14'}`}>
                               <AvatarImage 
-                                src={avatarUrl || undefined} 
+                                src={avatarUrl} 
                                 alt={displayName} 
-                                className="leaderboard-avatar-image" 
+                                className="object-cover" 
                               />
-                              <AvatarFallback className={`leaderboard-avatar-fallback ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              <AvatarFallback className={`font-bold text-green-700 bg-green-50 ${index === 0 ? 'text-lg' : 'text-sm'}`}>
                                 {displayName.slice(0, 2).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                             
                             <div className="flex-1 min-w-0">
-                              <p className={`leaderboard-name ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              <p className={`font-bold text-gray-900 truncate ${index === 0 ? 'text-xl' : 'text-base'}`}>
                                 {displayName}
                               </p>
-                              <div className="leaderboard-metric-container">
-                                <p className={`leaderboard-metric-label ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                                  Gross Deals:
-                                </p>
-                                <p className={`leaderboard-metric-value ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                                  {setter.totalLeads}
-                                </p>
+                              <div className={`flex items-center gap-1 ${index === 0 ? 'text-sm' : 'text-xs'}`}>
+                                <span className="text-gray-500">Gross Deals:</span>
+                                <span className="font-bold text-green-700">{setter.totalLeads}</span>
                               </div>
                             </div>
                           </div>
                           
-                          <div className="leaderboard-right-section">
-                            <p className={`leaderboard-kw-label ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                              Gross kW
-                            </p>
-                            <p className={`leaderboard-kw-value ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                          <div className="text-right shrink-0 ml-3">
+                            <p className={`text-gray-500 mb-1 ${index === 0 ? 'text-sm' : 'text-xs'}`}>Gross kW</p>
+                            <p className={`font-bold text-green-700 ${index === 0 ? 'text-2xl' : 'text-lg'}`}>
                               {formatKW(setter.grossKW)}
                             </p>
-                            <p className={`leaderboard-kw-unit ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                              kW
-                            </p>
+                            <p className={`text-gray-400 ${index === 0 ? 'text-sm' : 'text-xs'}`}>kW</p>
                           </div>
                         </div>
                       </div>
                     )
                   })}
                   {setters.length === 0 && (
-                    <div className={`leaderboard-empty ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                    <div className="text-center p-8 text-gray-400">
                       No setter data available for the selected date range.
                     </div>
                   )}
@@ -640,75 +592,67 @@ export default function LeaderboardPage() {
           </TabsContent>
 
           {/* Top Self-Gen Tab Content */}
-          <TabsContent value="selfgen" className="leaderboard-container">
-            <Card className={`${isPremium ? premiumCard : 'bg-white border border-gray-300 shadow-xl dark:bg-slate-900 dark:border-slate-800 dark:shadow-lg'}`} data-card>
-              <CardHeader className="leaderboard-card-header">
-                <CardTitle className={`leaderboard-card-title ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                  Top Self-Gen
-                </CardTitle>
+          <TabsContent value="selfgen">
+            <Card className="bg-white border border-gray-300 shadow-xl">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl font-bold text-gray-800">Top Self-Gen</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="leaderboard-container">
+                <div className="space-y-3">
                   {selfGen.slice(0, 10).map((person, index) => {
                     const displayName = person.matchedProfile?.displayName || person.name;
                     const avatarUrl = person.matchedProfile?.photoURL;
-                    const isTopRank = index === 0;
                     
                     return (
                       <div
                         key={person.name}
-                        className={`leaderboard-card ${isTopRank ? 'rank-1' : 'rank-other'} ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}
-                        style={isTopRank ? { zIndex: 2 } : {}}
+                        className={`p-4 border-2 rounded-xl transition-all duration-200 ${
+                          index === 0 
+                            ? 'bg-gradient-to-r from-purple-100 to-white border-purple-300 shadow-lg' 
+                            : 'bg-gradient-to-r from-purple-50 to-white border-purple-200 hover:shadow-md'
+                        }`}
                       >
-                        <div className="leaderboard-content">
-                          <div className="leaderboard-left-section">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3 flex-1 min-w-0">
                             <div className="shrink-0">
                               <LeaderboardRankBadge rank={index + 1} />
                             </div>
                             
-                            <Avatar className={`leaderboard-avatar ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                            <Avatar className={`ring-2 ring-purple-300 bg-white shadow-lg ${index === 0 ? 'h-20 w-20' : 'h-14 w-14'}`}>
                               <AvatarImage 
-                                src={avatarUrl || undefined} 
+                                src={avatarUrl} 
                                 alt={displayName} 
-                                className="leaderboard-avatar-image" 
+                                className="object-cover" 
                               />
-                              <AvatarFallback className={`leaderboard-avatar-fallback ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              <AvatarFallback className={`font-bold text-purple-700 bg-purple-50 ${index === 0 ? 'text-lg' : 'text-sm'}`}>
                                 {displayName.slice(0, 2).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                             
                             <div className="flex-1 min-w-0">
-                              <p className={`leaderboard-name ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                              <p className={`font-bold text-gray-900 truncate ${index === 0 ? 'text-xl' : 'text-base'}`}>
                                 {displayName}
                               </p>
-                              <div className="leaderboard-metric-container">
-                                <p className={`leaderboard-metric-label ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                                  Net Self-Gen Deals:
-                                </p>
-                                <p className={`leaderboard-metric-value ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                                  {person.sales}
-                                </p>
+                              <div className={`flex items-center gap-1 ${index === 0 ? 'text-sm' : 'text-xs'}`}>
+                                <span className="text-gray-500">Net Self-Gen:</span>
+                                <span className="font-bold text-purple-700">{person.sales}</span>
                               </div>
                             </div>
                           </div>
                           
-                          <div className="leaderboard-right-section">
-                            <p className={`leaderboard-kw-label ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                              Total kW
-                            </p>
-                            <p className={`leaderboard-kw-value ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                          <div className="text-right shrink-0 ml-3">
+                            <p className={`text-gray-500 mb-1 ${index === 0 ? 'text-sm' : 'text-xs'}`}>Total kW</p>
+                            <p className={`font-bold text-purple-700 ${index === 0 ? 'text-2xl' : 'text-lg'}`}>
                               {formatKW(person.totalKW)}
                             </p>
-                            <p className={`leaderboard-kw-unit ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
-                              kW
-                            </p>
+                            <p className={`text-gray-400 ${index === 0 ? 'text-sm' : 'text-xs'}`}>kW</p>
                           </div>
                         </div>
                       </div>
                     )
                   })}
                   {selfGen.length === 0 && (
-                    <div className={`leaderboard-empty ${isPremium ? 'premium' : 'default'} ${isPremium ? '' : 'dark'}`}>
+                    <div className="text-center p-8 text-gray-400">
                       No self-gen data available for the selected date range.
                     </div>
                   )}
