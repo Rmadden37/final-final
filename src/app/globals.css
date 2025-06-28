@@ -15,6 +15,10 @@
     --safe-area-inset-bottom: env(safe-area-inset-bottom);
     --safe-area-inset-left: env(safe-area-inset-left);
     
+    /* Sidebar variables - use standard units */
+    --sidebar-width-collapsed: 60px;
+    --sidebar-width-expanded: 240px;
+    
     /* Essential theme variables only */
     --background: 213 33% 95%;
     --foreground: 215 25% 17%;
@@ -71,7 +75,7 @@
       -webkit-text-size-adjust: 100%;
     }
     
-    /* Touch targets */
+    /* Touch targets - use standard properties */
     button, [role="button"] {
       min-height: 44px;
       min-width: 44px;
@@ -79,14 +83,61 @@
   }
 }
 
-/* Critical utility classes */
+/* Main content layout fix */
 @layer utilities {
-  /* Layout utilities */
+  /* Main content area with sidebar spacing - use standard properties */
+  .main-content {
+    margin-left: 60px; /* Use fixed value instead of CSS variable for better compatibility */
+    padding: 1rem;
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+  }
+
+  /* When sidebar is expanded */
+  .sidebar-expanded .main-content {
+    margin-left: 240px; /* Use fixed value instead of CSS variable */
+  }
+
+  /* Page title spacing */
+  .page-title {
+    margin-bottom: 1.5rem;
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+  }
+
+  /* Mobile responsive adjustments */
+  @media (max-width: 768px) {
+    .main-content {
+      margin-left: 0;
+      padding: 1rem;
+      padding-top: 70px; /* Account for mobile header */
+    }
+    
+    .sidebar-expanded .main-content {
+      margin-left: 0;
+    }
+    
+    .page-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+  }
+
+  /* Container utilities */
   .container {
     width: 100%;
     max-width: 100%;
     padding-right: 1rem;
     padding-left: 1rem;
+  }
+
+  @media (min-width: 1400px) {
+    .container {
+      max-width: 1400px;
+      padding-right: 2rem;
+      padding-left: 2rem;
+    }
   }
 
   /* Display utilities */
@@ -157,7 +208,6 @@
   .app-main {
     flex: 1;
     overflow-y: auto;
-    min-height: calc(100vh - 3.5rem);
   }
 
   /* Basic button */
@@ -165,7 +215,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--radius);
+    border-radius: 0.5rem; /* Use standard value instead of var(--radius) */
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     font-weight: 500;
@@ -186,7 +236,7 @@
 
   /* Basic card */
   .card {
-    border-radius: var(--radius);
+    border-radius: 0.5rem; /* Use standard value instead of var(--radius) */
     border: 1px solid hsl(var(--border));
     background: hsl(var(--card));
     color: hsl(var(--card-foreground));

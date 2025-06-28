@@ -8,6 +8,12 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
+  experimental: {
+    optimizeUniversalDefaults: true,
+  },
   theme: {
     container: {
       center: true,
@@ -104,9 +110,10 @@ const config: Config = {
         },
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        // Use fixed values instead of CSS variables to prevent warnings
+        lg: '0.5rem',
+        md: '0.375rem', 
+        sm: '0.25rem',
       },
       boxShadow: {
         'card-glow-dark': '0px 0px 20px -7px hsla(163, 50%, 35%, 0.22)',
@@ -128,16 +135,36 @@ const config: Config = {
             height: '0',
           },
         },
+        // Add loading animation for skeletons
+        'skeleton-loading': {
+          '0%': {
+            'background-color': 'hsl(200, 20%, 80%)',
+          },
+          '100%': {
+            'background-color': 'hsl(200, 20%, 95%)',
+          },
+        },
+        // Add spin animation
+        'spin': {
+          'to': {
+            transform: 'rotate(360deg)',
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'skeleton-loading': 'skeleton-loading 1s linear infinite alternate',
+        'spin': 'spin 0.6s linear infinite',
       },
       spacing: {
         'safe-top': 'env(safe-area-inset-top)',
         'safe-bottom': 'env(safe-area-inset-bottom)',
         'safe-left': 'env(safe-area-inset-left)',
         'safe-right': 'env(safe-area-inset-right)',
+        // Add sidebar spacing utilities
+        'sidebar-collapsed': '60px',
+        'sidebar-expanded': '240px',
       },
       minHeight: {
         'touch': '44px',
@@ -148,9 +175,72 @@ const config: Config = {
         'touch': '44px',
         'touch-lg': '48px',
       },
+      // Add sidebar-specific utilities
+      margin: {
+        'sidebar-collapsed': '60px',
+        'sidebar-expanded': '240px',
+      },
+      // Add transition utilities
+      transitionProperty: {
+        'sidebar': 'margin-left, width',
+      },
+      transitionDuration: {
+        '300': '300ms',
+      },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+    require('tailwindcss-animate'),
+    // Add plugin for custom utilities
+    function({ addUtilities }: any) {
+      const newUtilities = {
+        // Main content spacing utilities
+        '.main-content': {
+          'margin-left': '60px',
+          'padding': '1rem',
+          'transition': 'margin-left 0.3s ease',
+          'min-height': '100vh',
+        },
+        '.sidebar-expanded .main-content': {
+          'margin-left': '240px',
+        },
+        // Mobile responsive
+        '@media (max-width: 768px)': {
+          '.main-content': {
+            'margin-left': '0',
+            'padding': '1rem',
+            'padding-top': '70px',
+          },
+          '.sidebar-expanded .main-content': {
+            'margin-left': '0',
+          },
+        },
+        // Page title utilities
+        '.page-title': {
+          'margin-bottom': '1.5rem',
+          'font-size': '1.875rem',
+          'font-weight': '700',
+          'color': 'hsl(var(--foreground))',
+        },
+        '@media (max-width: 768px)': {
+          '.page-title': {
+            'font-size': '1.5rem',
+            'margin-bottom': '1rem',
+          },
+        },
+        // Touch-friendly utilities
+        '.touch-target': {
+          'min-height': '44px',
+          'min-width': '44px',
+        },
+        '.touch-target-lg': {
+          'min-height': '48px',
+          'min-width': '48px',
+        },
+      }
+      addUtilities(newUtilities)
+    }
+  ],
 };
 
 export default config;

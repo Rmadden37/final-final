@@ -2,7 +2,7 @@
 "use client";
 
 import {useState, useEffect} from "react";
-import type {Lead, Closer} from "@/types";
+import type {Lead, Closer, LeadStatus} from "@/types";
 import {useAuth} from "@/hooks/use-auth";
 import {db} from "@/lib/firebase";
 import {collection, query, where, onSnapshot, orderBy, Timestamp as FirestoreTimestamp, doc, serverTimestamp, writeBatch} from "firebase/firestore";
@@ -17,9 +17,10 @@ import {useToast} from "@/hooks/use-toast";
 const FORTY_FIVE_MINUTES_MS = 45 * 60 * 1000;
 const FIFTEEN_MINUTES_MS = 15 * 60 * 1000;
 
-// Helper function to attempt parsing various date string formats
+// Helper functions (inline to avoid import issues)
 function parseDateString(dateString: string): Date | null {
   if (!dateString || typeof dateString !== "string") return null;
+  
   let date = new Date(dateString);
   if (!isNaN(date.getTime())) return date;
 
@@ -32,6 +33,52 @@ function parseDateString(dateString: string): Date | null {
   }
 
   return null;
+}
+
+function parseTimestamp(value: any): FirestoreTimestamp | null {
+  if (!value) return null;
+  
+  if (value instanceof FirestoreTimestamp) {
+    return value;
+  }
+  
+  if (typeof value === 'string') {
+    const date = parseDateString(value);
+    if (date) {
+      return FirestoreTimestamp.fromDate(date);
+    }
+  }
+  
+  if (value instanceof Date) {
+    return FirestoreTimestamp.fromDate(value);
+  }
+  
+  // Handle objects with seconds and nanoseconds (Firestore format)
+  if (typeof value === 'object' && value !== null) {
+    if ('seconds' in value && typeof value.seconds === 'number') {
+      return new FirestoreTimestamp(value.seconds, value.nanoseconds || 0);
+    }
+    
+    if ('toDate' in value && typeof value.toDate === 'function') {
+      return value as FirestoreTimestamp;
+    }
+  }
+  
+  return null;
+}
+
+function getTimestampMillis(timestamp: FirestoreTimestamp | null | undefined): number {
+  if (!timestamp) return 0;
+  
+  try {
+    if (typeof timestamp.toMillis === 'function') {
+      return timestamp.toMillis();
+    }
+  } catch (error) {
+    console.warn('Error getting timestamp millis:', error);
+  }
+  
+  return 0;
 }
 
 export default function LeadQueue() {
@@ -65,19 +112,13 @@ export default function LeadQueue() {
     const unsubscribeWaiting = onSnapshot(qWaiting, (querySnapshot) => {
       const leadsData = querySnapshot.docs.map((docSnapshot) => {
         const data = docSnapshot.data();
+        
+        // Handle createdAt timestamp
         let createdAtTimestamp: FirestoreTimestamp | null = null;
-
         if (data.submissionTime) {
-          if (data.submissionTime instanceof FirestoreTimestamp) {
-            createdAtTimestamp = data.submissionTime;
-          } else if (typeof data.submissionTime === "string") {
-            const parsedDate = parseDateString(data.submissionTime);
-            if (parsedDate) {
-              createdAtTimestamp = FirestoreTimestamp.fromDate(parsedDate);
-            }
-          }
-        } else if (data.createdAt instanceof FirestoreTimestamp) {
-          createdAtTimestamp = data.createdAt;
+          createdAtTimestamp = parseTimestamp(data.submissionTime);
+        } else if (data.createdAt) {
+          createdAtTimestamp = parseTimestamp(data.createdAt);
         }
 
         return {
@@ -85,20 +126,20 @@ export default function LeadQueue() {
           customerName: data.clientName || data.customerName || "Unknown Customer",
           customerPhone: data.phone || data.customerPhone || "N/A",
           address: data.address,
-          status: data.status,
+          status: data.status as LeadStatus,
           teamId: data.teamId,
           dispatchType: data.type || data.dispatchType || "immediate",
           assignedCloserId: data.assignedCloserId || data.assignedCloser || null,
           assignedCloserName: data.assignedCloserName || null,
           createdAt: createdAtTimestamp,
-          updatedAt: data.updatedAt instanceof FirestoreTimestamp ? data.updatedAt : serverTimestamp(),
+          updatedAt: parseTimestamp(data.updatedAt) || null,
           dispositionNotes: data.dispositionNotes || "",
-          scheduledAppointmentTime: data.scheduledAppointmentTime instanceof FirestoreTimestamp ? data.scheduledAppointmentTime : (data.scheduledTime instanceof FirestoreTimestamp ? data.scheduledTime : null),
+          scheduledAppointmentTime: parseTimestamp(data.scheduledAppointmentTime) || parseTimestamp(data.scheduledTime) || null,
           setterId: data.setterId || null,
           setterName: data.setterName || null,
           setterLocation: data.setterLocation || null,
           setterVerified: data.setterVerified || false,
-          verifiedAt: data.verifiedAt || null,
+          verifiedAt: parseTimestamp(data.verifiedAt) || null,
           verifiedBy: data.verifiedBy || null,
           photoUrls: data.photoUrls || [],
         } as Lead;
@@ -138,18 +179,13 @@ export default function LeadQueue() {
     const unsubscribeScheduled = onSnapshot(qScheduled, async (querySnapshot) => {
       const leadsData = querySnapshot.docs.map((docSnapshot) => {
         const data = docSnapshot.data();
+        
+        // Handle createdAt timestamp
         let createdAtTimestamp: FirestoreTimestamp | null = null;
         if (data.submissionTime) {
-          if (data.submissionTime instanceof FirestoreTimestamp) {
-            createdAtTimestamp = data.submissionTime;
-          } else if (typeof data.submissionTime === "string") {
-            const parsedDate = parseDateString(data.submissionTime);
-            if (parsedDate) {
-              createdAtTimestamp = FirestoreTimestamp.fromDate(parsedDate);
-            }
-          }
-        } else if (data.createdAt instanceof FirestoreTimestamp) {
-          createdAtTimestamp = data.createdAt;
+          createdAtTimestamp = parseTimestamp(data.submissionTime);
+        } else if (data.createdAt) {
+          createdAtTimestamp = parseTimestamp(data.createdAt);
         }
 
         return {
@@ -157,15 +193,15 @@ export default function LeadQueue() {
           customerName: data.clientName || data.customerName || "Unknown Customer",
           customerPhone: data.phone || data.customerPhone || "N/A",
           address: data.address,
-          status: data.status,
+          status: data.status as LeadStatus,
           teamId: data.teamId,
           dispatchType: data.type || data.dispatchType || "immediate",
           assignedCloserId: data.assignedCloserId || data.assignedCloser || null,
           assignedCloserName: data.assignedCloserName || null,
           createdAt: createdAtTimestamp,
-          updatedAt: data.updatedAt instanceof FirestoreTimestamp ? data.updatedAt : serverTimestamp(),
+          updatedAt: parseTimestamp(data.updatedAt) || null,
           dispositionNotes: data.dispositionNotes || "",
-          scheduledAppointmentTime: data.scheduledAppointmentTime instanceof FirestoreTimestamp ? data.scheduledAppointmentTime : (data.scheduledTime instanceof FirestoreTimestamp ? data.scheduledTime : null),
+          scheduledAppointmentTime: parseTimestamp(data.scheduledAppointmentTime) || parseTimestamp(data.scheduledTime) || null,
           setterId: data.setterId || null,
           setterName: data.setterName || null,
           setterLocation: data.setterLocation || null,
@@ -183,9 +219,9 @@ export default function LeadQueue() {
 
       querySnapshot.docs.forEach((docSnapshot) => {
         const lead = {id: docSnapshot.id, ...docSnapshot.data()} as Lead;
-        const leadScheduledAppointmentTime = docSnapshot.data().scheduledAppointmentTime;
+        const leadScheduledAppointmentTime = parseTimestamp(docSnapshot.data().scheduledAppointmentTime);
 
-        if (leadScheduledAppointmentTime instanceof FirestoreTimestamp &&
+        if (leadScheduledAppointmentTime &&
             (lead.status === "rescheduled" || lead.status === "scheduled") &&
             !processedScheduledLeadIds.has(lead.id)) {
           const appointmentTime = leadScheduledAppointmentTime.toDate();
@@ -258,8 +294,8 @@ export default function LeadQueue() {
           const failedLeadIds = querySnapshot.docs
             .filter((docSnapshot) => {
               const leadData = docSnapshot.data();
-              const leadSchedTime = leadData.scheduledAppointmentTime;
-              return leadSchedTime instanceof FirestoreTimestamp &&
+              const leadSchedTime = parseTimestamp(leadData.scheduledAppointmentTime);
+              return leadSchedTime &&
                        (leadData.status === "rescheduled" || leadData.status === "scheduled") &&
                        (leadSchedTime.toDate().getTime() - now.getTime() <= FORTY_FIVE_MINUTES_MS) &&
                        leadData.setterVerified === true &&
@@ -399,7 +435,7 @@ export default function LeadQueue() {
           .filter(lead => !lead.assignedCloserId && lead.status === "waiting_assignment")
           .sort((a, b) => {
             if (!a.createdAt || !b.createdAt) return 0;
-            return a.createdAt.toMillis() - b.createdAt.toMillis();
+            return getTimestampMillis(a.createdAt) - getTimestampMillis(b.createdAt);
           });
 
         const assignmentsToMake = Math.min(sortedWaitingLeads.length, availableClosers.length);
@@ -442,82 +478,87 @@ export default function LeadQueue() {
   }, [waitingLeads, availableClosers, loadingWaiting, loadingClosers, user?.teamId, toast]);
 
   return (
-    <Card className="dashboard-card h-full flex flex-col bg-white/95 dark:bg-transparent premium:bg-transparent shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-0 premium:border-0 ring-1 ring-white/5 dark:ring-slate-800/20 dark:card-glass dark:glow-turquoise premium:card-glass premium:glow-premium">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6 pt-3 sm:pt-6 bg-transparent shrink-0">
-        <CardTitle className="text-lg sm:text-xl lg:text-2xl font-bold font-headline flex items-center text-slate-900 dark:text-slate-100 premium:text-glow">
-          <div className="p-1.5 sm:p-2 bg-transparent rounded-lg mr-2 sm:mr-3 dark:glow-turquoise premium:glow-premium premium:icon-hover-glow transition-all duration-300">
-            <ListChecks className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-blue-600 dark:text-blue-400 premium:text-premium-purple premium:nav-icon premium:icon-glow-purple transition-all duration-300" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm sm:text-base lg:text-xl">Lead Queues</span>
-            <span className="text-xs sm:text-sm font-normal text-muted-foreground premium:text-premium-teal">
-              Waiting & scheduled leads
-            </span>
-          </div>
-        </CardTitle>
-        {(loadingWaiting || loadingScheduled) && <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-muted-foreground premium:text-premium-teal premium:nav-icon premium:icon-glow-teal" />}
-      </CardHeader>
-      
-      <CardContent className="flex-grow overflow-hidden px-2 sm:px-4 lg:px-6 pb-2 sm:pb-4 lg:pb-6 bg-transparent">
-        <Tabs defaultValue="waiting" className="flex flex-col h-full">
-          <TabsList className="grid w-full grid-cols-2 mb-2 sm:mb-4 h-9 sm:h-10 lg:h-11 bg-muted/30 dark:bg-muted/30 rounded-lg p-1 premium:border premium:border-premium-glow shrink-0">
-            <TabsTrigger 
-              value="waiting" 
-              className="h-7 sm:h-8 lg:h-9 text-xs sm:text-sm lg:text-base font-medium rounded-md transition-all bg-transparent hover:bg-white/20 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white premium:data-[state=active]:bg-gradient-to-r premium:data-[state=active]:from-premium-purple/20 premium:data-[state=active]:to-premium-teal/10 premium:data-[state=active]:border premium:data-[state=active]:border-premium-glow premium:data-[state=active]:glow-premium"
-            >
-              <ListChecks className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 premium:nav-icon premium:icon-glow-purple transition-all duration-300" /> 
-              <span className="hidden sm:inline">Waiting List</span>
-              <span className="sm:hidden">Waiting</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="scheduled" 
-              className="h-7 sm:h-8 lg:h-9 text-xs sm:text-sm lg:text-base font-medium rounded-md transition-all bg-transparent hover:bg-white/20 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white premium:data-[state=active]:bg-gradient-to-r premium:data-[state=active]:from-premium-teal/20 premium:data-[state=active]:to-premium-purple/10 premium:data-[state=active]:border premium:data-[state=active]:border-premium-glow premium:data-[state=active]:glow-premium"
-            >
-              <CalendarClock className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 premium:nav-icon premium:icon-glow-teal transition-all duration-300" /> 
-              <span className="hidden sm:inline">Scheduled</span>
-              <span className="sm:hidden">Scheduled</span>
-            </TabsTrigger>
-          </TabsList>
-          
-          <div className="flex-1 overflow-hidden">
-            <TabsContent value="waiting" className="h-full mt-0 data-[state=inactive]:hidden">
-              {loadingWaiting ? (
-                <div className="flex h-full items-center justify-center">
-                  <div className="text-center">
-                    <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary mx-auto mb-3 premium:text-premium-purple premium:nav-icon premium:icon-glow-purple premium:icon-pulse" />
-                    <p className="text-sm text-muted-foreground">Loading waiting leads...</p>
-                  </div>
-                </div>
-              ) : waitingLeads.length === 0 ? (
-                <div className="flex h-full flex-col items-center justify-center text-center py-8">
-                  <div className="p-3 bg-transparent rounded-full mb-3 premium:glow-premium transition-all duration-300">
-                    <ListChecks className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground premium:text-premium-purple premium:nav-icon premium:icon-glow-purple" />
-                  </div>
-                  <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 premium:text-glow">Queue Empty</h3>
-                  <p className="text-muted-foreground text-xs sm:text-sm max-w-xs">
-                    No leads are currently waiting for assignment. New leads will appear here automatically.
-                  </p>
-                </div>
-              ) : (
-                <ScrollArea className="h-full">
-                  <div className="space-y-3 pr-2">
-                    {waitingLeads.map((lead) => (
-                      <LeadCard key={lead.id} lead={lead} context="queue-waiting" />
-                    ))}
-                  </div>
-                </ScrollArea>
-              )}
-            </TabsContent>
+    <div className="lead-queue-container h-full">
+      <Card className="h-full flex flex-col bg-white/95 dark:bg-transparent premium:bg-transparent shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-0 premium:border-0 ring-1 ring-white/5 dark:ring-slate-800/20 dark:card-glass dark:glow-turquoise premium:card-glass premium:glow-premium">
+        <CardHeader className="lead-queue-header shrink-0">
+          <CardTitle className="lead-queue-title text-slate-900 dark:text-slate-100 premium:text-glow">
+            <div className="p-1.5 sm:p-2 bg-transparent rounded-lg mr-2 sm:mr-3 dark:glow-turquoise premium:glow-premium premium:icon-hover-glow transition-all duration-300">
+              <ListChecks className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-blue-600 dark:text-blue-400 premium:text-premium-purple premium:nav-icon premium:icon-glow-purple transition-all duration-300" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm sm:text-base lg:text-xl">Lead Queues</span>
+              <span className="lead-queue-subtitle premium:text-premium-teal">
+                Waiting & scheduled leads
+              </span>
+            </div>
+          </CardTitle>
+          {(loadingWaiting || loadingScheduled) && <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-muted-foreground premium:text-premium-teal premium:nav-icon premium:icon-glow-teal" />}
+        </CardHeader>
+        
+        <CardContent className="flex-grow overflow-hidden px-2 sm:px-4 lg:px-6 pb-2 sm:pb-4 lg:pb-6 bg-transparent">
+          <Tabs defaultValue="waiting" className="flex flex-col h-full">
+            {/* Fixed Tab Navigation */}
+            <div className="tab-navigation shrink-0">
+              <TabsList className="w-full grid grid-cols-2 h-9 sm:h-10 lg:h-11 bg-muted/30 dark:bg-muted/30 rounded-lg p-1 premium:border premium:border-premium-glow">
+                <TabsTrigger 
+                  value="waiting" 
+                  className="tab-button h-7 sm:h-8 lg:h-9 text-xs sm:text-sm lg:text-base font-medium rounded-md transition-all bg-transparent hover:bg-white/20 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white premium:data-[state=active]:bg-gradient-to-r premium:data-[state=active]:from-premium-purple/20 premium:data-[state=active]:to-premium-teal/10 premium:data-[state=active]:border premium:data-[state=active]:border-premium-glow premium:data-[state=active]:glow-premium"
+                >
+                  <ListChecks className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 premium:nav-icon premium:icon-glow-purple transition-all duration-300" /> 
+                  <span className="hidden sm:inline">Waiting</span>
+                  <span className="sm:hidden">Wait</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="scheduled" 
+                  className="tab-button h-7 sm:h-8 lg:h-9 text-xs sm:text-sm lg:text-base font-medium rounded-md transition-all bg-transparent hover:bg-white/20 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white premium:data-[state=active]:bg-gradient-to-r premium:data-[state=active]:from-premium-teal/20 premium:data-[state=active]:to-premium-purple/10 premium:data-[state=active]:border premium:data-[state=active]:border-premium-glow premium:data-[state=active]:glow-premium"
+                >
+                  <CalendarClock className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 premium:nav-icon premium:icon-glow-teal transition-all duration-300" /> 
+                  <span className="hidden sm:inline">Scheduled</span>
+                  <span className="sm:hidden">Sched</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
             
-            <TabsContent value="scheduled" className="h-full mt-0 data-[state=inactive]:hidden">
-              <ScheduledLeadsCalendar 
-                scheduledLeads={scheduledLeads} 
-                loading={loadingScheduled} 
-              />
-            </TabsContent>
-          </div>
-        </Tabs>
-      </CardContent>
-    </Card>
+            <div className="flex-1 overflow-hidden mt-2 sm:mt-4">
+              <TabsContent value="waiting" className="h-full mt-0 data-[state=inactive]:hidden">
+                {loadingWaiting ? (
+                  <div className="flex h-full items-center justify-center">
+                    <div className="text-center">
+                      <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary mx-auto mb-3 premium:text-premium-purple premium:nav-icon premium:icon-glow-purple premium:icon-pulse" />
+                      <p className="text-sm text-muted-foreground">Loading waiting leads...</p>
+                    </div>
+                  </div>
+                ) : waitingLeads.length === 0 ? (
+                  <div className="flex h-full flex-col items-center justify-center text-center py-8">
+                    <div className="p-3 bg-transparent rounded-full mb-3 premium:glow-premium transition-all duration-300">
+                      <ListChecks className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground premium:text-premium-purple premium:nav-icon premium:icon-glow-purple" />
+                    </div>
+                    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 premium:text-glow">Queue Empty</h3>
+                    <p className="text-muted-foreground text-xs sm:text-sm max-w-xs">
+                      No leads are currently waiting for assignment. New leads will appear here automatically.
+                    </p>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-full">
+                    <div className="space-y-3 pr-2">
+                      {waitingLeads.map((lead) => (
+                        <LeadCard key={lead.id} lead={lead} context="queue-waiting" />
+                      ))}
+                    </div>
+                  </ScrollArea>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="scheduled" className="h-full mt-0 data-[state=inactive]:hidden">
+                <ScheduledLeadsCalendar 
+                  scheduledLeads={scheduledLeads} 
+                  loading={loadingScheduled} 
+                />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

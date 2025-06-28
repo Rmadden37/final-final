@@ -1,149 +1,100 @@
-// types/index.ts
+// src/types/index.ts
+import { Timestamp } from 'firebase/firestore';
 
-// If you're using Firebase Firestore
-import type { Timestamp } from 'firebase/firestore';
+export type LeadStatus = 
+  | "waiting_assignment" 
+  | "scheduled" 
+  | "rescheduled" 
+  | "accepted" 
+  | "in_process" 
+  | "completed" 
+  | "canceled" 
+  | "expired" 
+  | "no_show";
 
-// User role type
-export type UserRole = 'admin' | 'manager' | 'setter' | 'closer';
+export interface Lead {
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  address?: string;
+  status: LeadStatus;
+  teamId: string;
+  dispatchType: string;
+  assignedCloserId?: string | null;
+  assignedCloserName?: string | null;
+  createdAt: Timestamp | null;
+  updatedAt: Timestamp | null;
+  dispositionNotes?: string;
+  scheduledAppointmentTime?: Timestamp | null;
+  setterId?: string | null;
+  setterName?: string | null;
+  setterLocation?: string | null;
+  setterVerified?: boolean;
+  verifiedAt?: Timestamp | null;
+  verifiedBy?: string | null;
+  photoUrls?: string[];
+  
+  // Additional fields that might be present
+  clientName?: string;
+  phone?: string;
+  type?: string;
+  assignedCloser?: string;
+  scheduledTime?: Timestamp | null;
+  submissionTime?: Timestamp | string | null;
+}
 
-// User type
+export interface Closer {
+  uid: string;
+  name: string;
+  status: "On Duty" | "Off Duty";
+  teamId: string;
+  role?: string;
+  avatarUrl?: string;
+  phone?: string;
+  lineupOrder?: number;
+}
+
 export interface User {
   uid: string;
   email: string;
   displayName?: string;
-  role: UserRole;
   teamId?: string;
+  role?: string;
   avatarUrl?: string;
-  createdAt?: Date | Timestamp;
-  updatedAt?: Date | Timestamp;
 }
 
-// Closer type
-export interface Closer {
-  uid: string;
-  name: string;
-  status: 'On Duty' | 'Off Duty';
-  teamId: string;
-  role: UserRole;
-  avatarUrl?: string;
-  phone?: string;
-  lineupOrder?: number;
-  email?: string;
+// Date utility types for Firebase Timestamp handling
+export interface TimestampField {
+  toDate(): Date;
+  toMillis(): number;
 }
 
-// Lead status type
-export type LeadStatus = 
-  | 'new'
-  | 'dispatched'
-  | 'waiting_assignment'
-  | 'scheduled'
-  | 'accepted'
-  | 'in_process'
-  | 'sit'
-  | 'sold'
-  | 'no_sale'
-  | 'canceled'
-  | 'credit_fail';
+// Lead with converted dates for easier handling
+export interface LeadWithDates extends Omit<Lead, 'createdAt' | 'updatedAt' | 'scheduledAppointmentTime' | 'verifiedAt'> {
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  scheduledAppointmentTime: Date | null;
+  verifiedAt: Date | null;
+}
 
-// Lead type
-export interface Lead {
-  id?: string;
-  
-  // Team association
-  teamId: string;
-  
-  // Setter information
-  setter_id: string;
-  setter_name: string;
-  
-  // Customer information
-  customer_name: string;
-  customer_phone?: string;
-  customer_email?: string;
-  customer_address?: string;
-  
-  // Lead details
-  status: LeadStatus;
-  source?: string;
+// Form data types
+export interface LeadFormData {
+  customerName: string;
+  customerPhone: string;
+  address?: string;
+  dispatchType: string;
+  scheduledAppointmentTime?: Date | null;
+  setterId?: string;
+  setterName?: string;
   notes?: string;
-  
-  // Assignment
-  assignedCloserId?: string;
-  assignedCloserName?: string;
-  assigned_closer_id?: string;  // Legacy field
-  assigned_closer_name?: string; // Legacy field
-  
-  // Appointment details
-  appointment_date?: Date | Timestamp;
-  appointment_time?: string;
-  
-  // Results
-  sale_amount?: number;
-  commission_amount?: number;
-  
-  // Timestamps - can be either Date or Firestore Timestamp
-  createdAt: Date | Timestamp;
-  updatedAt?: Date | Timestamp;
-  
-  // Metadata
-  isImmediateDispatch?: boolean;
-  isSelfGenerated?: boolean;
-  
-  // Any additional fields your app uses
-  [key: string]: any;
 }
 
-// Helper function to convert Timestamp to Date
-export function timestampToDate(timestamp: Date | Timestamp | undefined): Date {
-  if (!timestamp) return new Date();
-  
-  // If it's already a Date, return it
-  if (timestamp instanceof Date) return timestamp;
-  
-  // If it's a Firestore Timestamp, convert it
-  if (timestamp && typeof timestamp === 'object' && 'toDate' in timestamp && typeof timestamp.toDate === 'function') {
-    return timestamp.toDate();
-  }
-  
-  // Fallback
-  return new Date();
-}
-
-// Performance types for analytics
-export interface SetterPerformance {
-  uid: string;
-  name: string;
-  totalLeads: number;
-  sitRate: number;
-  failedCreditRate: number;
-  cancelNoShowRate: number;
-}
-
-export interface CloserPerformance {
-  uid: string;
-  name: string;
-  totalAssigned: number;
-  closeRate: number;
-  conversionRate: number;
-  selfGenRate: number;
-}
-
-export interface TeamMetrics {
-  totalLeads: number;
-  totalSits: number;
-  totalSales: number;
-  avgSitRate: number;
-  avgCloseRate: number;
-  avgConversionRate: number;
-  topSetterName: string;
-  topCloserName: string;
-}
-
-export interface TrendData {
-  date: string;
-  totalLeads: number;
-  sitRate: number;
-  closeRate: number;
-  isSpecialPoint?: boolean;
-  pointType?: 'today' | 'projection';
+// Calendar event type for scheduled leads display
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  lead: Lead;
+  status: LeadStatus;
 }
