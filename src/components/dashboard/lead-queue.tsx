@@ -10,9 +10,10 @@ import LeadCard from "./lead-card";
 import ScheduledLeadsCalendar from "./scheduled-leads-calendar";
 import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {ListChecks, CalendarClock, Loader2} from "lucide-react";
+import {ListChecks, CalendarClock, Loader2, Zap, Clock} from "lucide-react";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {useToast} from "@/hooks/use-toast";
+import {Badge} from "@/components/ui/badge";
 
 const FORTY_FIVE_MINUTES_MS = 45 * 60 * 1000;
 const FIFTEEN_MINUTES_MS = 15 * 60 * 1000;
@@ -477,88 +478,120 @@ export default function LeadQueue() {
     return () => clearTimeout(assignmentTimer);
   }, [waitingLeads, availableClosers, loadingWaiting, loadingClosers, user?.teamId, toast]);
 
+  const isLoading = loadingWaiting || loadingScheduled;
+
   return (
-    <div className="lead-queue-container h-full">
-      <Card className="h-full flex flex-col bg-white/95 dark:bg-transparent premium:bg-transparent shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 dark:border-0 premium:border-0 ring-1 ring-white/5 dark:ring-slate-800/20 dark:card-glass dark:glow-turquoise premium:card-glass premium:glow-premium">
-        <CardHeader className="lead-queue-header shrink-0">
-          <CardTitle className="lead-queue-title text-slate-900 dark:text-slate-100 premium:text-glow">
-            <div className="p-1.5 sm:p-2 bg-transparent rounded-lg mr-2 sm:mr-3 dark:glow-turquoise premium:glow-premium premium:icon-hover-glow transition-all duration-300">
-              <ListChecks className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-blue-600 dark:text-blue-400 premium:text-premium-purple premium:nav-icon premium:icon-glow-purple transition-all duration-300" />
+    <Card className="h-full flex flex-col bg-white dark:bg-slate-900 shadow-xl border-0 ring-1 ring-slate-200 dark:ring-slate-800 overflow-hidden">
+      <CardHeader className="shrink-0 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border-b border-blue-100 dark:border-blue-900">
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-500 rounded-lg">
+              <ListChecks className="h-5 w-5 text-white" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-sm sm:text-base lg:text-xl">Lead Queues</span>
-              <span className="lead-queue-subtitle premium:text-premium-teal">
-                Waiting & scheduled leads
-              </span>
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Lead Queues</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Manage waiting & scheduled leads</p>
             </div>
-          </CardTitle>
-          {(loadingWaiting || loadingScheduled) && <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-muted-foreground premium:text-premium-teal premium:nav-icon premium:icon-glow-teal" />}
-        </CardHeader>
-        
-        <CardContent className="flex-grow overflow-hidden px-2 sm:px-4 lg:px-6 pb-2 sm:pb-4 lg:pb-6 bg-transparent">
-          <Tabs defaultValue="waiting" className="flex flex-col h-full">
-            {/* Fixed Tab Navigation */}
-            <div className="tab-navigation shrink-0">
-              <TabsList className="w-full grid grid-cols-2 h-9 sm:h-10 lg:h-11 bg-muted/30 dark:bg-muted/30 rounded-lg p-1 premium:border premium:border-premium-glow">
-                <TabsTrigger 
-                  value="waiting" 
-                  className="tab-button h-7 sm:h-8 lg:h-9 text-xs sm:text-sm lg:text-base font-medium rounded-md transition-all bg-transparent hover:bg-white/20 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white premium:data-[state=active]:bg-gradient-to-r premium:data-[state=active]:from-premium-purple/20 premium:data-[state=active]:to-premium-teal/10 premium:data-[state=active]:border premium:data-[state=active]:border-premium-glow premium:data-[state=active]:glow-premium"
-                >
-                  <ListChecks className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 premium:nav-icon premium:icon-glow-purple transition-all duration-300" /> 
-                  <span className="hidden sm:inline">Waiting</span>
-                  <span className="sm:hidden">Wait</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="scheduled" 
-                  className="tab-button h-7 sm:h-8 lg:h-9 text-xs sm:text-sm lg:text-base font-medium rounded-md transition-all bg-transparent hover:bg-white/20 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-700 dark:data-[state=active]:text-white premium:data-[state=active]:bg-gradient-to-r premium:data-[state=active]:from-premium-teal/20 premium:data-[state=active]:to-premium-purple/10 premium:data-[state=active]:border premium:data-[state=active]:border-premium-glow premium:data-[state=active]:glow-premium"
-                >
-                  <CalendarClock className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 premium:nav-icon premium:icon-glow-teal transition-all duration-300" /> 
+          </div>
+          {isLoading && (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+              <span className="text-sm text-slate-600">Syncing...</span>
+            </div>
+          )}
+        </CardTitle>
+      </CardHeader>
+      
+      <CardContent className="flex-grow overflow-hidden p-0">
+        <Tabs defaultValue="waiting" className="flex flex-col h-full">
+          <div className="shrink-0 border-b border-slate-200 dark:border-slate-700">
+            <TabsList className="w-full h-12 bg-transparent rounded-none p-0">
+              <TabsTrigger 
+                value="waiting" 
+                className="flex-1 h-12 rounded-none border-r border-slate-200 dark:border-slate-700 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 dark:data-[state=active]:bg-blue-950/50 dark:data-[state=active]:text-blue-400"
+              >
+                <div className="flex items-center gap-2">
+                  <Zap className="h-4 w-4" />
+                  <span className="hidden sm:inline">Waiting Assignment</span>
+                  <span className="sm:hidden">Waiting</span>
+                  {waitingLeads.length > 0 && (
+                    <Badge variant="secondary" className="ml-1 bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400">
+                      {waitingLeads.length}
+                    </Badge>
+                  )}
+                </div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="scheduled" 
+                className="flex-1 h-12 rounded-none data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700 data-[state=active]:border-b-2 data-[state=active]:border-purple-500 dark:data-[state=active]:bg-purple-950/50 dark:data-[state=active]:text-purple-400"
+              >
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
                   <span className="hidden sm:inline">Scheduled</span>
                   <span className="sm:hidden">Sched</span>
-                </TabsTrigger>
-              </TabsList>
-            </div>
+                  {scheduledLeads.length > 0 && (
+                    <Badge variant="secondary" className="ml-1 bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400">
+                      {scheduledLeads.length}
+                    </Badge>
+                  )}
+                </div>
+              </TabsTrigger>
+            </TabsList>
+          </div>
+          
+          <div className="flex-1 overflow-hidden">
+            <TabsContent value="waiting" className="h-full mt-0 data-[state=inactive]:hidden">
+              {loadingWaiting ? (
+                <div className="flex h-full items-center justify-center">
+                  <div className="text-center space-y-4">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto" />
+                    <div>
+                      <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Loading waiting leads...</p>
+                      <p className="text-xs text-slate-500">Fetching latest data</p>
+                    </div>
+                  </div>
+                </div>
+              ) : waitingLeads.length === 0 ? (
+                <div className="flex h-full flex-col items-center justify-center text-center py-12 px-6">
+                  <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/50 rounded-full mb-4">
+                    <ListChecks className="h-8 w-8 text-blue-500" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">Queue is Empty</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 max-w-sm">
+                    No leads are currently waiting for assignment. New leads will appear here automatically when they're ready to be processed.
+                  </p>
+                  <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+                    <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span>System is actively monitoring for new leads</span>
+                  </div>
+                </div>
+              ) : (
+                <ScrollArea className="h-full">
+                  <div className="p-4 space-y-3">
+                    {waitingLeads.map((lead, index) => (
+                      <div key={lead.id} className="relative">
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-red-400 to-red-600 rounded-r-full"></div>
+                        <div className="ml-3">
+                          <LeadCard lead={lead} context="queue-waiting" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              )}
+            </TabsContent>
             
-            <div className="flex-1 overflow-hidden mt-2 sm:mt-4">
-              <TabsContent value="waiting" className="h-full mt-0 data-[state=inactive]:hidden">
-                {loadingWaiting ? (
-                  <div className="flex h-full items-center justify-center">
-                    <div className="text-center">
-                      <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary mx-auto mb-3 premium:text-premium-purple premium:nav-icon premium:icon-glow-purple premium:icon-pulse" />
-                      <p className="text-sm text-muted-foreground">Loading waiting leads...</p>
-                    </div>
-                  </div>
-                ) : waitingLeads.length === 0 ? (
-                  <div className="flex h-full flex-col items-center justify-center text-center py-8">
-                    <div className="p-3 bg-transparent rounded-full mb-3 premium:glow-premium transition-all duration-300">
-                      <ListChecks className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground premium:text-premium-purple premium:nav-icon premium:icon-glow-purple" />
-                    </div>
-                    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 premium:text-glow">Queue Empty</h3>
-                    <p className="text-muted-foreground text-xs sm:text-sm max-w-xs">
-                      No leads are currently waiting for assignment. New leads will appear here automatically.
-                    </p>
-                  </div>
-                ) : (
-                  <ScrollArea className="h-full">
-                    <div className="space-y-3 pr-2">
-                      {waitingLeads.map((lead) => (
-                        <LeadCard key={lead.id} lead={lead} context="queue-waiting" />
-                      ))}
-                    </div>
-                  </ScrollArea>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="scheduled" className="h-full mt-0 data-[state=inactive]:hidden">
+            <TabsContent value="scheduled" className="h-full mt-0 data-[state=inactive]:hidden">
+              <div className="h-full p-4">
                 <ScheduledLeadsCalendar 
                   scheduledLeads={scheduledLeads} 
                   loading={loadingScheduled} 
                 />
-              </TabsContent>
-            </div>
-          </Tabs>
-        </CardContent>
-      </Card>
-    </div>
+              </div>
+            </TabsContent>
+          </div>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 }

@@ -34,7 +34,7 @@ export interface Lead {
   verifiedBy?: string | null;
   photoUrls?: string[];
   
-  // Additional fields that might be present
+  // Additional fields that might be present in Firestore
   clientName?: string;
   phone?: string;
   type?: string;
@@ -61,40 +61,4 @@ export interface User {
   teamId?: string;
   role?: string;
   avatarUrl?: string;
-}
-
-// Date utility types for Firebase Timestamp handling
-export interface TimestampField {
-  toDate(): Date;
-  toMillis(): number;
-}
-
-// Lead with converted dates for easier handling
-export interface LeadWithDates extends Omit<Lead, 'createdAt' | 'updatedAt' | 'scheduledAppointmentTime' | 'verifiedAt'> {
-  createdAt: Date | null;
-  updatedAt: Date | null;
-  scheduledAppointmentTime: Date | null;
-  verifiedAt: Date | null;
-}
-
-// Form data types
-export interface LeadFormData {
-  customerName: string;
-  customerPhone: string;
-  address?: string;
-  dispatchType: string;
-  scheduledAppointmentTime?: Date | null;
-  setterId?: string;
-  setterName?: string;
-  notes?: string;
-}
-
-// Calendar event type for scheduled leads display
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  lead: Lead;
-  status: LeadStatus;
 }

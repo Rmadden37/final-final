@@ -11,8 +11,9 @@ import LeadCard from "./lead-card";
 import CloserCard from "./closer-card";
 import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card";
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
-import { Activity, Loader2, Ghost } from "lucide-react";
+import { Activity, Loader2, Zap, UserCheck } from "lucide-react";
 import {ScrollArea} from "@/components/ui/scroll-area";
+import {Badge} from "@/components/ui/badge";
 
 interface InProcessDisplayItem {
   lead: Lead;
@@ -128,8 +129,7 @@ export default function InProcessLeads() {
     if (canAccessLead) {
       if (user?.role === "closer" && 
           user.uid === lead.assignedCloserId && 
-          (lead.status === "waiting_assignment" || lead.status === "scheduled") && 
-          !lead.acceptedAt) {
+          (lead.status === "waiting_assignment" || lead.status === "scheduled")) {
         
         try {
           const result = await acceptJobFunction({ leadId: lead.id });
@@ -233,66 +233,125 @@ export default function InProcessLeads() {
     }
   };
 
+  // Group display items by status
+  const groupedItems = displayItems.reduce((acc, item) => {
+    const status = item.lead.status;
+    if (!acc[status]) acc[status] = [];
+    acc[status].push(item);
+    return acc;
+  }, {} as Record<string, InProcessDisplayItem[]>);
+
+  const getStatusInfo = (status: string) => {
+    switch (status) {
+      case "waiting_assignment":
+        return { label: "Pending Assignment", color: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-400", icon: Activity };
+      case "accepted":
+        return { label: "Accepted", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400", icon: UserCheck };
+      case "in_process":
+        return { label: "In Progress", color: "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400", icon: Zap };
+      default:
+        return { label: status.replace("_", " "), color: "bg-gray-100 text-gray-700 dark:bg-gray-900/50 dark:text-gray-400", icon: Activity };
+    }
+  };
+
   return (
-    <Card className="h-full flex flex-col bg-white dark:bg-slate-900 shadow-lg hover:shadow-xl transition-all duration-200 border-0 ring-1 ring-slate-200 dark:ring-slate-800">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 px-4 pt-4 shrink-0">
-        <CardTitle className="text-lg sm:text-xl font-bold font-headline flex items-center text-slate-900 dark:text-slate-100 premium:text-premium-purple premium:text-glow">
-          <Activity className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-green-500 animate-pulse premium:icon-glow-teal" />
-          <div className="flex flex-col min-w-0">
-            <span className="text-sm sm:text-base leading-tight">In Process Leads</span>
-            <span className="text-xs font-normal text-muted-foreground premium:text-premium-teal truncate">Active customer interactions</span>
+    <Card className="h-full flex flex-col bg-white dark:bg-slate-900 shadow-xl border-0 ring-1 ring-slate-200 dark:ring-slate-800 overflow-hidden">
+      <CardHeader className="shrink-0 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 border-b border-green-100 dark:border-green-900">
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-500 rounded-lg">
+              <Activity className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Active Leads</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Currently being processed</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-green-500" />
+                <span className="text-sm text-slate-600">Loading...</span>
+              </div>
+            ) : (
+              <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400">
+                {displayItems.length} Active
+              </Badge>
+            )}
           </div>
         </CardTitle>
-        {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground shrink-0" />}
       </CardHeader>
       
-      <CardContent className="flex-grow overflow-hidden px-4 pb-4">
+      <CardContent className="flex-grow overflow-hidden p-0">
         {isLoading ? (
           <div className="flex h-full items-center justify-center">
-            <div className="text-center">
-              <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">Loading leads...</p>
+            <div className="text-center space-y-4">
+              <Loader2 className="h-8 w-8 animate-spin text-green-500 mx-auto" />
+              <div>
+                <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Loading active leads...</p>
+                <p className="text-xs text-slate-500">Fetching current assignments</p>
+              </div>
             </div>
           </div>
         ) : displayItems.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center text-center py-8">
-            <div className="flex items-center justify-center mb-4" style={{blockSize: 48}}>
-              <Ghost className="h-8 w-8 sm:h-12 sm:w-12 text-white stroke-2" fill="none" stroke="currentColor" strokeWidth={2} />
+          <div className="flex h-full flex-col items-center justify-center text-center py-12 px-6">
+            <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/50 rounded-full mb-4">
+              <Activity className="h-8 w-8 text-green-500" />
             </div>
-            <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">All Quiet</h3>
-            <p className="text-muted-foreground text-sm max-w-xs">
-              No leads are currently being processed. New leads will appear here when closers start working on them.
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">All Quiet</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 max-w-sm">
+              No leads are currently being processed. New assignments will appear here when closers start working on them.
             </p>
+            <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+              <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span>Ready for new assignments</span>
+            </div>
           </div>
         ) : (
-          <div className="h-full overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="space-y-3 pr-2">
-                {displayItems.map(({lead, closer}, index) => {
-                  const showDropdown = (user?.role === "manager" || user?.role === "admin") ? true :
-                    (user?.role === "closer" && (lead.status === "in_process" || lead.status === "accepted"));
-                  
-                  return (
-                    <div key={lead.id}>
-                      {closer && (
-                        <CloserCard
-                          closer={closer}
-                          assignedLeadName={lead.customerName}
-                          allowInteractiveToggle={false}
-                          onLeadClick={() => handleLeadClick(lead)}
-                          onDispositionChange={(status) => handleDispositionChange(lead.id, status)}
-                          showDispositionSelector={showDropdown}
-                          currentLeadStatus={lead.status}
-                          leadId={lead.id}
-                          position={index + 1}
-                        />
-                      )}
+          <ScrollArea className="h-full">
+            <div className="p-4 space-y-6">
+              {Object.entries(groupedItems).map(([status, items]) => {
+                const statusInfo = getStatusInfo(status);
+                const StatusIcon = statusInfo.icon;
+                
+                return (
+                  <div key={status} className="space-y-3">
+                    <div className="flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-700">
+                      <StatusIcon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                      <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                        {statusInfo.label}
+                      </h4>
+                      <Badge variant="secondary" className={`text-xs ${statusInfo.color}`}>
+                        {items.length}
+                      </Badge>
                     </div>
-                  );
-                })}
-              </div>
-            </ScrollArea>
-          </div>
+                    <div className="space-y-3">
+                      {items.map(({lead, closer}, index) => {
+                        const showDropdown = (user?.role === "manager" || user?.role === "admin") ? true :
+                          (user?.role === "closer" && (lead.status === "in_process" || lead.status === "accepted"));
+                        
+                        return (
+                          <div key={lead.id} className="relative">
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-green-400 to-green-600 rounded-r-full"></div>
+                            <div className="ml-3">
+                              {closer && (
+                                <CloserCard
+                                  closer={closer}
+                                  assignedLeadName={lead.customerName}
+                                  allowInteractiveToggle={false}
+                                  position={index + 1}
+                                />
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </ScrollArea>
         )}
       </CardContent>
       

@@ -1,0 +1,137 @@
+/* Dashboard Layout CSS - Complete layout system */
+/* File: src/styles/dashboard-layout.css */
+
+/* Main dashboard page container with sidebar offset */
+.dashboard-page {
+  margin-left: 60px; /* Collapsed sidebar width */
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  padding: 1rem;
+  background: #f8fafc;
+}
+
+/* When sidebar is expanded */
+.sidebar-expanded .dashboard-page {
+  margin-left: 240px; /* Expanded sidebar width */
+}
+
+/* Dashboard title section */
+.dashboard-title-section {
+  margin-bottom: 2rem;
+  padding-left: 1rem;
+}
+
+.dashboard-title-section h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.dashboard-subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0.5rem 0 0 0;
+}
+
+/* Dashboard grid layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-top: 0;
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Card positioning */
+.lead-queue-card {
+  grid-column: 1;
+}
+
+.closer-lineup-card {
+  grid-column: 2;
+}
+
+/* Mobile responsive layout */
+@media (max-width: 768px) {
+  .dashboard-page {
+    margin-left: 0;
+    padding: 1rem;
+    padding-top: 5rem; /* Space for mobile header */
+  }
+  
+  .sidebar-expanded .dashboard-page {
+    margin-left: 0;
+  }
+  
+  .dashboard-title-section {
+    padding-left: 0;
+    margin-bottom: 1.5rem;
+  }
+  
+  .dashboard-title-section h1 {
+    font-size: 1.5rem;
+  }
+  
+  .lead-queue-card,
+  .closer-lineup-card {
+    grid-column: 1;
+  }
+  
+  /* Mobile header */
+  .mobile-dashboard-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4rem;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    z-index: 100;
+  }
+  
+  .mobile-menu-toggle {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    color: #6b7280;
+    cursor: pointer;
+    margin-right: 1rem;
+  }
+  
+  .mobile-menu-toggle:hover {
+    background: #f3f4f6;
+    color: #374151;
+  }
+  
+  .mobile-dashboard-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+  }
+}
+
+/* Hide mobile header on desktop */
+@media (min-width: 769px) {
+  .mobile-dashboard-header {
+    display: none;
+  }
+}

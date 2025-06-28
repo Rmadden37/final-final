@@ -1,5 +1,5 @@
 /* Complete Sidebar Styling Fixes */
-/* Add this to your styles folder */
+/* Minimal changes to fix mobile without breaking desktop */
 
 /* ===== SIDEBAR BASE STYLES ===== */
 [data-sidebar="sidebar"] {
@@ -255,8 +255,15 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* ===== MOBILE SIDEBAR ===== */
+/* ===== MOBILE SIDEBAR - ONLY MOBILE FIXES ===== */
 @media (max-width: 768px) {
+  /* CRITICAL: Fix mobile content overlap */
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding-top: 60px; /* Space for mobile header */
+  }
+
   /* Full width on mobile */
   [data-sidebar="sidebar"] {
     position: fixed;
@@ -288,23 +295,7 @@
   }
 }
 
-/* --- MOBILE LEAD QUEUES & TABS & RESPONSIVE SIZING FIXES --- */
-@media (max-width: 640px) {
-  /* ...existing code... */
+/* ===== DESKTOP - Keep existing behavior ===== */
+@media (min-width: 769px) {
+  /* Don't override desktop layout - let existing CSS handle it */
 }
-
-/* --- EXTRA SMALL MOBILE (max-inline-size: 425px) --- */
-@media (max-inline-size: 425px) {
-  /* ...existing code... */
-}
-
-/* --- TINY MOBILE (max-inline-size: 375px) --- */
-@media (max-inline-size: 375px) {
-  /* ...existing code... */
-}
-
-/* ===== COLOR CORRECTIONS ===== */
-/* ...existing code... */
-
-/* ===== SPECIFIC FIXES ===== */
-/* ...existing code... */

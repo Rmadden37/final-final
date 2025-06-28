@@ -432,3 +432,104 @@
 .toast-error {
   border-left: 4px solid #ef4444;
 }
+/* Header layout fixes for sidebar toggle overlap */
+/* ADD this to the END of your existing src/styles/components-styles.css file */
+
+/* Header layout - prevents overlap with sidebar toggle */
+.header-layout {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 3.5rem;
+  padding: 0 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: hsl(var(--background));
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+/* Sidebar toggle button positioning */
+.sidebar-toggle-btn {
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+/* Centered page title */
+.page-title-centered {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  min-width: 0;
+}
+
+.page-title-centered h1,
+.page-title-centered .title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 640px) {
+  .page-title-centered h1,
+  .page-title-centered .title {
+    font-size: 1.5rem;
+  }
+}
+
+/* Header actions on the right */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .header-actions {
+    gap: 0.75rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .header-actions {
+    gap: 1rem;
+  }
+}
+
+/* Mobile-specific header adjustments */
+@media (max-width: 768px) {
+  .header-layout {
+    padding: 0 1rem;
+  }
+  
+  .page-title-centered h1,
+  .page-title-centered .title {
+    font-size: 1.125rem;
+    margin-left: -2rem; /* Compensate for sidebar toggle width */
+  }
+}
+
+/* Dashboard header specific styling */
+.dashboard-header {
+  background: hsl(var(--background));
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.dashboard-title {
+  background: linear-gradient(135deg, #3574F2 0%, #5096F2 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}

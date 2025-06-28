@@ -1,7 +1,4 @@
-/* Critical CSS - Minimal styles needed for initial render */
-/* This file should be kept as small as possible */
-
-/* Tailwind base layers */
+/* Enhanced global styles with proper sidebar spacing */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -15,33 +12,65 @@
     --safe-area-inset-bottom: env(safe-area-inset-bottom);
     --safe-area-inset-left: env(safe-area-inset-left);
     
-    /* Sidebar variables - use standard units */
-    --sidebar-width-collapsed: 60px;
-    --sidebar-width-expanded: 240px;
+    /* Sidebar variables - FIXED VALUES */
+    --sidebar-width-collapsed: 70px;
+    --sidebar-width-expanded: 280px;
     
-    /* Essential theme variables only */
-    --background: 213 33% 95%;
-    --foreground: 215 25% 17%;
+    /* Enhanced theme variables */
+    --background: 0 0% 100%;
+    --foreground: 222 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 17%;
-    --border: 216 12% 84%;
-    --primary: 185 85% 45%;
-    --primary-foreground: 0 0% 100%;
+    --card-foreground: 222 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 84% 4.9%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
     --radius: 0.5rem;
+    
+    /* Dashboard specific colors */
+    --success: 142 76% 36%;
+    --success-foreground: 355 100% 97%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+    --info: 199 89% 48%;
+    --info-foreground: 210 40% 98%;
   }
 
-  /* Dark theme essentials */
+  /* Dark theme */
   .dark {
-    --background: 220 13% 7%;
-    --foreground: 220 10% 92%;
-    --card: 220 10% 16%;
-    --card-foreground: 220 10% 92%;
-    --border: 220 10% 22%;
+    --background: 222 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
     --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: 222 84% 4.9%;
+    --secondary: 217 32% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 32% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 32% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: 224 71% 4%;
   }
 
-  /* Critical base styles */
+  /* Enhanced base styles */
   * {
     border-color: hsl(var(--border));
     box-sizing: border-box;
@@ -61,6 +90,9 @@
     overflow-x: hidden;
     margin: 0;
     padding: 0;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Prevent layout shift */
@@ -69,53 +101,58 @@
     height: auto;
   }
 
-  /* Critical mobile styles */
+  /* Enhanced mobile styles */
   @media (max-width: 768px) {
     body {
       -webkit-text-size-adjust: 100%;
     }
     
-    /* Touch targets - use standard properties */
-    button, [role="button"] {
+    /* Touch targets */
+    button, 
+    [role="button"], 
+    input[type="button"], 
+    input[type="submit"] {
       min-height: 44px;
       min-width: 44px;
     }
   }
 }
 
-/* Main content layout fix */
+/* CRITICAL SIDEBAR LAYOUT FIXES */
 @layer utilities {
-  /* Main content area with sidebar spacing - use standard properties */
+  /* Main content area with PROPER sidebar spacing */
   .main-content {
-    margin-left: 60px; /* Use fixed value instead of CSS variable for better compatibility */
-    padding: 1rem;
+    margin-left: var(--sidebar-width-collapsed);
     transition: margin-left 0.3s ease;
     min-height: 100vh;
+    width: calc(100% - var(--sidebar-width-collapsed));
   }
 
   /* When sidebar is expanded */
   .sidebar-expanded .main-content {
-    margin-left: 240px; /* Use fixed value instead of CSS variable */
+    margin-left: var(--sidebar-width-expanded);
+    width: calc(100% - var(--sidebar-width-expanded));
   }
 
-  /* Page title spacing */
+  /* Page title styling */
   .page-title {
-    margin-bottom: 1.5rem;
     font-size: 1.875rem;
     font-weight: 700;
     color: hsl(var(--foreground));
+    margin-bottom: 1.5rem;
   }
 
-  /* Mobile responsive adjustments */
+  /* MOBILE RESPONSIVE - Remove sidebar margin */
   @media (max-width: 768px) {
     .main-content {
-      margin-left: 0;
-      padding: 1rem;
+      margin-left: 0 !important;
+      width: 100% !important;
       padding-top: 70px; /* Account for mobile header */
     }
     
     .sidebar-expanded .main-content {
-      margin-left: 0;
+      margin-left: 0 !important;
+      width: 100% !important;
     }
     
     .page-title {
@@ -124,12 +161,14 @@
     }
   }
 
-  /* Container utilities */
+  /* Enhanced container utilities */
   .container {
     width: 100%;
     max-width: 100%;
     padding-right: 1rem;
     padding-left: 1rem;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   @media (min-width: 1400px) {
@@ -140,59 +179,95 @@
     }
   }
 
-  /* Display utilities */
-  .hidden {
-    display: none;
+  /* Dashboard specific layout fixes */
+  .dashboard-layout {
+    margin-left: var(--sidebar-width-collapsed);
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+    background: #f8fafc;
   }
 
-  .block {
-    display: block;
+  .sidebar-expanded .dashboard-layout {
+    margin-left: var(--sidebar-width-expanded);
   }
 
-  .flex {
-    display: flex;
+  @media (max-width: 768px) {
+    .dashboard-layout {
+      margin-left: 0;
+    }
   }
 
-  .grid {
-    display: grid;
-  }
-
-  /* Spacing utilities */
-  .p-4 {
-    padding: 1rem;
-  }
-
-  .m-0 {
-    margin: 0;
-  }
-
-  /* Text utilities */
-  .text-center {
-    text-align: center;
-  }
-
-  .font-bold {
-    font-weight: 700;
-  }
-
-  /* Loading states */
+  /* Loading states with better animations */
   .skeleton {
-    animation: skeleton-loading 1s linear infinite alternate;
+    background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--border)) 50%, hsl(var(--muted)) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+    border-radius: 0.5rem;
   }
 
   @keyframes skeleton-loading {
     0% {
-      background-color: hsl(200, 20%, 80%);
+      background-position: 200% 0;
     }
     100% {
-      background-color: hsl(200, 20%, 95%);
+      background-position: -200% 0;
     }
+  }
+
+  /* Status colors */
+  .status-success {
+    background-color: rgb(240 253 244);
+    color: rgb(21 128 61);
+    border-color: rgb(187 247 208);
+  }
+  
+  .status-warning {
+    background-color: rgb(254 252 232);
+    color: rgb(161 98 7);
+    border-color: rgb(254 240 138);
+  }
+  
+  .status-error {
+    background-color: rgb(254 242 242);
+    color: rgb(185 28 28);
+    border-color: rgb(254 202 202);
+  }
+  
+  .status-info {
+    background-color: rgb(239 246 255);
+    color: rgb(29 78 216);
+    border-color: rgb(191 219 254);
+  }
+
+  /* Dark mode status colors */
+  .dark .status-success {
+    background-color: rgb(6 78 59 / 0.5);
+    color: rgb(34 197 94);
+    border-color: rgb(6 78 59);
+  }
+  
+  .dark .status-warning {
+    background-color: rgb(120 53 15 / 0.5);
+    color: rgb(251 191 36);
+    border-color: rgb(120 53 15);
+  }
+  
+  .dark .status-error {
+    background-color: rgb(127 29 29 / 0.5);
+    color: rgb(248 113 113);
+    border-color: rgb(127 29 29);
+  }
+  
+  .dark .status-info {
+    background-color: rgb(30 58 138 / 0.5);
+    color: rgb(96 165 250);
+    border-color: rgb(30 58 138);
   }
 }
 
-/* Critical component styles */
+/* Enhanced component styles */
 @layer components {
-  /* App shell */
+  /* App shell with better structure */
   .app-header {
     position: sticky;
     top: 0;
@@ -200,9 +275,26 @@
     height: 3.5rem;
     display: flex;
     align-items: center;
-    padding: 0 1rem;
-    background: hsl(var(--background));
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    background: hsl(var(--background) / 0.95);
+    backdrop-filter: blur(8px);
     border-bottom: 1px solid hsl(var(--border));
+    transition: all 0.3s ease;
+    margin-left: var(--sidebar-width-collapsed);
+    width: calc(100% - var(--sidebar-width-collapsed));
+  }
+
+  .sidebar-expanded .app-header {
+    margin-left: var(--sidebar-width-expanded);
+    width: calc(100% - var(--sidebar-width-expanded));
+  }
+
+  @media (max-width: 768px) {
+    .app-header {
+      margin-left: 0;
+      width: 100%;
+    }
   }
 
   .app-main {
@@ -210,36 +302,74 @@
     overflow-y: auto;
   }
 
-  /* Basic button */
+  /* Enhanced button styles */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0.5rem; /* Use standard value instead of var(--radius) */
+    border-radius: 0.375rem;
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     font-weight: 500;
-    transition: opacity 0.2s;
-    cursor: pointer;
-    user-select: none;
+    transition: all 0.2s ease;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
   }
 
   .btn:disabled {
+    pointer-events: none;
     opacity: 0.5;
-    cursor: not-allowed;
   }
 
   .btn-primary {
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
+    box-shadow: 0 4px 6px -1px hsl(var(--primary) / 0.25);
   }
 
-  /* Basic card */
+  .btn-primary:hover {
+    background: hsl(var(--primary) / 0.9);
+    box-shadow: 0 10px 15px -3px hsl(var(--primary) / 0.3);
+  }
+
+  /* Enhanced card styles */
   .card {
-    border-radius: 0.5rem; /* Use standard value instead of var(--radius) */
+    border-radius: 0.5rem;
     border: 1px solid hsl(var(--border));
     background: hsl(var(--card));
     color: hsl(var(--card-foreground));
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .card-interactive {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    transform: translateY(-1px);
+    cursor: pointer;
+  }
+
+  .card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 1.5rem;
+  }
+
+  .card-content {
+    padding: 1.5rem;
+    padding-top: 0;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    padding-top: 0;
   }
 }
 
@@ -248,12 +378,74 @@
   display: inline-block;
   width: 1.5rem;
   height: 1.5rem;
-  border: 2px solid hsl(var(--border));
-  border-top-color: hsl(var(--primary));
+  border: 2px solid currentColor;
+  border-top-color: transparent;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to { 
+    transform: rotate(360deg); 
+  }
+}
+
+/* Enhanced scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground)) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted-foreground));
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--foreground));
+}
+/* Add this to the END of your src/app/globals.css file */
+
+/* Hide only the title in the header area, not the main page title */
+@layer utilities {
+  /* Target the header sticky element specifically */
+  header.sticky h1,
+  header.sticky h2,
+  header.sticky span,
+  .sticky.top-0 h1,
+  .sticky.top-0 h2,
+  .sticky.top-0 span[class*="title"],
+  .sticky.top-0 span[class*="text-"],
+  .sticky.top-0 div[class*="title"] {
+    display: none !important;
+  }
+
+  /* More specific targeting for header content */
+  .sticky.top-0.flex h1,
+  .sticky.top-0.flex h2,
+  .sticky.top-0.flex span:not([class*="button"]):not([class*="icon"]) {
+    display: none !important;
+  }
+
+  /* Target text in the header gap area */
+  .sticky.top-0 .gap-4 h1,
+  .sticky.top-0 .gap-4 h2,
+  .sticky.top-0 .gap-4 span:first-child {
+    display: none !important;
+  }
+}
+
+/* Alternative: Target only elements in the header that could be titles */
+header h1, header h2, header .title {
+  display: none !important;
 }

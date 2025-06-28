@@ -2,16 +2,18 @@
 "use client";
 
 import {useState, useEffect} from "react";
-import type {Closer, Lead, UserRole} from "@/types";
+import type {Closer, Lead} from "@/types";
 import {useAuth} from "@/hooks/use-auth";
 import {useToast} from "@/hooks/use-toast";
 import {db} from "@/lib/firebase";
 import {collection, query, where, onSnapshot, orderBy} from "firebase/firestore";
 import CloserCard from "./closer-card";
 import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card";
-import { Users, Loader2, Activity } from "lucide-react";
+import { Users, Loader2, UserCheck, Settings } from "lucide-react";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import ManageClosersModal from "./off-duty-closers-modal";
+import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
 
 export default function CloserLineup() {
   const {user} = useAuth();
@@ -101,7 +103,7 @@ export default function CloserLineup() {
             name: data.name,
             status: data.status as "On Duty" | "Off Duty",
             teamId: data.teamId,
-            role: data.role as UserRole,
+            role: data.role,
             avatarUrl: data.avatarUrl,
             phone: data.phone,
             lineupOrder: data.lineupOrder,
@@ -167,7 +169,7 @@ export default function CloserLineup() {
 
   const isOverallLoading = isLoadingAssignedCloserIds || isLoadingClosersForLineup;
 
-  const handleCardClick = () => {
+  const handleManageClick = () => {
     if (canManageClosers) {
       setIsManageModalOpen(true);
     }
@@ -179,46 +181,56 @@ export default function CloserLineup() {
         closers: [],
         emptyTitle: "Loading...",
         emptyDescription: "Please wait while we load your data.",
-        titleSuffix: 'Loading'
+        titleSuffix: 'Loading',
+        availableCount: 0,
+        workingCount: 0
       };
     }
 
     if (isCloser) {
       const displayClosers = allOnDutyClosers;
-      const emptyTitle = "No On Duty Closers";
+      const availableCount = closersInLineup.length;
+      const workingCount = allOnDutyClosers.length - availableCount;
+      const emptyTitle = "No Team Members Online";
       const emptyDescription = "No closers are currently on duty.";
-      const titleSuffix = 'On duty team members';
+      const titleSuffix = 'Team status overview';
       
       return {
         closers: displayClosers,
         emptyTitle,
         emptyDescription,
-        titleSuffix
+        titleSuffix,
+        availableCount,
+        workingCount
       };
     } else {
       const displayClosers = closersInLineup;
+      const availableCount = closersInLineup.length;
+      const workingCount = allOnDutyClosers.length - availableCount;
       const emptyTitle = "No Available Closers";
       const emptyDescription = "All closers are currently off duty or assigned to leads.";
-      const titleSuffix = 'Available team members';
+      const titleSuffix = 'Available for assignment';
       
       return {
         closers: displayClosers,
         emptyTitle,
         emptyDescription,
-        titleSuffix
+        titleSuffix,
+        availableCount,
+        workingCount
       };
     }
   };
 
-  const { closers: displayClosers, emptyTitle, emptyDescription, titleSuffix } = getDisplayData();
+  const { closers: displayClosers, emptyTitle, emptyDescription, titleSuffix, availableCount, workingCount } = getDisplayData();
 
   if (!user) {
     return (
-      <Card className="h-full flex flex-col bg-white shadow-lg hover:shadow-xl transition-all duration-200 border-0 ring-1 ring-slate-200">
+      <Card className="h-full flex flex-col bg-white dark:bg-slate-900 shadow-xl border-0 ring-1 ring-slate-200 dark:ring-slate-800">
         <CardContent className="flex-grow overflow-hidden px-4 pb-4">
           <div className="flex h-full flex-col items-center justify-center text-center py-8">
-            <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-muted-foreground" />
-            <p className="text-sm text-muted-foreground mt-2">Loading...</p>
+            <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-3" />
+            <p className="text-sm text-slate-600">Loading...</p>
           </div>
         </CardContent>
       </Card>
@@ -227,66 +239,106 @@ export default function CloserLineup() {
 
   return (
     <>
-      <Card 
-        className="h-full flex flex-col bg-white shadow-lg hover:shadow-xl transition-all duration-200 border-0 ring-1 ring-slate-200"
-      >
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 px-4 pt-4 shrink-0">
-          <CardTitle className="text-lg sm:text-xl font-bold font-headline flex items-center text-slate-900 dark:text-slate-100 premium:text-premium-purple premium:text-glow">
-            <div className={
-              `mr-2 rounded-lg flex items-center justify-center p-2 border-2 border-premium-purple dark:border-premium-purple premium:border-premium-purple premium:shadow-premium-purple premium:bg-gradient-to-br premium:from-premium-purple/80 premium:to-premium-teal/80 premium:icon-glow-purple`
-            } onClick={canManageClosers ? handleCardClick : undefined}>
-              <Users className="h-4 w-4 sm:h-5 sm:w-5 text-premium-purple premium:icon-glow-purple" />
+      <Card className="h-full flex flex-col bg-white dark:bg-slate-900 shadow-xl border-0 ring-1 ring-slate-200 dark:ring-slate-800 overflow-hidden">
+        <CardHeader className="shrink-0 bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-950/50 dark:to-violet-950/50 border-b border-purple-100 dark:border-purple-900">
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-500 rounded-lg">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Closer Lineup</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{titleSuffix}</p>
+              </div>
             </div>
-            <div className="flex flex-col min-w-0">
-              <span className="text-sm sm:text-base leading-tight">Closer Lineup</span>
-              <span className="text-xs font-normal text-muted-foreground premium:text-premium-teal truncate">{titleSuffix}</span>
+            <div className="flex items-center gap-2">
+              {isOverallLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin text-purple-500" />
+              ) : (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400">
+                      <UserCheck className="h-3 w-3 mr-1" />
+                      {availableCount}
+                    </Badge>
+                    {workingCount > 0 && (
+                      <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400">
+                        <Users className="h-3 w-3 mr-1" />
+                        {workingCount}
+                      </Badge>
+                    )}
+                  </div>
+                  {canManageClosers && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleManageClick}
+                      className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900 hover:bg-white/50"
+                    >
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </CardTitle>
-          <div className="flex items-center gap-2 shrink-0">
-            {isOverallLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-          </div>
         </CardHeader>
         
-        <CardContent className="flex-grow overflow-hidden px-4 pb-4">
+        <CardContent className="flex-grow overflow-hidden p-0">
           {displayClosers.length === 0 && !isOverallLoading ? (
-            <div className="flex h-full flex-col items-center justify-center text-center py-8">
-              <div className="p-3 bg-slate-100 rounded-full mb-3">
-                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
+            <div className="flex h-full flex-col items-center justify-center text-center py-12 px-6">
+              <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/50 rounded-full mb-4">
+                <Users className="h-8 w-8 text-purple-500" />
               </div>
-              <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">{emptyTitle}</h3>
-              <p className="text-muted-foreground text-sm max-w-xs">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">{emptyTitle}</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400 max-w-sm">
                 {emptyDescription}
               </p>
               {user && !user.teamId && (
-                <p className="text-xs text-red-600 bg-red-50 px-3 py-1 rounded-md mt-2">
-                  Error: User missing team assignment
-                </p>
+                <div className="mt-4 p-3 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-lg">
+                  <p className="text-xs text-red-600 dark:text-red-400">
+                    Error: User missing team assignment
+                  </p>
+                </div>
               )}
             </div>
           ) : (
-            <div className="h-full overflow-hidden">
-              <ScrollArea className="h-full">
-                <div className="space-y-3 pr-2">
-                  {displayClosers.map((closer, index) => {
-                    const isCurrentUser = closer.uid === user?.uid;
-                    const isAssigned = assignedLeadCloserIds.has(closer.uid);
-                    
-                    return (
-                      <div key={closer.uid} className={isCurrentUser ? "ring-2 ring-blue-400 rounded-lg" : ""}>
-                        <CloserCard
-                          closer={closer}
-                          allowInteractiveToggle={false}
-                          position={index + 1}
-                          assignedLeadName={
-                            isAssigned ? "Working on lead" : undefined
-                          }
-                        />
+            <ScrollArea className="h-full">
+              <div className="p-4 space-y-3">
+                {displayClosers.map((closer, index) => {
+                  const isCurrentUser = closer.uid === user?.uid;
+                  const isAssigned = assignedLeadCloserIds.has(closer.uid);
+                  
+                  return (
+                    <div key={closer.uid} className="relative">
+                      {isCurrentUser && (
+                        <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/20 to-purple-600/20 rounded-lg"></div>
+                      )}
+                      <div className="relative">
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-400 to-purple-600 rounded-r-full"></div>
+                        <div className="ml-3">
+                          <CloserCard
+                            closer={closer}
+                            allowInteractiveToggle={false}
+                            position={index + 1}
+                            assignedLeadName={
+                              isAssigned ? "Working on lead" : undefined
+                            }
+                          />
+                        </div>
                       </div>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
-            </div>
+                      {isCurrentUser && (
+                        <div className="absolute top-2 right-2">
+                          <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400 text-xs">
+                            You
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
           )}
         </CardContent>
       </Card>

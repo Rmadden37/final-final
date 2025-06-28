@@ -9,7 +9,6 @@ import AvailabilityToggle from "./availability-toggle";
 import {useState} from "react";
 import dynamic from "next/dynamic";
 import TeamChatButton from "./floating-team-chat-button";
-import GearIcon from "@/components/ui/gear-icon";
 
 // Dynamic import with Next.js dynamic to avoid circular dependency issues
 const CreateLeadForm = dynamic(() => import("./create-lead-form"), {
@@ -30,26 +29,26 @@ export default function DashboardHeader() {
   return (
     <>
       <header className="sticky top-0 z-50 flex h-14 items-center gap-4 border-b bg-background px-6">
+        {/* Professional Sidebar toggle */}
         <button
-          className="p-2 flex items-center justify-center z-10"
+          className="flex items-center justify-center h-10 w-10 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:hover:border-slate-600 dark:hover:bg-slate-800 transition-all duration-200 shadow-sm"
           onClick={() => {
             if (typeof window !== 'undefined') {
               const event = new CustomEvent('sidebar-toggle');
               window.dispatchEvent(event);
             }
           }}
-          aria-label="Open sidebar"
+          aria-label="Toggle sidebar"
         >
-          <svg width="28" height="28" fill="none" stroke="currentColor" className="block">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h20M4 14h20M4 21h20" />
+          <svg width="18" height="18" fill="none" stroke="currentColor" className="text-slate-600 dark:text-slate-400">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <div className="flex-1 flex justify-center items-center relative min-w-0">
-          <span className="block w-full text-center truncate text-xl sm:text-2xl font-bold font-headline bg-gradient-to-r from-[#3574F2] to-[#5096F2] bg-clip-text text-transparent pointer-events-none select-none">
-            Dashboard
-          </span>
-        </div>
 
+        {/* Spacer to push content to the right */}
+        <div className="flex-1"></div>
+
+        {/* Right side - Actions and user menu */}
         <div className="flex items-center justify-end space-x-2 sm:space-x-3 md:space-x-4 ml-auto z-10">
           {(user?.role === "setter" || user?.role === "manager" || user?.role === "admin") && (
             <Button 
