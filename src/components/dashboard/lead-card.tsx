@@ -10,7 +10,7 @@ import {
   Ban,
   CalendarClock,
   CreditCard,
-  User as UserIcon,
+  User,
   Phone,
   Clock,
   ClipboardList,
@@ -22,13 +22,12 @@ import {
   Ghost,
 } from "lucide-react";
 import {useAuth} from "@/hooks/use-auth";
-import {useState} from "react";
+import {useState, useEffect, useMemo} from "react";
 import LeadDispositionModal from "./lead-disposition-modal";
 import LeadPhotoGallery from "./lead-photo-gallery";
 import VerifiedCheckbox from "./verified-checkbox";
 import {Badge} from "@/components/ui/badge";
 import {formatDistanceToNow, format as formatDate} from "date-fns";
-
 
 interface LeadCardProps {
   lead: Lead;
@@ -56,40 +55,98 @@ const getStatusIcon = (status: Lead["status"]) => {
       return <CreditCard className="h-4 w-4 text-blue-500" />;
     case "waiting_assignment":
       return <ClipboardList className="h-4 w-4 text-gray-500" />;
+    case "expired":
+      return <Clock className="h-4 w-4 text-gray-500" />;
     default:
-      return null;
+      return <Activity className="h-4 w-4 text-gray-500" />;
   }
 };
 
 const getStatusVariant = (status: Lead["status"]): "default" | "secondary" | "destructive" | "outline" => {
   switch (status) {
-  case "sold": return "default";
-  case "accepted": return "secondary";
-  case "in_process": return "secondary";
-  case "no_sale":
-  case "credit_fail":
-  case "canceled":
-    return "destructive";
-  case "waiting_assignment":
-  case "rescheduled":
-  case "scheduled":
-    return "outline";
-  default: return "outline";
+    case "sold": 
+      return "default";
+    case "accepted": 
+    case "in_process": 
+      return "secondary";
+    case "no_sale":
+    case "credit_fail":
+    case "canceled":
+      return "destructive";
+    case "waiting_assignment":
+    case "rescheduled":
+    case "scheduled":
+    case "expired":
+    default:
+      return "outline";
   }
 };
 
-
 export default function LeadCard({lead, context = "in-process", onLeadClick}: LeadCardProps) {
-    const {user} = useAuth();
+  const {user} = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
 
-  // Allow any closer to disposition leads that are accepted or in process, not just assigned closers
-  // Also allow managers/admins to disposition any lead when viewing all leads or in-process leads
-  // Allow managers to disposition scheduled leads too
-  const canUpdateDisposition = 
-    (user?.role === "closer" && (lead.status === "in_process" || lead.status === "accepted")) ||
-    ((user?.role === "manager" || user?.role === "admin") && (context === "all-leads" || context === "in-process" || context === "queue-scheduled"));
+  // Enhanced permission logic with detailed checks
+  const canUpdateDisposition = useMemo(() => {
+    // For closers: can update if lead is accepted or in_process AND assigned to them
+    if (user?.role === "closer") {
+      const isAssignedToUser = lead.assignedCloserId === user.uid;
+      const isCorrectStatus = (lead.status === "in_process" || lead.status === "accepted");
+      const result = isAssignedToUser && isCorrectStatus;
+      
+      if (context === "in-process") {
+        console.log('🔍 Closer Permission Check:', {
+          leadId: lead.id,
+          isAssignedToUser,
+          isCorrectStatus,
+          leadStatus: lead.status,
+          assignedCloserId: lead.assignedCloserId,
+          userId: user.uid,
+          result
+        });
+      }
+      
+      return result;
+    }
+    
+    // For managers/admins: can update leads in specific contexts
+    if (user?.role === "manager" || user?.role === "admin") {
+      const allowedContexts = ["all-leads", "in-process", "queue-scheduled"];
+      const result = allowedContexts.includes(context);
+      
+      if (context === "in-process") {
+        console.log('🔍 Manager/Admin Permission Check:', {
+          leadId: lead.id,
+          userRole: user.role,
+          context,
+          allowedContexts,
+          result
+        });
+      }
+      
+      return result;
+    }
+    
+    return false;
+  }, [user?.role, user?.uid, lead.assignedCloserId, lead.status, context, lead.id]);
+
+  // Debug logging for in-process context
+  useEffect(() => {
+    if (context === "in-process") {
+      console.log('🔍 LeadCard Debug Info:', {
+        leadId: lead.id,
+        customerName: lead.customerName,
+        userRole: user?.role,
+        userId: user?.uid,
+        leadStatus: lead.status,
+        assignedCloserId: lead.assignedCloserId,
+        context: context,
+        canUpdateDisposition: canUpdateDisposition,
+        hasOnLeadClick: !!onLeadClick
+      });
+    }
+  }, [lead.id, lead.customerName, user?.role, user?.uid, lead.status, lead.assignedCloserId, context, canUpdateDisposition, onLeadClick]);
 
   const timeCreatedAgo = lead.createdAt ? formatDistanceToNow(lead.createdAt.toDate(), {addSuffix: true}) : "N/A";
 
@@ -97,26 +154,53 @@ export default function LeadCard({lead, context = "in-process", onLeadClick}: Le
     formatDate(lead.scheduledAppointmentTime.toDate(), "MMM d, p") :
     null;
 
+  // Fixed card click handler
+  const handleCardClick = () => {
+    console.log('🔥 LeadCard - Card clicked:', { 
+      leadId: lead.id, 
+      customerName: lead.customerName,
+      context: context,
+      userRole: user?.role,
+      hasOnLeadClick: !!onLeadClick,
+      canUpdateDisposition
+    });
+    
+    // Only trigger onLeadClick if it's provided and user has permission
+    if (onLeadClick && canUpdateDisposition) {
+      onLeadClick(lead);
+    } else if (!onLeadClick) {
+      console.log('❌ No onLeadClick handler provided');
+    } else if (!canUpdateDisposition) {
+      console.log('❌ User does not have disposition permission');
+    }
+  };
+
+  // Fixed disposition button handler
+  const handleDispositionClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    console.log('🔥 LeadCard - Disposition button clicked:', { 
+      leadId: lead.id, 
+      customerName: lead.customerName,
+      context: context,
+      userRole: user?.role 
+    });
+    setIsModalOpen(true);
+  };
+
   // Compact display for scheduled leads in the queue
   if (context === "queue-scheduled") {
     return (
       <>
         <Card 
-          className={`shadow-md hover:shadow-lg transition-shadow duration-200 flex flex-col dark:card-glass dark:glow-turquoise dark:border-turquoise/20 ${canUpdateDisposition ? 'cursor-pointer hover:dark:glow-cyan' : ''}`}
-          onClick={canUpdateDisposition ? () => {
-            console.log('🔥 LeadCard - Card clicked for lead details:', { 
-              leadId: lead.id, 
-              customerName: lead.customerName,
-              context: context,
-              userRole: user?.role 
-            });
-            onLeadClick?.(lead);
-          } : undefined}
+          className={`shadow-md hover:shadow-lg transition-shadow duration-200 flex flex-col dark:card-glass dark:glow-turquoise dark:border-turquoise/20 ${
+            canUpdateDisposition && onLeadClick ? 'cursor-pointer hover:dark:glow-cyan' : ''
+          }`}
+          onClick={canUpdateDisposition && onLeadClick ? handleCardClick : undefined}
         >
           <CardHeader className="pb-2 pt-3 px-3 sm:pb-3 sm:pt-4 sm:px-4">
             <div className="flex justify-between items-start">
               <div className="flex items-center flex-1 min-w-0">
-                <UserIcon className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
+                <User className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                 <div className="min-w-0 flex-1">
                   <CardTitle className="text-sm sm:text-base font-semibold font-headline text-left truncate">
                     {lead.customerName}
@@ -146,19 +230,12 @@ export default function LeadCard({lead, context = "in-process", onLeadClick}: Le
                 )}
               </div>
             </div>
-          </CardHeader>            {canUpdateDisposition && (
+          </CardHeader>
+          
+          {canUpdateDisposition && (
             <CardFooter className="pt-0 pb-2 px-3 sm:pb-3 sm:px-4">
               <Button 
-                onClick={(e) => {
-                  console.log('🔥 LeadCard - Update status button clicked:', { 
-                    leadId: lead.id, 
-                    customerName: lead.customerName,
-                    context: context,
-                    userRole: user?.role 
-                  });
-                  e.stopPropagation();
-                  setIsModalOpen(true);
-                }} 
+                onClick={handleDispositionClick}
                 size="sm" 
                 variant="secondary"
                 className="w-full text-xs sm:text-sm dark:card-glass dark:glow-cyan dark:hover:glow-turquoise transition-all duration-300"
@@ -188,7 +265,7 @@ export default function LeadCard({lead, context = "in-process", onLeadClick}: Le
         <CardHeader className="pb-2 pt-3 px-3 sm:pb-3 sm:pt-4 sm:px-4">
           <div className="flex justify-between items-start">
             <div className="flex items-center flex-1 min-w-0">
-              <UserIcon className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
+              <User className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
               <div className="min-w-0 flex-1">
                 <CardTitle className="text-sm sm:text-base font-semibold font-headline text-left truncate">
                   {lead.customerName}
@@ -212,13 +289,19 @@ export default function LeadCard({lead, context = "in-process", onLeadClick}: Le
     );
   }
 
+  // Full lead card display for in-process and all-leads contexts
   return (
     <>
-      <Card className="shadow-md hover:shadow-lg transition-shadow duration-200 flex flex-col dark:card-glass dark:glow-cyan dark:border-white/[.08]">
+      <Card 
+        className={`shadow-md hover:shadow-lg transition-shadow duration-200 flex flex-col dark:card-glass dark:glow-cyan dark:border-white/[.08] ${
+          canUpdateDisposition && onLeadClick ? 'cursor-pointer hover:dark:glow-turquoise' : ''
+        }`}
+        onClick={canUpdateDisposition && onLeadClick ? handleCardClick : undefined}
+      >
         <CardHeader className="pb-3 pt-4 px-4">
           <div className="flex justify-between items-start">
             <div className="flex items-center">
-              <UserIcon className="mr-2 h-5 w-5 text-primary flex-shrink-0" />
+              <User className="mr-2 h-5 w-5 text-primary flex-shrink-0" />
               <div>
                 <CardTitle className="text-base font-semibold font-headline text-left">
                   {lead.customerName}
@@ -236,6 +319,7 @@ export default function LeadCard({lead, context = "in-process", onLeadClick}: Le
             )}
           </div>
         </CardHeader>
+        
         <CardContent className="text-sm space-y-1.5 pb-3 px-4 flex-grow">
           <div className="flex items-center text-muted-foreground">
             <Phone className="mr-2 h-4 w-4 flex-shrink-0" />
@@ -255,7 +339,7 @@ export default function LeadCard({lead, context = "in-process", onLeadClick}: Le
           {/* Display assignment info for full details view */}
           {lead.assignedCloserName && lead.status === "in_process" && (
             <div className="flex items-center text-muted-foreground">
-              <UserIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+              <User className="mr-2 h-4 w-4 flex-shrink-0" />
               <span>Assigned: {lead.assignedCloserName}</span>
             </div>
           )}
@@ -263,7 +347,7 @@ export default function LeadCard({lead, context = "in-process", onLeadClick}: Le
           {/* Display assigned closer for rescheduled leads */}
           {lead.assignedCloserName && lead.status === "rescheduled" && (
             <div className="flex items-center text-blue-600">
-              <UserIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+              <User className="mr-2 h-4 w-4 flex-shrink-0" />
               <span className="font-bold">Assigned: {lead.assignedCloserName}</span>
             </div>
           )}
@@ -277,11 +361,20 @@ export default function LeadCard({lead, context = "in-process", onLeadClick}: Le
 
           {(user?.role === "manager" || user?.role === "admin") && lead.setterName && (
             <div className="flex items-center text-muted-foreground text-xs mt-1">
-              <UserIcon className="mr-2 h-3 w-3 text-gray-400 flex-shrink-0" />
+              <User className="mr-2 h-3 w-3 text-gray-400 flex-shrink-0" />
               <span>Set by: {lead.setterName}</span>
             </div>
           )}
-          {(user?.role === "manager" || user?.role === "admin") && lead.setterLocation && (
+          
+          {/* FIXED: Completely null-safe setterLocation handling */}
+          {(user?.role === "manager" || user?.role === "admin") && 
+           lead.setterLocation && 
+           lead.setterLocation !== null &&
+           typeof lead.setterLocation === 'object' && 
+           'latitude' in lead.setterLocation && 
+           'longitude' in lead.setterLocation &&
+           typeof lead.setterLocation.latitude === 'number' && 
+           typeof lead.setterLocation.longitude === 'number' && (
             <div className="flex items-center text-muted-foreground text-xs mt-1">
               <MapPin className="mr-2 h-3 w-3 text-gray-400 flex-shrink-0" />
               <span>
@@ -293,17 +386,20 @@ export default function LeadCard({lead, context = "in-process", onLeadClick}: Le
                   rel="noopener noreferrer"
                   className="text-primary hover:underline"
                   aria-label="View location on map"
+                  onClick={(e) => e.stopPropagation()} // Prevent card click
                 >
                   (Map)
                 </a>
               </span>
             </div>
           )}
+          
           {lead.photoUrls && lead.photoUrls.length > 0 && (
             <div className="flex items-center text-muted-foreground text-xs mt-1">
               <ImageIcon className="mr-2 h-3 w-3 text-gray-400 flex-shrink-0" />
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent card click
                   console.log('🔥 LeadCard - Photo gallery clicked:', { 
                     leadId: lead.id, 
                     customerName: lead.customerName,
@@ -319,27 +415,22 @@ export default function LeadCard({lead, context = "in-process", onLeadClick}: Le
             </div>
           )}
         </CardContent>
+        
         {canUpdateDisposition && (
           <CardFooter className="pt-0 pb-3 px-4">
             <Button 
-              onClick={() => {
-                console.log('🔥 LeadCard - Disposition modal trigger clicked:', { 
-                  leadId: lead.id, 
-                  customerName: lead.customerName,
-                  context: context,
-                  userRole: user?.role 
-                });
-                setIsModalOpen(true);
-              }} 
+              onClick={handleDispositionClick}
               size="sm" 
               variant="secondary"
               className="w-full dark:card-glass dark:glow-cyan dark:hover:glow-turquoise transition-all duration-300"
             >
-              <ArrowDown className="h-4 w-4" />
+              <ArrowDown className="h-4 w-4 mr-2" />
+              Update Status
             </Button>
           </CardFooter>
         )}
       </Card>
+      
       {canUpdateDisposition && (
         <LeadDispositionModal
           lead={lead}
@@ -347,6 +438,7 @@ export default function LeadCard({lead, context = "in-process", onLeadClick}: Le
           onClose={() => setIsModalOpen(false)}
         />
       )}
+      
       {lead.photoUrls && lead.photoUrls.length > 0 && (
         <LeadPhotoGallery
           photoUrls={lead.photoUrls}

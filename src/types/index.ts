@@ -1,46 +1,58 @@
-// src/types/index.ts
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp } from "firebase/firestore";
+
+export type UserRole = "setter" | "closer" | "manager" | "admin";
+
+export type DispatchType = "immediate" | "scheduled";
 
 export type LeadStatus = 
-  | "waiting_assignment" 
-  | "scheduled" 
-  | "rescheduled" 
+  | "waiting_assignment"
   | "accepted" 
-  | "in_process" 
-  | "completed" 
-  | "canceled" 
-  | "expired" 
-  | "no_show";
+  | "in_process"
+  | "sold"
+  | "no_sale"
+  | "canceled"
+  | "rescheduled"
+  | "scheduled"
+  | "credit_fail"
+  | "expired";
+
+export interface User {
+  uid: string;
+  email: string;
+  displayName?: string | null;
+  role: UserRole;
+  teamId: string;
+  status?: "On Duty" | "Off Duty";
+  avatarUrl?: string;
+  phone?: string;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
 
 export interface Lead {
   id: string;
   customerName: string;
   customerPhone: string;
-  address?: string;
+  address: string;
   status: LeadStatus;
   teamId: string;
-  dispatchType: string;
-  assignedCloserId?: string | null;
-  assignedCloserName?: string | null;
+  dispatchType: DispatchType;
+  assignedCloserId: string | null;
+  assignedCloserName: string | null;
   createdAt: Timestamp | null;
   updatedAt: Timestamp | null;
-  dispositionNotes?: string;
-  scheduledAppointmentTime?: Timestamp | null;
-  setterId?: string | null;
-  setterName?: string | null;
-  setterLocation?: string | null;
+  dispositionNotes: string;
+  scheduledAppointmentTime: Timestamp | null;
+  setterId: string | null;
+  setterName: string | null;
+  setterLocation: {
+    latitude: number;
+    longitude: number;
+  } | null;
   setterVerified?: boolean;
   verifiedAt?: Timestamp | null;
   verifiedBy?: string | null;
-  photoUrls?: string[];
-  
-  // Additional fields that might be present in Firestore
-  clientName?: string;
-  phone?: string;
-  type?: string;
-  assignedCloser?: string;
-  scheduledTime?: Timestamp | null;
-  submissionTime?: Timestamp | string | null;
+  photoUrls: string[];
 }
 
 export interface Closer {
@@ -48,17 +60,20 @@ export interface Closer {
   name: string;
   status: "On Duty" | "Off Duty";
   teamId: string;
-  role?: string;
+  role: UserRole;
   avatarUrl?: string;
   phone?: string;
   lineupOrder?: number;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
 }
 
-export interface User {
-  uid: string;
-  email: string;
-  displayName?: string;
-  teamId?: string;
-  role?: string;
-  avatarUrl?: string;
+export interface Team {
+  id: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  closerOrder?: string[];
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
 }

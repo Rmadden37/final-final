@@ -1,191 +1,280 @@
-// src/components/dashboard/closer-card.tsx
 "use client";
 
-import type {Closer, LeadStatus} from "@/types";
-import {Card, CardContent} from "@/components/ui/card";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {UserCheck, UserX, Loader2} from "lucide-react";
-import {Switch} from "@/components/ui/switch";
-import {Label} from "@/components/ui/label";
-import {Button} from "@/components/ui/button";
-import ProfileCard from "./profile-card";
-
-import {useAuth} from "@/hooks/use-auth";
-import {db} from "@/lib/firebase";
-import {doc, updateDoc, serverTimestamp as _serverTimestamp, Timestamp as _Timestamp} from "firebase/firestore";
-import {useToast} from "@/hooks/use-toast";
-import {useState, useEffect} from "react";
-import { getPhotoUrlByName } from "@/utils/photo-vlookup";
-
-type ExtendedLeadStatus = LeadStatus | 'accepted' | 'scheduled' | 'waiting_assignment' | 'in_process';
+import { useState } from "react";
+import type { Closer } from "@/types";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { 
+  User, 
+  Phone, 
+  Power, 
+  PowerOff,
+  Crown,
+  Shield,
+  CheckCircle,
+  Clock
+} from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { db } from "@/lib/firebase";
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 
 interface CloserCardProps {
   closer: Closer;
-  allowInteractiveToggle?: boolean;
-  canMoveUp?: boolean;
-  canMoveDown?: boolean;
-  showMoveControls?: boolean;
-  isUpdatingOrder?: boolean;
   assignedLeadName?: string;
-  showDispositionSelector?: boolean;
-  currentLeadStatus?: ExtendedLeadStatus;
-  leadId?: string;
+  allowInteractiveToggle?: boolean;
   position?: number;
+  onLeadClick?: () => void;
+  showStatusToggle?: boolean;
+  compact?: boolean;
 }
 
 export default function CloserCard({
   closer,
-  allowInteractiveToggle = true,
-  canMoveUp,
-  canMoveDown,
-  showMoveControls,
-  isUpdatingOrder,
   assignedLeadName,
-  showDispositionSelector = false,
-  currentLeadStatus,
-  leadId,
+  allowInteractiveToggle = true,
   position,
+  onLeadClick,
+  showStatusToggle = true,
+  compact = false
 }: CloserCardProps) {
-  const {user} = useAuth();
-  const {toast} = useToast();
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [photoVlookupUrl, setPhotoVlookupUrl] = useState<string | undefined>(undefined);
-  
-  const isAcceptedLead = currentLeadStatus === "accepted";
-  const isScheduledLead = currentLeadStatus === "scheduled";
-  const isWaitingAssignmentLead = currentLeadStatus === "waiting_assignment";
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  const canUserManagerOrSelfToggle = user && (user.role === "manager" || user.role === "admin" || (user.role === "closer" && user.uid === closer.uid));
-  const showInteractiveSwitch = canUserManagerOrSelfToggle && allowInteractiveToggle && !assignedLeadName;
+  const canToggleStatus = allowInteractiveToggle && 
+    (user?.role === "manager" || user?.role === "admin" || user?.uid === closer.uid);
 
-  // Try to fetch vlookup photo if no avatarUrl
-  useEffect(() => {
-    let ignore = false;
-    if (!closer.avatarUrl && closer.name) {
-      getPhotoUrlByName(closer.name).then(url => {
-        if (!ignore) setPhotoVlookupUrl(url);
-      });
-    }
-    return () => { ignore = true; };
-  }, [closer.avatarUrl, closer.name]);
+  const handleStatusToggle = async () => {
+    if (!canToggleStatus || isUpdating) return;
 
-  const handleToggleCloserAvailability = async (checked: boolean) => {
-    if (!user || !canUserManagerOrSelfToggle || assignedLeadName) return;
-
-    setIsUpdatingStatus(true);
-    const newStatus = checked ? "On Duty" : "Off Duty";
-
+    setIsUpdating(true);
     try {
-      const closerDocRef = doc(db, "closers", closer.uid);
-      await updateDoc(closerDocRef, {
+      const newStatus = closer.status === "On Duty" ? "Off Duty" : "On Duty";
+      const closerRef = doc(db, "closers", closer.uid);
+      
+      await updateDoc(closerRef, {
         status: newStatus,
+        updatedAt: serverTimestamp(),
       });
+
       toast({
         title: "Status Updated",
-        description: `${closer.name || "Closer"}'s status set to ${newStatus}.`,
+        description: `${closer.name} is now ${newStatus}`,
       });
     } catch (error) {
+      console.error("Error updating closer status:", error);
       toast({
-        title: "Update Failed",
-        description: `Could not update ${closer.name || "Closer"}'s status.`,
+        title: "Error",
+        description: "Failed to update status. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setIsUpdatingStatus(false);
+      setIsUpdating(false);
     }
   };
 
-  const currentStatusIsOnDuty = closer.status === "On Duty";
-  const avatarSrc = closer.avatarUrl || photoVlookupUrl || `https://ui-avatars.com/api/?name=${(closer.name || "User").replace(/\s+/g, "+")}&background=random&color=fff`;
-  const avatarDataAiHint = closer.avatarUrl ? undefined : (closer.name?.split(" ")[0]?.toLowerCase() || "person");
+  const getStatusIcon = () => {
+    if (closer.status === "On Duty") {
+      return <Power className="h-3 w-3 text-green-600" />;
+    }
+    return <PowerOff className="h-3 w-3 text-gray-400" />;
+  };
 
-  return (
-    <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700">
-      <CardContent className="p-4 sm:p-5 lg:p-6">
-        <div className="flex items-start space-x-3 sm:space-x-4">
-          {/* Position indicator */}
-          {position && (
-            <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-slate-600 text-sm sm:text-base font-bold rounded-full border border-slate-300">
-              {position}
+  const getStatusColor = () => {
+    if (closer.status === "On Duty") {
+      return "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400";
+    }
+    return "bg-gray-100 text-gray-600 dark:bg-gray-900/50 dark:text-gray-400";
+  };
+
+  const getRoleIcon = () => {
+    switch (closer.role) {
+      case "admin":
+        return <Crown className="h-3 w-3 text-purple-600" />;
+      case "manager":
+        return <Shield className="h-3 w-3 text-blue-600" />;
+      case "closer":
+        return <User className="h-3 w-3 text-gray-600" />;
+      default:
+        return <User className="h-3 w-3 text-gray-600" />;
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map(word => word.charAt(0))
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  if (compact) {
+    return (
+      <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
+        {/* Position Number */}
+        {position && (
+          <div className="flex-shrink-0 w-8 h-8 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+            <span className="text-sm font-bold text-slate-600 dark:text-slate-400">{position}</span>
+          </div>
+        )}
+
+        {/* Avatar */}
+        <Avatar className="h-10 w-10 flex-shrink-0">
+          {closer.avatarUrl && <AvatarImage src={closer.avatarUrl} alt={closer.name} />}
+          <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
+            {getInitials(closer.name)}
+          </AvatarFallback>
+        </Avatar>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h4 className="font-semibold text-slate-900 dark:text-slate-100 truncate">
+              {closer.name}
+            </h4>
+            <Badge variant="secondary" className={`text-xs ${getStatusColor()}`}>
+              {getStatusIcon()}
+              <span className="ml-1">{closer.status}</span>
+            </Badge>
+          </div>
+          
+          {assignedLeadName && (
+            <div className="text-xs text-muted-foreground mt-1">
+              Working on:{" "}
+              {onLeadClick ? (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    console.log('🔥 CloserCard - Lead name clicked:', assignedLeadName);
+                    onLeadClick();
+                  }}
+                  className="text-primary hover:underline font-medium cursor-pointer transition-colors"
+                >
+                  {assignedLeadName}
+                </button>
+              ) : (
+                <span className="font-medium">{assignedLeadName}</span>
+              )}
             </div>
           )}
-          
-          {/* Avatar - Made larger */}
-          <Avatar 
-            className="h-12 w-12 sm:h-14 sm:w-14 lg:h-16 lg:w-16 border-2 shadow-lg flex-shrink-0 cursor-pointer transition-all duration-300 border-slate-200 hover:border-primary hover:shadow-xl"
-            onClick={() => {
-              setIsProfileModalOpen(true);
-            }}
-          >
-            <AvatarImage src={avatarSrc} alt={closer.name || "User"} data-ai-hint={avatarDataAiHint} />
-            <AvatarFallback className="font-bold text-sm sm:text-base lg:text-lg bg-blue-100 text-blue-900">
-              {closer.name ? closer.name.substring(0, 2).toUpperCase() : "N/A"}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Card className="shadow-md hover:shadow-lg transition-shadow duration-200 dark:card-glass dark:glow-cyan dark:border-white/[.08]">
+      <CardContent className="p-4">
+        <div className="flex items-start gap-4">
+          {/* Position Number (if provided) */}
+          {position && (
+            <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">{position}</span>
+            </div>
+          )}
+
+          {/* Avatar */}
+          <Avatar className="h-12 w-12 flex-shrink-0 ring-2 ring-blue-200 dark:ring-blue-900">
+            {closer.avatarUrl && <AvatarImage src={closer.avatarUrl} alt={closer.name} />}
+            <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
+              {getInitials(closer.name)}
             </AvatarFallback>
           </Avatar>
-          
-          <div className="flex-1 min-w-0 pr-2">
-            <div className="flex items-center gap-2">
-              {/* Name - Made larger */}
-              <p className="text-sm sm:text-base lg:text-lg font-bold font-headline text-gray-900 dark:text-gray-100 truncate">
-                {closer.name || "Unnamed Closer"}
-              </p>
+
+          {/* Main Content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100 truncate">
+                {closer.name}
+              </h3>
+              {getRoleIcon()}
             </div>
-            
-            {assignedLeadName ? (
-              <div className={`flex items-center text-sm sm:text-base mt-2 text-blue-700 dark:text-blue-300`}>
-                <span className="font-medium truncate">Working on: {assignedLeadName}</span>
+
+            {/* Status Badge */}
+            <div className="flex items-center gap-2 mb-2">
+              <Badge variant="secondary" className={`text-xs ${getStatusColor()}`}>
+                {getStatusIcon()}
+                <span className="ml-1">{closer.status}</span>
+              </Badge>
+              {closer.lineupOrder && (
+                <Badge variant="outline" className="text-xs">
+                  Order: {closer.lineupOrder}
+                </Badge>
+              )}
+            </div>
+
+            {/* Phone Number */}
+            {closer.phone && (
+              <div className="flex items-center text-sm text-muted-foreground mb-2">
+                <Phone className="h-3 w-3 mr-2 flex-shrink-0" />
+                <span>{closer.phone}</span>
               </div>
-            ) : showInteractiveSwitch ? (
-              <div className="flex items-center space-x-3 mt-2">
-                <Switch
-                  id={`status-toggle-${closer.uid}`}
-                  checked={currentStatusIsOnDuty}
-                  onCheckedChange={handleToggleCloserAvailability}
-                  disabled={isUpdatingStatus || isUpdatingOrder}
-                  aria-label={currentStatusIsOnDuty ? `Set ${closer.name || "Closer"} to Off Duty` : `Set ${closer.name || "Closer"} to On Duty`}
-                  className="scale-90 sm:scale-100"
-                />
-                <Label
-                  htmlFor={`status-toggle-${closer.uid}`}
-                  className={`text-sm sm:text-base font-medium ${currentStatusIsOnDuty ? "text-green-700 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
-                >
-                  {isUpdatingStatus ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    currentStatusIsOnDuty ? "Available" : "Off Duty"
-                  )}
-                </Label>
-              </div>
-            ) : (
-              <div className={`flex items-center text-sm sm:text-base mt-2 ${currentStatusIsOnDuty ? "text-green-700 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-                {currentStatusIsOnDuty ? (
-                  <UserCheck className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+            )}
+
+            {/* Assigned Lead */}
+            {assignedLeadName && (
+              <div className="flex items-center text-sm mb-2">
+                {closer.status === "On Duty" ? (
+                  <CheckCircle className="h-3 w-3 mr-2 text-green-500 flex-shrink-0" />
                 ) : (
-                  <UserX className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  <Clock className="h-3 w-3 mr-2 text-yellow-500 flex-shrink-0" />
                 )}
-                <span className="font-medium">{currentStatusIsOnDuty ? "Available" : "Off Duty"}</span>
+                <span className="text-muted-foreground">
+                  Working on:{" "}
+                  {onLeadClick ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('🔥 CloserCard - Lead name clicked:', assignedLeadName);
+                        onLeadClick();
+                      }}
+                      className="text-primary hover:underline font-medium cursor-pointer transition-colors"
+                    >
+                      {assignedLeadName}
+                    </button>
+                  ) : (
+                    <span className="font-medium">{assignedLeadName}</span>
+                  )}
+                </span>
+              </div>
+            )}
+
+            {/* Status Toggle Button */}
+            {showStatusToggle && canToggleStatus && (
+              <div className="mt-3">
+                <Button
+                  variant={closer.status === "On Duty" ? "destructive" : "default"}
+                  size="sm"
+                  onClick={handleStatusToggle}
+                  disabled={isUpdating}
+                  className="w-full text-xs dark:card-glass dark:glow-cyan dark:hover:glow-turquoise transition-all duration-300"
+                >
+                  {isUpdating ? (
+                    <>
+                      <Clock className="h-3 w-3 mr-2 animate-spin" />
+                      Updating...
+                    </>
+                  ) : closer.status === "On Duty" ? (
+                    <>
+                      <PowerOff className="h-3 w-3 mr-2" />
+                      Set Off Duty
+                    </>
+                  ) : (
+                    <>
+                      <Power className="h-3 w-3 mr-2" />
+                      Set On Duty
+                    </>
+                  )}
+                </Button>
               </div>
             )}
           </div>
         </div>
-        
-        {/* Removed action buttons row */}
       </CardContent>
-      
-      {/* Profile Modal */}
-      <ProfileCard
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-        profile={{
-          uid: closer.uid,
-          name: closer.name || "Unnamed Closer",
-          email: null,
-          phone: closer.phone || null,
-          avatarUrl: closer.avatarUrl || `https://ui-avatars.com/api/?name=${(closer.name || "User").replace(/\s+/g, "+")}&background=random&color=fff`,
-          role: "closer"
-        }}
-      />
     </Card>
   );
 }

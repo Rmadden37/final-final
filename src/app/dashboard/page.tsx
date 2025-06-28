@@ -44,7 +44,7 @@ export default function DashboardPage() {
           
           {/* Mobile: Show Active Leads first (order-1) */}
           <div className="order-1 lg:order-2 lg:col-span-4 h-full">
-            <InProcessLeads />
+            <InProcessLeads closer={undefined} />
           </div>
           
           {/* Mobile: Show Closer Lineup last (order-3) */}
