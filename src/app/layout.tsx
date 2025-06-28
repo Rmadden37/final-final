@@ -2,11 +2,12 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import '../styles/theme-styles.css'
-import '../styles/dashboard-styles.css'
-import '../styles/components-styles.css'
-import '../styles/mobile-fixes.css'
-import '../styles/sidebar-fixes.css'
+import './theme-styles.css'
+import '../styles/styles/dashboard-styles.css'
+import '../styles/styles/components-styles.css'
+import '../styles/styles/mobile-fixes.css'
+import '../styles/styles/sidebar-fixes.css'
+import { Providers } from './providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -14,10 +15,7 @@ export const metadata: Metadata = {
   title: 'LeadFlow',
   description: 'Lead management system',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#1a1b26' }
-  ],
+  themeColor: '#ffffff',
 }
 
 export default function RootLayout({
@@ -32,8 +30,10 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
-      <body className={`${inter.className} antialiased`}>
-        {children}
+      <body className={`${inter.className} antialiased light-mode-only`} style={{ background: '#f8fafc', color: '#222' }}>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   )
