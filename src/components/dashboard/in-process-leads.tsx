@@ -22,7 +22,7 @@ import { db } from "@/lib/firebase";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 
 interface CloserCardProps {
-  closer: Closer;
+  closer: Closer | null | undefined;
   assignedLeadName?: string;
   allowInteractiveToggle?: boolean;
   position?: number;
@@ -44,11 +44,47 @@ export default function CloserCard({
   const { toast } = useToast();
   const [isUpdating, setIsUpdating] = useState(false);
 
+  // Debug logging
+  console.log('CloserCard render:', { closer, hasCloser: !!closer, closerUid: closer?.uid, closerName: closer?.name });
+
+  // Early return if closer is null or undefined - but make it more visible
+  if (!closer) {
+    return (
+      <Card className="shadow-md border border-gray-200 bg-white">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-12 w-12 flex-shrink-0 border">
+              <AvatarFallback className="bg-gray-100 text-gray-600 font-semibold">
+                ?
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <div className="text-gray-700 font-medium">Loading closer data...</div>
+              <div className="text-gray-500 text-sm">Please wait</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Validate that we have a valid closer object
+  if (!closer.uid) {
+    console.error('Invalid closer object - missing uid:', closer);
+    return (
+      <Card className="shadow-md border border-red-200 bg-red-50">
+        <CardContent className="p-4">
+          <div className="text-red-600">Error: Invalid closer data</div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const canToggleStatus = allowInteractiveToggle && 
     (user?.role === "manager" || user?.role === "admin" || user?.uid === closer.uid);
 
   const handleStatusToggle = async () => {
-    if (!canToggleStatus || isUpdating) return;
+    if (!canToggleStatus || isUpdating || !closer?.uid) return;
 
     setIsUpdating(true);
     try {
@@ -62,7 +98,7 @@ export default function CloserCard({
 
       toast({
         title: "Status Updated",
-        description: `${closer.name} is now ${newStatus}`,
+        description: `${closer.name || 'User'} is now ${newStatus}`,
       });
     } catch (error) {
       console.error("Error updating closer status:", error);
@@ -77,21 +113,21 @@ export default function CloserCard({
   };
 
   const getStatusIcon = () => {
-    if (closer.status === "On Duty") {
+    if (closer?.status === "On Duty") {
       return <Power className="h-3 w-3 text-green-600" />;
     }
     return <PowerOff className="h-3 w-3 text-gray-400" />;
   };
 
   const getStatusColor = () => {
-    if (closer.status === "On Duty") {
+    if (closer?.status === "On Duty") {
       return "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400";
     }
     return "bg-gray-100 text-gray-600 dark:bg-gray-900/50 dark:text-gray-400";
   };
 
   const getRoleIcon = () => {
-    switch (closer.role) {
+    switch (closer?.role) {
       case "admin":
         return <Crown className="h-3 w-3 text-purple-600" />;
       case "manager":
@@ -103,18 +139,34 @@ export default function CloserCard({
     }
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map(word => word.charAt(0))
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+  // Safe getInitials function with comprehensive null checks
+  const getInitials = (name?: string | null) => {
+    if (!name || typeof name !== 'string' || name.trim() === '') {
+      return "U"; // Default fallback
+    }
+    
+    try {
+      return name
+        .trim()
+        .split(" ")
+        .filter(word => word && word.length > 0) // Filter out empty strings and null values
+        .map(word => word.charAt(0))
+        .join("")
+        .toUpperCase()
+        .slice(0, 2) || "U"; // Fallback if no valid characters
+    } catch (error) {
+      console.error("Error generating initials:", error);
+      return "U";
+    }
   };
+
+  // Safe display values with explicit defaults
+  const displayName = closer?.name && closer.name.trim() ? closer.name : 'Unknown User';
+  const displayStatus = closer?.status || 'Unknown';
 
   if (compact) {
     return (
-      <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
+      <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
         {/* Position Number */}
         {position && (
           <div className="flex-shrink-0 w-8 h-8 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
@@ -122,11 +174,19 @@ export default function CloserCard({
           </div>
         )}
 
-        {/* Avatar - FIXED: Added null check */}
-        <Avatar className="h-10 w-10 flex-shrink-0">
-          {closer.avatarUrl && <AvatarImage src={closer.avatarUrl} alt={closer.name} />}
-          <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
-            {getInitials(closer.name)}
+        {/* Avatar */}
+        <Avatar className="h-10 w-10 flex-shrink-0 border">
+          {closer?.avatarUrl && (
+            <AvatarImage 
+              src={closer.avatarUrl} 
+              alt={displayName}
+              onError={(e) => {
+                console.error("Avatar image failed to load:", e);
+              }}
+            />
+          )}
+          <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 font-semibold">
+            {getInitials(closer?.name)}
           </AvatarFallback>
         </Avatar>
 
@@ -134,11 +194,11 @@ export default function CloserCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h4 className="font-semibold text-slate-900 dark:text-slate-100 truncate">
-              {closer.name}
+              {displayName}
             </h4>
             <Badge variant="secondary" className={`text-xs ${getStatusColor()}`}>
               {getStatusIcon()}
-              <span className="ml-1">{closer.status}</span>
+              <span className="ml-1">{displayStatus}</span>
             </Badge>
           </div>
           
@@ -167,7 +227,7 @@ export default function CloserCard({
   }
 
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow duration-200 dark:card-glass dark:glow-cyan dark:border-white/[.08]">
+    <Card className="shadow-md hover:shadow-lg transition-shadow duration-200 bg-white border border-gray-200 dark:card-glass dark:glow-cyan dark:border-white/[.08]">
       <CardContent className="p-4">
         <div className="flex items-start gap-4">
           {/* Position Number (if provided) */}
@@ -177,10 +237,19 @@ export default function CloserCard({
             </div>
           )}
 
-          {/* Avatar - FIXED: Added null check */}
-          <Avatar className="h-12 w-12 flex-shrink-0 ring-2 ring-blue-200 dark:ring-blue-900">
-            <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
-              {getInitials(closer.name)}
+          {/* Avatar with comprehensive error handling */}
+          <Avatar className="h-12 w-12 flex-shrink-0 ring-2 ring-blue-200 dark:ring-blue-900 border">
+            {closer?.avatarUrl && (
+              <AvatarImage 
+                src={closer.avatarUrl} 
+                alt={displayName}
+                onError={(e) => {
+                  console.error("Avatar image failed to load:", e);
+                }}
+              />
+            )}
+            <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 font-semibold">
+              {getInitials(closer?.name)}
             </AvatarFallback>
           </Avatar>
 
@@ -188,7 +257,7 @@ export default function CloserCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100 truncate">
-                {closer.name}
+                {displayName}
               </h3>
               {getRoleIcon()}
             </div>
@@ -197,9 +266,9 @@ export default function CloserCard({
             <div className="flex items-center gap-2 mb-2">
               <Badge variant="secondary" className={`text-xs ${getStatusColor()}`}>
                 {getStatusIcon()}
-                <span className="ml-1">{closer.status}</span>
+                <span className="ml-1">{displayStatus}</span>
               </Badge>
-              {closer.lineupOrder && (
+              {closer?.lineupOrder && (
                 <Badge variant="outline" className="text-xs">
                   Order: {closer.lineupOrder}
                 </Badge>
@@ -207,7 +276,7 @@ export default function CloserCard({
             </div>
 
             {/* Phone Number */}
-            {closer.phone && (
+            {closer?.phone && (
               <div className="flex items-center text-sm text-muted-foreground mb-2">
                 <Phone className="h-3 w-3 mr-2 flex-shrink-0" />
                 <span>{closer.phone}</span>
@@ -217,7 +286,7 @@ export default function CloserCard({
             {/* Assigned Lead */}
             {assignedLeadName && (
               <div className="flex items-center text-sm mb-2">
-                {closer.status === "On Duty" ? (
+                {closer?.status === "On Duty" ? (
                   <CheckCircle className="h-3 w-3 mr-2 text-green-500 flex-shrink-0" />
                 ) : (
                   <Clock className="h-3 w-3 mr-2 text-yellow-500 flex-shrink-0" />
@@ -246,7 +315,7 @@ export default function CloserCard({
             {showStatusToggle && canToggleStatus && (
               <div className="mt-3">
                 <Button
-                  variant={closer.status === "On Duty" ? "destructive" : "default"}
+                  variant={closer?.status === "On Duty" ? "destructive" : "default"}
                   size="sm"
                   onClick={handleStatusToggle}
                   disabled={isUpdating}
@@ -257,7 +326,7 @@ export default function CloserCard({
                       <Clock className="h-3 w-3 mr-2 animate-spin" />
                       Updating...
                     </>
-                  ) : closer.status === "On Duty" ? (
+                  ) : closer?.status === "On Duty" ? (
                     <>
                       <PowerOff className="h-3 w-3 mr-2" />
                       Set Off Duty
