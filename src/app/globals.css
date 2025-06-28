@@ -207,10 +207,3 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-
-/* Import additional styles */
-@import '../../styles/theme-styles.css';
-@import '../../styles/dashboard-styles.css';
-@import '../../styles/components-styles.css';
-@import '../../styles/mobile-fixes.css';
-@import '../../styles/sidebar-fixes.css';

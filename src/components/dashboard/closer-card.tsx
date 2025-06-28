@@ -4,7 +4,7 @@
 import type {Closer, LeadStatus} from "@/types";
 import {Card, CardContent} from "@/components/ui/card";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {UserCheck, UserX, Loader2, ArrowUp, ArrowDown, Briefcase, Crown as _Crown} from "lucide-react";
+import {UserCheck, UserX, Loader2} from "lucide-react";
 import {Switch} from "@/components/ui/switch";
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
@@ -17,19 +17,18 @@ import {useToast} from "@/hooks/use-toast";
 import {useState, useEffect} from "react";
 import { getPhotoUrlByName } from "@/utils/photo-vlookup";
 
+type ExtendedLeadStatus = LeadStatus | 'accepted' | 'scheduled' | 'waiting_assignment' | 'in_process';
+
 interface CloserCardProps {
   closer: Closer;
   allowInteractiveToggle?: boolean;
-  onMove?: (direction: "up" | "down") => void;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
   showMoveControls?: boolean;
   isUpdatingOrder?: boolean;
   assignedLeadName?: string;
-  onLeadClick?: () => void;
-  onDispositionChange?: (status: LeadStatus, scheduledTime?: Date) => void;
   showDispositionSelector?: boolean;
-  currentLeadStatus?: LeadStatus;
+  currentLeadStatus?: ExtendedLeadStatus;
   leadId?: string;
   position?: number;
 }
@@ -37,14 +36,11 @@ interface CloserCardProps {
 export default function CloserCard({
   closer,
   allowInteractiveToggle = true,
-  onMove,
   canMoveUp,
   canMoveDown,
   showMoveControls,
   isUpdatingOrder,
   assignedLeadName,
-  onLeadClick,
-  onDispositionChange,
   showDispositionSelector = false,
   currentLeadStatus,
   leadId,
@@ -137,18 +133,7 @@ export default function CloserCard({
             </div>
             
             {assignedLeadName ? (
-              <div 
-                className={`flex items-center text-sm sm:text-base mt-2 ${onLeadClick ? 'cursor-pointer hover:text-blue-600 transition-colors' : ''} text-blue-700 dark:text-blue-300`}
-                onClick={() => {
-                  if (onLeadClick) {
-                    onLeadClick();
-                  }
-                }}
-                role={onLeadClick ? "button" : undefined}
-                tabIndex={onLeadClick ? 0 : undefined}
-                onKeyDown={onLeadClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onLeadClick(); } } : undefined}
-              >
-                <Briefcase className="mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+              <div className={`flex items-center text-sm sm:text-base mt-2 text-blue-700 dark:text-blue-300`}>
                 <span className="font-medium truncate">Working on: {assignedLeadName}</span>
               </div>
             ) : showInteractiveSwitch ? (
@@ -185,74 +170,7 @@ export default function CloserCard({
           </div>
         </div>
         
-        {/* Action buttons row */}
-        {((isWaitingAssignmentLead || isScheduledLead || isAcceptedLead) && onDispositionChange) || 
-         (showMoveControls && onMove && !assignedLeadName) ? (
-          <div className="flex items-center justify-end space-x-2 mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-            {/* Accept buttons for managers/admins */}
-            {(isWaitingAssignmentLead || isScheduledLead) && (user?.role === "manager" || user?.role === "admin") && onDispositionChange && (
-              <Button 
-                size="sm" 
-                className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm bg-green-500/80 backdrop-blur-sm hover:bg-green-600/90 text-white border border-green-400/30 hover:border-green-300/50 transition-all duration-300"
-                onClick={() => {
-                  onDispositionChange("in_process");
-                  toast({
-                    title: "Lead Accepted",
-                    description: "Lead has been accepted and is now in process."
-                  });
-                }}
-              >
-                Accept & Start
-              </Button>
-            )}
-            
-            {/* Accept Job button for scheduled leads (closers only) */}
-            {isScheduledLead && user?.role === "closer" && onDispositionChange && (
-              <Button 
-                size="sm" 
-                className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm bg-green-500/80 backdrop-blur-sm hover:bg-green-600/90 text-white border border-green-400/30 hover:border-green-300/50 transition-all duration-300"
-                onClick={() => {
-                  onDispositionChange("accepted");
-                  toast({
-                    title: "Job Accepted",
-                    description: "Job has been accepted."
-                  });
-                }}
-              >
-                Accept Job
-              </Button>
-            )}
-            
-            {/* Start Working button for accepted leads (closers only) */}
-            {isAcceptedLead && user?.role === "closer" && onDispositionChange && (
-              <Button 
-                size="sm" 
-                className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm bg-blue-500/80 backdrop-blur-sm hover:bg-blue-600/90 text-white border border-blue-400/30 hover:border-blue-300/50 transition-all duration-300"
-                onClick={() => {
-                  onDispositionChange("in_process");
-                  toast({
-                    title: "Lead Status Updated",
-                    description: "You are now actively working on this lead."
-                  });
-                }}
-              >
-                Start Working
-              </Button>
-            )}
-
-            {/* Move Controls */}
-            {showMoveControls && onMove && !assignedLeadName && (
-              <div className="flex items-center space-x-1 ml-2">
-                <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-7 sm:w-7" onClick={() => onMove("up")} disabled={!canMoveUp || isUpdatingStatus || isUpdatingOrder}>
-                  <ArrowUp className="h-3 w-3 sm:h-4 sm:w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-7 sm:w-7" onClick={() => onMove("down")} disabled={!canMoveDown || isUpdatingStatus || isUpdatingOrder}>
-                  <ArrowDown className="h-3 w-3 sm:h-4 sm:w-4" />
-                </Button>
-              </div>
-            )}
-          </div>
-        ) : null}
+        {/* Removed action buttons row */}
       </CardContent>
       
       {/* Profile Modal */}

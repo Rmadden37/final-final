@@ -2,7 +2,7 @@
 "use client";
 
 import {useState, useEffect} from "react";
-import type {Closer, UserRole, Lead} from "@/types";
+import type {Closer, Lead, UserRole} from "@/types";
 import {useAuth} from "@/hooks/use-auth";
 import {useToast} from "@/hooks/use-toast";
 import {db} from "@/lib/firebase";

@@ -3,8 +3,54 @@
 // If you're using Firebase Firestore
 import type { Timestamp } from 'firebase/firestore';
 
+// User role type
+export type UserRole = 'admin' | 'manager' | 'setter' | 'closer';
+
+// User type
+export interface User {
+  uid: string;
+  email: string;
+  displayName?: string;
+  role: UserRole;
+  teamId?: string;
+  avatarUrl?: string;
+  createdAt?: Date | Timestamp;
+  updatedAt?: Date | Timestamp;
+}
+
+// Closer type
+export interface Closer {
+  uid: string;
+  name: string;
+  status: 'On Duty' | 'Off Duty';
+  teamId: string;
+  role: UserRole;
+  avatarUrl?: string;
+  phone?: string;
+  lineupOrder?: number;
+  email?: string;
+}
+
+// Lead status type
+export type LeadStatus = 
+  | 'new'
+  | 'dispatched'
+  | 'waiting_assignment'
+  | 'scheduled'
+  | 'accepted'
+  | 'in_process'
+  | 'sit'
+  | 'sold'
+  | 'no_sale'
+  | 'canceled'
+  | 'credit_fail';
+
+// Lead type
 export interface Lead {
   id?: string;
+  
+  // Team association
+  teamId: string;
   
   // Setter information
   setter_id: string;
@@ -17,13 +63,15 @@ export interface Lead {
   customer_address?: string;
   
   // Lead details
-  status: 'new' | 'dispatched' | 'sit' | 'sold' | 'no_sale' | 'canceled' | 'credit_fail';
+  status: LeadStatus;
   source?: string;
   notes?: string;
   
   // Assignment
-  assigned_closer_id?: string;
-  assigned_closer_name?: string;
+  assignedCloserId?: string;
+  assignedCloserName?: string;
+  assigned_closer_id?: string;  // Legacy field
+  assigned_closer_name?: string; // Legacy field
   
   // Appointment details
   appointment_date?: Date | Timestamp;
@@ -53,7 +101,7 @@ export function timestampToDate(timestamp: Date | Timestamp | undefined): Date {
   if (timestamp instanceof Date) return timestamp;
   
   // If it's a Firestore Timestamp, convert it
-  if (timestamp && typeof timestamp === 'object' && 'toDate' in timestamp) {
+  if (timestamp && typeof timestamp === 'object' && 'toDate' in timestamp && typeof timestamp.toDate === 'function') {
     return timestamp.toDate();
   }
   
@@ -61,4 +109,41 @@ export function timestampToDate(timestamp: Date | Timestamp | undefined): Date {
   return new Date();
 }
 
-// Add any other types your app uses here
+// Performance types for analytics
+export interface SetterPerformance {
+  uid: string;
+  name: string;
+  totalLeads: number;
+  sitRate: number;
+  failedCreditRate: number;
+  cancelNoShowRate: number;
+}
+
+export interface CloserPerformance {
+  uid: string;
+  name: string;
+  totalAssigned: number;
+  closeRate: number;
+  conversionRate: number;
+  selfGenRate: number;
+}
+
+export interface TeamMetrics {
+  totalLeads: number;
+  totalSits: number;
+  totalSales: number;
+  avgSitRate: number;
+  avgCloseRate: number;
+  avgConversionRate: number;
+  topSetterName: string;
+  topCloserName: string;
+}
+
+export interface TrendData {
+  date: string;
+  totalLeads: number;
+  sitRate: number;
+  closeRate: number;
+  isSpecialPoint?: boolean;
+  pointType?: 'today' | 'projection';
+}
