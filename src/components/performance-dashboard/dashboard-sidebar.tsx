@@ -40,7 +40,7 @@ import { usePushNotifications } from "@/hooks/use-push-notifications";
 import Image from "next/image";
 
 // Dynamic import for Create Lead Form
-const CreateLeadForm = dynamic(() => import("./create-lead-form"), {
+const CreateLeadForm = dynamic(() => import("../dashboard/create-lead-form"), {
   ssr: false,
   loading: () => <div>Loading...</div>
 });
