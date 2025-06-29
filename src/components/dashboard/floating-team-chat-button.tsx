@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
-import TeamChat from "../performance-dashboard/team-chat";
+import TeamChat from "../dashboard/team-chat";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function TeamChatButton() {
