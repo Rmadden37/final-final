@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
-import TeamChat from "./team-chat";
+import TeamChat from "../performance-dashboard/team-chat";
 
 export default function FloatingChatButton() {
   const [isOpen, setIsOpen] = useState(false);
