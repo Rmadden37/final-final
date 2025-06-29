@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { db, storage } from "@/lib/firebase";
 import { addDoc, collection, serverTimestamp, Timestamp } from "firebase/firestore";
@@ -479,13 +479,13 @@ export default function CreateLeadForm({ isOpen, onClose }: CreateLeadFormProps)
                             <div 
                               className="fixed z-[9999] bg-popover border rounded-md shadow-lg max-h-60 overflow-y-auto min-w-[300px]"
                               style={{
-                                top: addressInputRef.current 
+                                insetBlockStart: addressInputRef.current
                                   ? addressInputRef.current.getBoundingClientRect().bottom + window.scrollY + 4
                                   : 0,
-                                left: addressInputRef.current 
+                                insetInlineStart: addressInputRef.current
                                   ? addressInputRef.current.getBoundingClientRect().left + window.scrollX
                                   : 0,
-                                width: addressInputRef.current 
+                                inlineSize: addressInputRef.current
                                   ? addressInputRef.current.getBoundingClientRect().width
                                   : 300
                               }}
@@ -640,7 +640,7 @@ export default function CreateLeadForm({ isOpen, onClose }: CreateLeadFormProps)
             <FormField
               control={form.control}
               name="photos"
-              render={({ field: _field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel className="text-sm sm:text-base">Photos</FormLabel>
                   <FormDescription className="text-xs sm:text-sm">
@@ -685,7 +685,6 @@ export default function CreateLeadForm({ isOpen, onClose }: CreateLeadFormProps)
                             <div key={index} className="relative group">
                               <div className="aspect-square rounded-lg overflow-hidden bg-muted">
                                 {url ? (
-                                  /* eslint-disable-next-line @next/next/no-img-element */
                                   <img
                                     src={url}
                                     alt={`Preview ${index + 1}`}
