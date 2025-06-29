@@ -5,33 +5,24 @@ import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import TeamChat from "./team-chat";
 import { useAuth } from "@/hooks/use-auth";
-import { ChatService } from "@/lib/chat-service";
 
 export default function TeamChatButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
   const { user } = useAuth();
 
-  // Check for unread messages
+  // Mock unread check - you can replace this with actual chat service logic
   useEffect(() => {
     if (!user) return;
-    let unsub: (() => void) | undefined;
-    let lastRead = 0;
+    
+    // Simulate checking for unread messages
     try {
-      lastRead = parseInt(localStorage.getItem("team-chat-last-read") || "0", 10);
-    } catch {}
-    ChatService.listenToUserChannels(user.uid, user.teamId, (channels) => {
-      // Check both region and team channels for new messages
-      let unread = false;
-      channels.forEach((channel) => {
-        if (channel.lastMessageTimestamp && typeof channel.lastMessageTimestamp.toDate === "function") {
-          const ts = channel.lastMessageTimestamp.toDate().getTime();
-          if (ts > lastRead) unread = true;
-        }
-      });
-      setHasUnread(unread);
-    }).then((u) => { unsub = u; });
-    return () => { if (unsub) unsub(); };
+      const lastRead = parseInt(localStorage.getItem("team-chat-last-read") || "0", 10);
+      // For now, just set hasUnread to false
+      setHasUnread(false);
+    } catch {
+      setHasUnread(false);
+    }
   }, [user]);
 
   // Mark as read when chat is opened

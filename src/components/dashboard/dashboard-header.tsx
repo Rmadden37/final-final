@@ -53,7 +53,7 @@ export default function DashboardHeader() {
           {(user?.role === "setter" || user?.role === "manager" || user?.role === "admin") && (
             <Button 
               onClick={() => setIsCreateLeadModalOpen(true)} 
-              variant="primary-solid" 
+              variant="default" 
               size="sm" 
               className="hidden sm:flex bg-gradient-to-r from-[#3574F2] to-[#5096F2] hover:from-[#3574F2]/90 hover:to-[#5096F2]/90 dark:from-turquoise dark:to-cyan dark:hover:from-turquoise/90 dark:hover:to-cyan/90 premium:from-premium-purple premium:to-premium-teal premium:hover:from-premium-purple/90 premium:hover:to-premium-teal/90 shadow-lg shadow-[#3574F2]/25 dark:shadow-turquoise/25 premium:shadow-premium-purple/25 hover:shadow-xl hover:shadow-[#3574F2]/30 dark:hover:shadow-turquoise/30 premium:hover:shadow-premium-purple/30 transition-all duration-300 border-0 dark:glow-turquoise premium:glow-premium group"
             >
@@ -65,7 +65,7 @@ export default function DashboardHeader() {
           {(user?.role === "setter" || user?.role === "manager" || user?.role === "admin") && (
             <Button 
               onClick={() => setIsCreateLeadModalOpen(true)} 
-              variant="primary-solid" 
+              variant="default" 
               size="sm" 
               className="sm:hidden bg-gradient-to-r from-[#3574F2] to-[#5096F2] hover:from-[#3574F2]/90 hover:to-[#5096F2]/90 dark:from-turquoise dark:to-cyan dark:hover:from-turquoise/90 dark:hover:to-cyan/90 premium:from-premium-purple premium:to-premium-teal premium:hover:from-premium-purple/90 premium:hover:to-premium-teal/90 shadow-lg shadow-[#3574F2]/25 dark:shadow-turquoise/25 premium:shadow-premium-purple/25 border-0 dark:glow-turquoise premium:glow-premium group"
             >

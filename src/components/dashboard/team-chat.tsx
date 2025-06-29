@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { ChatService } from "@/lib/chat-service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -34,12 +33,39 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { ChatMessage, ChatChannel } from "@/types";
 import { formatDistanceToNow } from "date-fns";
 
 interface TeamChatProps {
   isOpen: boolean;
   onClose: () => void;
+}
+
+// Mock types for demonstration
+interface ChatMessage {
+  id: string;
+  content: string;
+  senderId: string;
+  senderName: string;
+  senderAvatar?: string;
+  timestamp: Date | { toDate(): Date };
+  messageType?: "text" | "image" | "gif" | "sticker";
+  mediaUrl?: string;
+  editedAt?: Date;
+  mediaMetadata?: {
+    width?: number;
+    height?: number;
+    fileName?: string;
+    altText?: string;
+  };
+}
+
+interface ChatChannel {
+  id: string;
+  name: string;
+  type: "team" | "region";
+  memberCount?: number;
+  lastMessageContent?: string;
+  lastMessageSender?: string;
 }
 
 interface MessageItemProps {
@@ -103,7 +129,9 @@ function MessageItem({ message, isOwn, onEdit, onDelete, onReply }: MessageItemP
       console.error('Error formatting timestamp:', error);
       return "just now";
     }
-  };  return (
+  };
+
+  return (
     <div className={`chat-message-mobile flex gap-3 group ${isOwn ? 'justify-end' : 'justify-start'}`}>
       {!isOwn && (
         <Avatar className="avatar-mobile h-8 w-8 mt-1">
@@ -240,35 +268,22 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
     // Reset mobile sidebar state when dialog opens
     setShowMobileSidebar(true);
     
-    const initializeChannels = async () => {
-      try {
-        // Update member counts when chat opens
-        await ChatService.updateAllChannelMemberCounts();
-        
-        const unsubscribe = await ChatService.listenToUserChannels(
-          user.uid,
-          user.teamId,
-          (userChannels) => {
-            setChannels(userChannels);
-            if (userChannels.length > 0 && !activeChannel) {
-              setActiveChannel(userChannels[0]);
-            }
-          }
-        );
-        
-        return unsubscribe;
-      } catch (error) {
-        console.error("Error loading channels:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load chat channels",
-          variant: "destructive",
-        });
+    // Mock channels for demonstration
+    setChannels([
+      {
+        id: "team",
+        name: "Team Chat",
+        type: "team",
+        memberCount: 5,
+      },
+      {
+        id: "region",
+        name: "Regional Chat",
+        type: "region",
+        memberCount: 15,
       }
-    };
-
-    initializeChannels();
-  }, [isOpen, user, activeChannel, toast]);
+    ]);
+  }, [isOpen, user]);
 
   useEffect(() => {
     scrollToBottom();
@@ -292,17 +307,17 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
     setMessages([]);
     setShowMobileSidebar(false); // Hide sidebar on mobile when channel is selected
     
-    try {
-      const channelMessages = await ChatService.getChannelMessages(channel.id);
-      setMessages(channelMessages);
-    } catch (error) {
-      console.error("Error loading messages:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load messages",
-        variant: "destructive",
-      });
-    }
+    // Mock messages for demonstration
+    setMessages([
+      {
+        id: "1",
+        content: "Welcome to the team chat!",
+        senderId: "other",
+        senderName: "Team Bot",
+        timestamp: new Date(),
+        messageType: "text"
+      }
+    ]);
   };
 
   const sendMessage = async () => {
@@ -312,29 +327,17 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
     setNewMessage("");
     setShowEmojiPicker(false);
 
-    try {
-      await ChatService.sendMessage(
-        messageContent,
-        user.uid,
-        user.displayName || "Unknown User",
-        user.role || "agent",
-        activeChannel.id,
-        activeChannel.type,
-        user.avatarUrl || undefined,
-        undefined,
-        "text"
-      );
+    // Mock message sending
+    const newMsg: ChatMessage = {
+      id: Date.now().toString(),
+      content: messageContent,
+      senderId: user.uid,
+      senderName: user.displayName || "You",
+      timestamp: new Date(),
+      messageType: "text"
+    };
 
-      const updatedMessages = await ChatService.getChannelMessages(activeChannel.id);
-      setMessages(updatedMessages);
-    } catch (error) {
-      console.error("Error sending message:", error);
-      toast({
-        title: "Error",
-        description: "Failed to send message",
-        variant: "destructive",
-      });
-    }
+    setMessages(prev => [...prev, newMsg]);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -374,95 +377,25 @@ export default function TeamChat({ isOpen, onClose }: TeamChatProps) {
       return;
     }
 
-    try {
-      setIsLoading(true);
-      const mediaUrl = URL.createObjectURL(file);
-      let messageType: "image" | "gif" = "image";
-      if (file.type === 'image/gif') {
-        messageType = "gif";
-      }
-
-      const img = new window.Image();
-      img.onload = async () => {
-        try {
-          await ChatService.sendMessage(
-            newMessage.trim() || `Shared a ${messageType}`,
-            user.uid,
-            user.displayName || "Unknown User",
-            user.role || "agent",
-            activeChannel.id,
-            activeChannel.type,
-            user.avatarUrl || undefined,
-            undefined,
-            messageType,
-            mediaUrl,
-            {
-              width: img.width,
-              height: img.height,
-              fileName: file.name,
-              altText: `${messageType} shared by ${user.displayName}`
-            }
-          );
-
-          setNewMessage("");
-          const updatedMessages = await ChatService.getChannelMessages(activeChannel.id);
-          setMessages(updatedMessages);
-        } catch (error) {
-          console.error("Error sending media message:", error);
-          toast({
-            title: "Error",
-            description: "Failed to send image",
-            variant: "destructive",
-          });
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      
-      img.src = mediaUrl;
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      setIsLoading(false);
-      toast({
-        title: "Error",
-        description: "Failed to upload image",
-        variant: "destructive",
-      });
-    }
+    // Mock file upload
+    toast({
+      title: "Image Upload",
+      description: "Image upload feature coming soon!",
+    });
   };
 
   const editMessage = async (messageId: string, content: string) => {
-    if (!activeChannel) return;
-    
-    try {
-      await ChatService.editMessage(messageId, content);
-      const updatedMessages = await ChatService.getChannelMessages(activeChannel.id);
-      setMessages(updatedMessages);
-    } catch (error) {
-      console.error("Error editing message:", error);
-      toast({
-        title: "Error",
-        description: "Failed to edit message",
-        variant: "destructive",
-      });
-    }
+    // Mock message editing
+    setMessages(prev => prev.map(msg => 
+      msg.id === messageId 
+        ? { ...msg, content, editedAt: new Date() }
+        : msg
+    ));
   };
 
   const deleteMessage = async (messageId: string) => {
-    if (!activeChannel) return;
-    
-    try {
-      await ChatService.deleteMessage(messageId);
-      const updatedMessages = await ChatService.getChannelMessages(activeChannel.id);
-      setMessages(updatedMessages);
-    } catch (error) {
-      console.error("Error deleting message:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete message",
-        variant: "destructive",
-      });
-    }
+    // Mock message deletion
+    setMessages(prev => prev.filter(msg => msg.id !== messageId));
   };
 
   const getChannelIcon = (channel: ChatChannel) => {

@@ -1,71 +1,118 @@
-// Analytics types and interfaces
+import { Timestamp } from "firebase/firestore";
 
-export interface SetterPerformance {
+export interface TeamStats {
+  teamId: string;
+  totalLeads: number;
+  leadsByStatus: Record<string, number>;
+  closers: Array<{
+    uid: string;
+    name: string;
+    status: string;
+    assignedLeads: number;
+  }>;
+  onDutyClosers: number;
+  timestamp: Timestamp | Date | null;
+}
+
+export interface AnalyticsData {
+  leads: Lead[];
+  closers: Closer[];
+  teamStats: TeamStats | null;
+}
+
+export interface SetterAnalytics {
   uid: string;
   name: string;
   totalLeads: number;
-  sitCount: number;
-  sitRate: number;
-  failedCreditCount: number;
-  failedCreditRate: number;
-  immediateDispatchCount: number;
-  scheduledDispatchCount: number;
-  immediateDispatchPercentage: number;
-  cancelNoShowCount: number;
-  cancelNoShowRate: number;
-  avgLeadsPerDay: number;
+  soldLeads: number;
+  conversionRate: number;
+  immediateLeads: number;
+  scheduledLeads: number;
 }
 
-export interface CloserPerformance {
+export interface CloserAnalytics {
   uid: string;
   name: string;
   totalAssigned: number;
-  soldCount: number;
-  noSaleCount: number;
-  failedCreditCount: number;
-  closeRate: number;
-  selfGenCount: number;
-  selfGenRate: number;
-  avgLeadsPerDay: number;
-  conversionRate: number;
+  totalSold: number;
+  totalNoSale: number;
+  totalFailedCredits: number;
+  closingRatio: number;
+  closingPercentage: number;
 }
 
-export interface TeamMetrics {
+export interface DispatchAnalytics {
+  immediate: {
+    total: number;
+    sold: number;
+    conversionRate: number;
+  };
+  scheduled: {
+    total: number;
+    sold: number;
+    conversionRate: number;
+  };
+}
+
+export interface FilteredMetrics {
   totalLeads: number;
-  totalSetters: number;
-  totalClosers: number;
-  avgCloseRate: number;
-  avgSitRate: number;
-  totalRevenue: number;
-  avgRevenuePerLead: number;
-  conversionRate: number;
-  canceledLeadRate: number;
-  samedaySitCloseRate: number;
-  scheduledAppointmentCloseRate: number;
-  samedaySitRate: number;
-  scheduledSitRate: number;
-  leadsToday: number;
-  leadsThisWeek: number;
-  leadsThisMonth: number;
+  soldLeads: number;
+  sitLeads: number;
+  sitRate: string;
+  conversionRate: string;
 }
 
-export interface TrendData {
-  date: string;
-  totalLeads: number;
-  sitRate: number;
-  closeRate: number;
+// Interfaces for your core data types
+export interface Lead {
+  id: string;
+  teamId: string;
+  createdAt: Timestamp | Date;
+  setterId: string;
+  setterName: string;
+  assignedCloserId?: string;
+  assignedCloserName?: string;
+  status: string;
+  dispatchType: 'immediate' | 'scheduled';
+  customerName: string;
+  customerPhone: string;
+  address?: string;
+  dispositionNotes?: string;
+  scheduledAppointmentTime?: Timestamp | null;
+  setterLocation?: any;
+  photoUrls?: string[];
+  updatedAt?: Timestamp;
+  setterVerified?: boolean;
+  verifiedAt?: Timestamp | null;
+  verifiedBy?: string | null;
 }
 
-export interface PerformanceDashboardProps {
-  className?: string;
+export interface Closer {
+  uid: string;
+  teamId: string;
+  name: string;
+  status: "On Duty" | "Off Duty";
+  role?: string;
+  avatarUrl?: string | null;
+  phone?: string | null;
+  lineupOrder?: number | null;
 }
 
-export const chartConfig = {
-  total: { label: "Total Leads", color: "hsl(185 85% 45%)" },
-  sitRate: { label: "Sit Rate", color: "hsl(145 65% 50%)" },
-  closeRate: { label: "Close Rate", color: "hsl(25 75% 55%)" },
-  failedCredit: { label: "Failed Credit", color: "hsl(358 75% 58%)" },
-  cancelNoShow: { label: "Cancel/No Show", color: "hsl(280 50% 55%)" },
-  selfGen: { label: "Self-Generated", color: "hsl(45 85% 55%)" },
-  immediate: { label: "Immediate", color: "hsl(200 70% 50%)" }
-};
+// Interfaces for AI-generated chart data
+export interface AiChartDataPoint {
+  [key: string]: string | number;
+}
+
+export interface AiChart {
+  type: 'bar' | 'line' | 'pie';
+  title: string;
+  data: AiChartDataPoint[];
+  dataKey: string | string[];
+  categoryKey: string;
+  trendLineKey?: string;
+  stacked?: boolean;
+}
+
+export interface AiApiResponse {
+  text_response?: string;
+  chart_response?: AiChart;
+}

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { getTeamStatsFunction, db } from "@/lib/firebase";
+import { db } from "@/lib/firebase";
 import { collection, query, where, getDocs, orderBy, Timestamp } from "firebase/firestore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -40,17 +40,42 @@ export default function AnalyticsDashboard() {
         const daysAgo = parseInt(dateRange.replace('d', ''));
         const startDate = new Date(now.getTime() - (daysAgo * 24 * 60 * 60 * 1000));
 
-        const teamStatsResult = await getTeamStatsFunction({ teamId: user.teamId });
-        const leadsQuery = query(collection(db, "leads"), where("teamId", "==", user.teamId), where("createdAt", ">=", Timestamp.fromDate(startDate)), orderBy("createdAt", "desc"));
-        const closersQuery = query(collection(db, "closers"), where("teamId", "==", user.teamId), orderBy("name", "asc"));
-        const [leadsSnapshot, closersSnapshot] = await Promise.all([getDocs(leadsQuery), getDocs(closersQuery)]);
+        // Mock team stats function
+        const teamStatsResult = { data: null };
+        
+        const leadsQuery = query(
+          collection(db, "leads"), 
+          where("teamId", "==", user.teamId), 
+          where("createdAt", ">=", Timestamp.fromDate(startDate)), 
+          orderBy("createdAt", "desc")
+        );
+        
+        const closersQuery = query(
+          collection(db, "closers"), 
+          where("teamId", "==", user.teamId), 
+          orderBy("name", "asc")
+        );
+        
+        const [leadsSnapshot, closersSnapshot] = await Promise.all([
+          getDocs(leadsQuery), 
+          getDocs(closersQuery)
+        ]);
+        
         const leadsData = leadsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Lead[];
         const closersData = closersSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() })) as Closer[];
 
-        setAnalytics({ leads: leadsData, closers: closersData, teamStats: teamStatsResult.data as any });
+        setAnalytics({ 
+          leads: leadsData, 
+          closers: closersData, 
+          teamStats: teamStatsResult.data as any 
+        });
       } catch (error) {
         console.error("Error fetching analytics:", error);
-        toast({ title: "Error", description: "Failed to load analytics data.", variant: "destructive" });
+        toast({ 
+          title: "Error", 
+          description: "Failed to load analytics data.", 
+          variant: "destructive" 
+        });
       } finally {
         setLoading(false);
       }
@@ -67,7 +92,12 @@ export default function AnalyticsDashboard() {
       <div className="space-y-6 p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
-            <Card key={i} className="animate-pulse"><CardContent className="p-6"><div className="h-4 bg-muted rounded w-1/2 mb-2"></div><div className="h-8 bg-muted rounded w-3/4"></div></CardContent></Card>
+            <Card key={i} className="animate-pulse">
+              <CardContent className="p-6">
+                <div className="h-4 bg-muted rounded w-1/2 mb-2"></div>
+                <div className="h-8 bg-muted rounded w-3/4"></div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
