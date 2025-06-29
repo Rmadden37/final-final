@@ -108,7 +108,7 @@ export const ChartTooltipContent = React.forwardRef<
     nameKey?: string
     labelKey?: string
   }
->(({ className, hideLabel, hideIndicator, indicator = "dot", nameKey, labelKey, ...props }, ref) => {
+>(({ className, ...props }, ref) => {
   return (
     <div
       ref={ref}
@@ -162,7 +162,7 @@ export const ChartLegendContent = ({ payload }: any) => {
 }
 
 // Chart Legend Component (wrapper)
-export const ChartLegend = ({ content, ...props }: any) => {
+export const ChartLegend = ({ ...props }: any) => {
   // This is primarily used to pass the content prop to Recharts Legend
   return null
 }
