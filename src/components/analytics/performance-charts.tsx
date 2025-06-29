@@ -374,7 +374,7 @@ export function PerformanceCharts({
           ) : (
             <ChartContainer config={chartConfig} className="h-[350px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={ppwData} margin={{ top: 20, right: 20, bottom: 60, left: 20 }}>
+                <BarChart data={ppwData}>
                   <CartesianGrid strokeDasharray="3 3" className="dark:stroke-white/10" />
                   <XAxis 
                     dataKey="name" 
@@ -432,7 +432,7 @@ export function PerformanceCharts({
         <CardContent className="dark:pb-6">
           <ChartContainer config={chartConfig} className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={setterChartData} margin={{ top: 20, right: 20, bottom: 60, left: 20 }}>
+              <BarChart data={setterChartData}>
                 <CartesianGrid strokeDasharray="3 3" className="dark:stroke-white/10" />
                 <XAxis 
                   dataKey="name" 
@@ -472,7 +472,7 @@ export function PerformanceCharts({
         <CardContent className="dark:pb-6">
           <ChartContainer config={chartConfig} className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={closerChartData} margin={{ top: 20, right: 20, bottom: 60, left: 20 }}>
+              <BarChart data={closerChartData}>
                 <CartesianGrid strokeDasharray="3 3" className="dark:stroke-white/10" />
                 <XAxis 
                   dataKey="name" 
@@ -505,7 +505,7 @@ export function PerformanceCharts({
         <CardContent className="dark:pb-6">
           <ChartContainer config={chartConfig} className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+              <PieChart>
                 <Pie
                   data={leadDispositionsData}
                   cx="50%"
@@ -541,7 +541,7 @@ export function PerformanceCharts({
         <CardContent className="dark:pb-6">
           <ChartContainer config={chartConfig} className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={enhancedTrendData} margin={{ top: 20, right: 20, bottom: 60, left: 20 }}>
+              <LineChart data={enhancedTrendData}>
                 <CartesianGrid strokeDasharray="3 3" className="dark:stroke-white/10" />
                 <XAxis 
                   dataKey="date" 
