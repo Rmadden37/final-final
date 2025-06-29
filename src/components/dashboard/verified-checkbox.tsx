@@ -1,120 +1,125 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import React, { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, AlertCircle } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { db } from "@/lib/firebase";
+import { doc, updateDoc } from "firebase/firestore";
+import type { Lead } from "@/types";
 
-interface VerifiedCheckboxProps {
-  leadId: string;
-  disabled?: boolean;
-  className?: string;
+export interface VerifiedCheckboxProps {
+  leadId?: string;
+  isVerified?: boolean;
+  lead?: Lead;
+  size?: "sm" | "default" | "lg";
+  onVerificationChange?: (verified: boolean) => void;
 }
 
-export default function VerifiedCheckbox({ leadId, disabled = false, className = "" }: VerifiedCheckboxProps) {
-  const [isVerified, setIsVerified] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
+export default function VerifiedCheckbox({ 
+  leadId, 
+  isVerified = false, 
+  lead, 
+  size = "default",
+  onVerificationChange 
+}: VerifiedCheckboxProps) {
+  const { user } = useAuth();
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  
+  // Use lead prop if provided, otherwise use individual props
+  const actualLeadId = leadId || lead?.id;
+  const actualIsVerified = isVerified || lead?.setterVerified || false;
 
-  useEffect(() => {
-    const fetchVerificationStatus = async () => {
-      try {
-        const docRef = doc(db, "leads", leadId);
-        const docSnap = await getDoc(docRef);
+  // Only managers and admins can verify
+  const canVerify = user?.role === "manager" || user?.role === "admin";
 
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          // Check both isVerified and setterVerified for compatibility
-          setIsVerified(data.isVerified || data.setterVerified || false);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching verification status:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load verification status",
-          variant: "destructive",
-        });
-        setLoading(false);
-      }
-    };
+  const handleVerificationToggle = async (checked: boolean) => {
+    if (!canVerify || !actualLeadId) return;
 
-    fetchVerificationStatus();
-  }, [leadId, toast]);
-
-  const handleChange = async (checked: boolean) => {
-    if (disabled) return;
-    
+    setLoading(true);
     try {
-      setUpdating(true);
-      setIsVerified(checked);
-      
-      await updateDoc(doc(db, "leads", leadId), {
-        isVerified: checked,
-        setterVerified: checked, // Keep both fields in sync
+      await updateDoc(doc(db, "leads", actualLeadId), {
+        setterVerified: checked,
         verifiedAt: checked ? new Date() : null,
-        updatedAt: new Date()
+        verifiedBy: checked ? user?.uid : null,
       });
 
       toast({
-        title: checked ? "Lead Verified" : "Lead Unverified",
+        title: checked ? "Lead Verified" : "Verification Removed",
         description: checked 
-          ? "Lead is now verified and can be assigned to closers" 
-          : "Lead verification removed",
-        variant: checked ? "default" : "destructive",
+          ? "Lead has been marked as verified." 
+          : "Lead verification has been removed.",
       });
+
+      onVerificationChange?.(checked);
     } catch (error) {
-      console.error("Error updating verification status:", error);
-      setIsVerified(!checked); // Revert on error
+      console.error("Error updating verification:", error);
       toast({
-        title: "Update Failed",
-        description: "Failed to update verification status. Please try again.",
+        title: "Error",
+        description: "Failed to update verification status.",
         variant: "destructive",
       });
     } finally {
-      setUpdating(false);
+      setLoading(false);
     }
   };
 
-  if (loading) {
+  if (!canVerify) {
+    // Show read-only status for non-managers
     return (
-      <div className="flex items-center space-x-2">
-        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-        <span className="text-sm text-muted-foreground">Loading...</span>
-      </div>
+      <Badge 
+        variant={actualIsVerified ? "default" : "secondary"} 
+        className={`
+          ${size === "sm" ? "text-xs px-2 py-1" : ""}
+          ${actualIsVerified 
+            ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400" 
+            : "bg-gray-100 text-gray-600 dark:bg-gray-900/20 dark:text-gray-400"
+          }
+        `}
+      >
+        {actualIsVerified ? (
+          <>
+            <CheckCircle2 className={`${size === "sm" ? "h-3 w-3" : "h-4 w-4"} mr-1`} />
+            Verified
+          </>
+        ) : (
+          <>
+            <AlertCircle className={`${size === "sm" ? "h-3 w-3" : "h-4 w-4"} mr-1`} />
+            Unverified
+          </>
+        )}
+      </Badge>
     );
   }
 
   return (
-    <div className={`flex items-center space-x-2 ${className}`}>
+    <div className="flex items-center space-x-2">
       <Checkbox
-        id={`verified-${leadId}`}
-        checked={isVerified}
-        onCheckedChange={handleChange}
-        disabled={disabled || updating}
-        className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+        id={`verify-${actualLeadId}`}
+        checked={actualIsVerified}
+        onCheckedChange={handleVerificationToggle}
+        disabled={loading}
+        className={size === "sm" ? "h-4 w-4" : ""}
       />
-      <Label 
-        htmlFor={`verified-${leadId}`}
-        className={`cursor-pointer text-sm flex items-center gap-1 ${
-          disabled ? "opacity-50 cursor-not-allowed" : ""
-        }`}
+      <label 
+        htmlFor={`verify-${actualLeadId}`} 
+        className={`
+          cursor-pointer font-medium transition-colors
+          ${size === "sm" ? "text-xs" : "text-sm"}
+          ${actualIsVerified 
+            ? "text-green-600 dark:text-green-400" 
+            : "text-gray-600 dark:text-gray-400"
+          }
+        `}
       >
-        {updating ? (
-          <Loader2 className="h-3 w-3 animate-spin" />
-        ) : isVerified ? (
-          <CheckCircle className="h-3 w-3 text-green-600" />
-        ) : (
-          <XCircle className="h-3 w-3 text-red-500" />
-        )}
-        <span className={isVerified ? "text-green-600 font-medium" : "text-red-500"}>
-          {isVerified ? "Verified" : "Not Verified"}
-        </span>
-      </Label>
+        {actualIsVerified ? "Verified" : "Verify"}
+      </label>
+      {loading && (
+        <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-blue-600 ${size === "sm" ? "h-3 w-3" : "h-4 w-4"}`} />
+      )}
     </div>
   );
 }

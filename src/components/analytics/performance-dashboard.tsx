@@ -123,7 +123,7 @@ export default function PerformanceDashboard({ className }: PerformanceDashboard
   // Calculate performance metrics using extracted utility functions with memoization
   const setterPerformance = useMemo(() => calculateSetterPerformance(leads), [leads]);
   const closerPerformance = useMemo(() => calculateCloserPerformance(leads), [leads]);
-  const teamMetrics = useMemo(() => calculateTeamMetrics(leads, setterPerformance, closerPerformance), [leads, setterPerformance, closerPerformance]);
+  const teamMetrics = useMemo(() => calculateTeamMetrics(leads, []), [leads]);
   const trendData = useMemo(() => generateTrendData(leads), [leads]);
 
   // Filter data based on selected filters

@@ -1,75 +1,148 @@
-import React, { useState, useMemo } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Calendar, Clock, MapPin } from "lucide-react";
+import LeadCard from "@/components/dashboard/lead-card";
 import type { Lead } from "@/types";
-import LeadCard from "@/components/performance-dashboard.tsx/lead-card";
+import { useAuth } from "@/hooks/use-auth";
+import { db } from "@/lib/firebase";
+import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
+import { format, startOfDay, endOfDay, addDays } from "date-fns";
 
 interface LeadFormWithCalendarProps {
-  scheduledLeads?: Lead[];
+  className?: string;
 }
 
-const LeadFormWithCalendar: React.FC<LeadFormWithCalendarProps> = ({ scheduledLeads = [] }) => {
-  const [startDate, setStartDate] = useState<Date | null>(new Date());
+export default function LeadFormWithCalendar({ className }: LeadFormWithCalendarProps) {
+  const { user } = useAuth();
+  const [scheduledLeads, setScheduledLeads] = useState<Lead[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [loading, setLoading] = useState(true);
 
-  // Filter scheduled leads for the selected date
-  const leadsForSelectedDate = useMemo(() => {
-    if (!startDate) return [];
-    return scheduledLeads.filter(lead => {
-      if (!lead.scheduledAppointmentTime) return false;
-      const leadDate = lead.scheduledAppointmentTime.toDate();
-      return (
-        leadDate.getFullYear() === startDate.getFullYear() &&
-        leadDate.getMonth() === startDate.getMonth() &&
-        leadDate.getDate() === startDate.getDate()
-      );
+  // Fetch scheduled leads
+  useEffect(() => {
+    if (!user?.teamId) return;
+
+    const startDate = startOfDay(selectedDate);
+    const endDate = endOfDay(selectedDate);
+
+    const q = query(
+      collection(db, "leads"),
+      where("teamId", "==", user.teamId),
+      where("status", "==", "scheduled"),
+      orderBy("scheduledAppointmentTime", "asc")
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const leads = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Lead))
+        .filter(lead => {
+          if (!lead.scheduledAppointmentTime) return false;
+          const appointmentDate = lead.scheduledAppointmentTime.toDate();
+          return appointmentDate >= startDate && appointmentDate <= endDate;
+        });
+
+      setScheduledLeads(leads);
+      setLoading(false);
     });
-  }, [scheduledLeads, startDate]);
+
+    return () => unsubscribe();
+  }, [user?.teamId, selectedDate]);
+
+  // Generate next 7 days for quick selection
+  const upcomingDays = Array.from({ length: 7 }, (_, i) => {
+    const date = addDays(new Date(), i);
+    return {
+      date,
+      label: format(date, i === 0 ? "'Today'" : i === 1 ? "'Tomorrow'" : "EEE, MMM d"),
+      isToday: i === 0,
+      isTomorrow: i === 1
+    };
+  });
 
   return (
-    <Dialog open>
-      <DialogContent
-        className="fixed inset-0 flex items-center justify-center bg-white z-50 p-0 overflow-y-auto"
-        style={{ height: 'calc(var(--vh, 1vh) * 100)', maxHeight: '100dvh' }}
-      >
-        <DialogTitle>
-          <span className="sr-only">Select a date for your lead</span>
-        </DialogTitle>
-        <div className="w-full max-w-md flex flex-col items-center justify-center overflow-y-auto p-4 sm:p-6 mobile:p-2" style={{ maxHeight: '90vh' }}>
-          <form className="w-full flex flex-col gap-4">
-            <div className="w-full flex justify-center">
-              <DatePicker
-                selected={startDate}
-                onChange={(date: Date | null) => setStartDate(date)}
-                inline
-                calendarClassName="!z-50 w-full max-w-xs sm:max-w-sm mobile:max-w-full"
-              />
-            </div>
-            <input
-              type="text"
-              placeholder="Lead Name"
-              className="block w-full border rounded p-2 text-base mobile:text-sm mobile:p-2"
-              autoComplete="off"
-            />
-            <button type="submit" className="w-full bg-blue-600 text-white rounded p-2 font-semibold text-base mobile:text-sm">Create Lead</button>
-          </form>
-          {/* Scheduled leads for selected date */}
-          <div className="w-full mt-4">
-            {leadsForSelectedDate.length > 0 ? (
-              <div className="space-y-2 max-h-[60vh] overflow-y-auto mobile:max-h-none"> {/* On mobile, remove max height to show all leads */}
-                <div className="text-xs font-semibold text-gray-500 mb-1">Scheduled leads for this date:</div>
-                {leadsForSelectedDate.map(lead => (
-                  <LeadCard key={lead.id} lead={lead} context="queue-scheduled" />
-                ))}
-              </div>
-            ) : (
-              <div className="text-xs text-gray-400 text-center">No scheduled leads for this date.</div>
-            )}
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
+    <div className={`space-y-6 ${className}`}>
+      {/* Header */}
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+          <Calendar className="h-6 w-6" />
+          Scheduled Appointments
+        </h2>
+        <p className="text-muted-foreground">
+          View and manage scheduled lead appointments
+        </p>
+      </div>
 
-export default LeadFormWithCalendar;
+      {/* Date Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            Select Date
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+            {upcomingDays.map((day, index) => (
+              <Button
+                key={index}
+                variant={selectedDate.toDateString() === day.date.toDateString() ? "default" : "outline"}
+                onClick={() => setSelectedDate(day.date)}
+                className="h-auto p-3 flex flex-col items-center"
+              >
+                <span className="text-sm font-medium">{day.label}</span>
+                <span className="text-xs text-muted-foreground">
+                  {format(day.date, "MMM d")}
+                </span>
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Scheduled Leads */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            Appointments for {format(selectedDate, "EEEE, MMMM d, yyyy")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading appointments...</p>
+            </div>
+          ) : scheduledLeads.length === 0 ? (
+            <div className="text-center py-8">
+              <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No appointments scheduled</h3>
+              <p className="text-muted-foreground">
+                No leads are scheduled for {format(selectedDate, "MMMM d, yyyy")}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {scheduledLeads.map((lead) => (
+                <div key={lead.id} className="border rounded-lg p-4">
+                  {lead.scheduledAppointmentTime && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+                      <Clock className="h-4 w-4" />
+                      <span>
+                        Scheduled for {format(lead.scheduledAppointmentTime.toDate(), "h:mm a")}
+                      </span>
+                    </div>
+                  )}
+                  <LeadCard lead={lead} context="calendar" />
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

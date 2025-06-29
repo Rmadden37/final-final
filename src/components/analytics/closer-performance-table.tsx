@@ -87,7 +87,7 @@ export function CloserPerformanceTable({
                         {closer.conversionRate.toFixed(1)}%
                       </span>
                     </td>
-                    <td className="text-center p-2">{closer.avgLeadsPerDay.toFixed(1)}</td>
+                    <td className="text-center p-2">{closer.avgDealsPerDay?.toFixed(1) || '0.0'}</td>
                   </tr>
                 ))}
             </tbody>

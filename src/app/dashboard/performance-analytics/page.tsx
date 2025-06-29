@@ -195,7 +195,7 @@ export default function PerformanceAnalyticsPage() {
       const snapshot = await getDocs(q);
       const leadsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Lead[];
       setLeads(leadsData);
-      setTeamMetrics(calculateTeamMetrics(leadsData, [], []));
+      setTeamMetrics(calculateTeamMetrics(leadsData, []));
     };
     fetchLeads();
   }, [user?.teamId]);
@@ -218,7 +218,7 @@ export default function PerformanceAnalyticsPage() {
         const snapshot = await getDocs(q);
         const leadsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Lead[];
         setLeads(leadsData);
-        setTeamMetrics(calculateTeamMetrics(leadsData, [], []));
+        setTeamMetrics(calculateTeamMetrics(leadsData, []));
       };
       fetchLeads();
     }

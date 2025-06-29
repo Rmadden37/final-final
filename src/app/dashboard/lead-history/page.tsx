@@ -5,281 +5,349 @@ import type {Lead} from "@/types";
 import {useAuth} from "@/hooks/use-auth";
 import {useToast} from "@/hooks/use-toast";
 import {db} from "@/lib/firebase";
-import {collection, query, where, onSnapshot, orderBy, doc, updateDoc, serverTimestamp} from "firebase/firestore";
+import {collection, query, where, onSnapshot, orderBy, limit, Timestamp} from "firebase/firestore";
 import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import {
-  Loader2,
+  History,
   Search,
   Filter,
-  Download,
-  MoreHorizontal,
+  Users,
+  TrendingUp,
   Calendar,
-  Phone,
   MapPin,
-  User,
+  Phone,
   Clock,
-  Check,
-  X,
-  Edit,
+  Loader2,
+  Download,
+  FileText,
+  BarChart3,
+  Target,
+  Award
 } from "lucide-react";
+import {format, startOfDay, endOfDay, subDays, subMonths} from "date-fns";
+import {useIsMobile} from "@/hooks/use-mobile";
 import {ScrollArea} from "@/components/ui/scroll-area";
+import VerifiedCheckbox from "@/components/dashboard/verified-checkbox";
 import {useRouter} from "next/navigation";
-import {format} from "date-fns";
-import VerifiedCheckbox from "@/components/performance-dashboard.tsx/verified-checkbox";
 
-export default function LeadManagementPage() {
+// Rest of the file content - keeping the same logic but just fixing the import
+const LEADS_PER_PAGE = 50;
+
+interface FilterState {
+  search: string;
+  status: string;
+  dispatchType: string;
+  setterId: string;
+  closerId: string;
+  dateRange: string;
+  startDate?: Date;
+  endDate?: Date;
+}
+
+// Status color mapping
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "sold":
+      return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400";
+    case "no_sale":
+      return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
+    case "canceled":
+      return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
+    case "credit_fail":
+      return "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400";
+    case "scheduled":
+      return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400";
+    case "waiting_assignment":
+      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400";
+    default:
+      return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
+  }
+};
+
+// Lead card component
+function LeadCard({lead, isMobile}: {lead: Lead; isMobile: boolean}) {
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return "N/A";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return format(date, "MMM d, yyyy 'at' h:mm a");
+  };
+
+  return (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="p-4">
+        <div className="space-y-3">
+          {/* Header with status */}
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="font-semibold text-lg">{lead.customerName}</h3>
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <Phone className="h-3 w-3"/>
+                {lead.customerPhone}
+              </p>
+            </div>
+            <Badge className={getStatusColor(lead.status)}>
+              {lead.status.replace("_", " ").toUpperCase()}
+            </Badge>
+          </div>
+
+          {/* Address */}
+          {lead.address && (
+            <p className="text-sm text-muted-foreground flex items-start gap-1">
+              <MapPin className="h-3 w-3 mt-0.5 flex-shrink-0"/>
+              {lead.address}
+            </p>
+          )}
+
+          {/* Metadata grid */}
+          <div className={`grid ${isMobile ? "grid-cols-1" : "grid-cols-2"} gap-2 text-xs`}>
+            <div>
+              <span className="font-medium">Setter:</span> {lead.setterName}
+            </div>
+            {lead.assignedCloserName && (
+              <div>
+                <span className="font-medium">Closer:</span> {lead.assignedCloserName}
+              </div>
+            )}
+            <div>
+              <span className="font-medium">Type:</span>{" "}
+              <Badge variant="outline" className="text-xs">
+                {lead.dispatchType}
+              </Badge>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock className="h-3 w-3"/>
+              <span className="font-medium">Created:</span> {formatDate(lead.createdAt)}
+            </div>
+          </div>
+
+          {/* Scheduled appointment */}
+          {lead.scheduledAppointmentTime && (
+            <div className="text-xs bg-blue-50 dark:bg-blue-900/20 p-2 rounded flex items-center gap-1">
+              <Calendar className="h-3 w-3 text-blue-600"/>
+              <span className="font-medium">Scheduled:</span> {formatDate(lead.scheduledAppointmentTime)}
+            </div>
+          )}
+
+          {/* Disposition notes */}
+          {lead.dispositionNotes && (
+            <div className="text-xs bg-gray-50 dark:bg-gray-900/20 p-2 rounded">
+              <span className="font-medium">Notes:</span> {lead.dispositionNotes}
+            </div>
+          )}
+
+          {/* Verification status for managers */}
+          <div className="flex items-center justify-between">
+         <VerifiedCheckbox lead={lead} size="sm" />
+            <span className="text-xs text-muted-foreground">
+              ID: {lead.id.slice(-8)}
+            </span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function LeadHistoryPage() {
   const {user, loading: authLoading} = useAuth();
   const {toast} = useToast();
   const router = useRouter();
+  const isMobile = useIsMobile();
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [allLeads, setAllLeads] = useState<Lead[]>([]);
   const [leadsLoading, setLeadsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [dispatchFilter, setDispatchFilter] = useState<string>("all");
-  const [dateFilter, setDateFilter] = useState<string>("all");
-  
-  // Inline editing state
-  const [editingLead, setEditingLead] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<{[key: string]: string | number}>({});
-  const [saving, setSaving] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
+  // Filter state
+  const [filters, setFilters] = useState<FilterState>({
+    search: "",
+    status: "all",
+    dispatchType: "all",
+    setterId: "all",
+    closerId: "all",
+    dateRange: "30d",
+  });
+
+  // Derived filter values
+  const dateRangeFilter = useMemo(() => {
+    const now = new Date();
+    switch (filters.dateRange) {
+      case "7d":
+        return {start: startOfDay(subDays(now, 7)), end: endOfDay(now)};
+      case "30d":
+        return {start: startOfDay(subDays(now, 30)), end: endOfDay(now)};
+      case "90d":
+        return {start: startOfDay(subDays(now, 90)), end: endOfDay(now)};
+      case "6m":
+        return {start: startOfDay(subMonths(now, 6)), end: endOfDay(now)};
+      case "1y":
+        return {start: startOfDay(subMonths(now, 12)), end: endOfDay(now)};
+      case "custom":
+        return filters.startDate && filters.endDate
+          ? {start: startOfDay(filters.startDate), end: endOfDay(filters.endDate)}
+          : null;
+      default:
+        return {start: startOfDay(subDays(now, 30)), end: endOfDay(now)};
+    }
+  }, [filters.dateRange, filters.startDate, filters.endDate]);
+
+  // Auth and permission check
   useEffect(() => {
     if (!authLoading && (!user || (user.role !== "manager" && user.role !== "admin"))) {
       router.replace(user ? "/dashboard" : "/login");
       return;
     }
+  }, [user, authLoading, router]);
 
-    if (user && user.teamId && (user.role === "manager" || user.role === "admin")) {
-      setLeadsLoading(true);
-      const q = query(
-        collection(db, "leads"),
-        where("teamId", "==", user.teamId),
-        orderBy("createdAt", "desc")
-      );
+  // Load leads from Firestore
+  useEffect(() => {
+    if (!user?.teamId || !dateRangeFilter) return;
 
-      const unsubscribe = onSnapshot(
-        q,
-        (querySnapshot) => {
-          const leadsData = querySnapshot.docs.map(
-            (doc) => ({id: doc.id, ...doc.data()} as Lead)
-          );
-          setLeads(leadsData);
-          setLeadsLoading(false);
-        },
-        (_error) => {
-          toast({
-            title: "Error",
-            description: "Failed to load leads. Please refresh the page.",
-            variant: "destructive",
-          });
-          setLeadsLoading(false);
-        }
-      );
+    setLeadsLoading(true);
+    setLeads([]);
+    setCurrentPage(1);
+    setHasMore(true);
 
-      return () => unsubscribe();
-    }
-  }, [user, authLoading, router, toast]);
+    const baseQuery = query(
+      collection(db, "leads"),
+      where("teamId", "==", user.teamId),
+      where("createdAt", ">=", Timestamp.fromDate(dateRangeFilter.start)),
+      where("createdAt", "<=", Timestamp.fromDate(dateRangeFilter.end)),
+      orderBy("createdAt", "desc")
+    );
 
-  // Filtered and searched leads
-  const filteredLeads = useMemo(() => {
-    return leads.filter((lead) => {
-      // Search filter
-      const matchesSearch = searchTerm === "" || 
-        lead.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lead.customerPhone.includes(searchTerm) ||
-        (lead.address && lead.address.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (lead.assignedCloserName && lead.assignedCloserName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (lead.setterName && lead.setterName.toLowerCase().includes(searchTerm.toLowerCase()));
-
-      // Status filter
-      const matchesStatus = statusFilter === "all" || lead.status === statusFilter;
-
-      // Dispatch type filter
-      const matchesDispatch = dispatchFilter === "all" || lead.dispatchType === dispatchFilter;
-
-      // Date filter
-      let matchesDate = true;
-      if (dateFilter !== "all") {
-        const leadDate = lead.createdAt.toDate();
-        const now = new Date();
-        
-        switch (dateFilter) {
-          case "today":
-            matchesDate = leadDate.toDateString() === now.toDateString();
-            break;
-          case "week": {
-            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-            matchesDate = leadDate >= weekAgo;
-            break;
-          }
-          case "month": {
-            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-            matchesDate = leadDate >= monthAgo;
-            break;
-          }
-        }
+    const unsubscribe = onSnapshot(
+      baseQuery,
+      (querySnapshot) => {
+        const leadsData = querySnapshot.docs.map(
+          (doc) => ({id: doc.id, ...doc.data()} as Lead)
+        );
+        setAllLeads(leadsData);
+        setLeadsLoading(false);
+      },
+      (error) => {
+        console.error("Error fetching leads:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load leads. Please refresh the page.",
+          variant: "destructive",
+        });
+        setLeadsLoading(false);
       }
+    );
 
-      return matchesSearch && matchesStatus && matchesDispatch && matchesDate;
-    });
-  }, [leads, searchTerm, statusFilter, dispatchFilter, dateFilter]);
+    return () => unsubscribe();
+  }, [user?.teamId, dateRangeFilter, toast]);
 
-  const getStatusBadgeVariant = (status: string, dispatchType?: string) => {
-    // For immediate dispatch leads, show neutral variant for N/A status
-    if (dispatchType === "immediate") {
-      return "secondary";
+  // Apply filters and pagination
+  const filteredAndPaginatedLeads = useMemo(() => {
+    let filtered = allLeads;
+
+    // Apply search filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(
+        (lead) =>
+          lead.customerName?.toLowerCase().includes(searchLower) ||
+          lead.customerPhone?.includes(searchLower) ||
+          lead.address?.toLowerCase().includes(searchLower) ||
+          lead.setterName?.toLowerCase().includes(searchLower) ||
+          lead.assignedCloserName?.toLowerCase().includes(searchLower)
+      );
     }
-    
-    switch (status) {
-      case "sold":
-        return "default";
-      case "accepted":
-      case "in_process":
-        return "secondary";
-      case "waiting_assignment":
-        return "outline";
-      case "scheduled":
-        return "outline";
-      case "no_sale":
-      case "canceled":
-        return "destructive";
-      case "rescheduled":
-        return "secondary";
-      default:
-        return "outline";
+
+    // Apply status filter
+    if (filters.status !== "all") {
+      filtered = filtered.filter((lead) => lead.status === filters.status);
     }
-  };
 
-  const exportToCSV = () => {
-    const headers = [
-      "Customer Name",
-      "Phone",
-      "Address",
-      "Status",
-      "Dispatch Type",
-      "Assigned Closer",
-      "Setter",
-      "Created At",
-      "Updated At",
-      "Scheduled Time"
-    ];
-
-    const csvData = filteredLeads.map(lead => [
-      lead.customerName,
-      lead.customerPhone,
-      lead.address || "",
-      lead.status,
-      lead.dispatchType,
-      lead.assignedCloserName || "",
-      lead.setterName || "",
-      format(lead.createdAt.toDate(), "yyyy-MM-dd HH:mm:ss"),
-      format(lead.updatedAt.toDate(), "yyyy-MM-dd HH:mm:ss"),
-      lead.scheduledAppointmentTime ? format(lead.scheduledAppointmentTime.toDate(), "yyyy-MM-dd HH:mm:ss") : ""
-    ]);
-
-    const csvContent = [headers, ...csvData]
-      .map(row => row.map(field => `"${field}"`).join(","))
-      .join("\n");
-
-    if (typeof window !== 'undefined') {
-      const blob = new Blob([csvContent], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `leads-export-${format(new Date(), "yyyy-MM-dd")}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
+    // Apply dispatch type filter
+    if (filters.dispatchType !== "all") {
+      filtered = filtered.filter((lead) => lead.dispatchType === filters.dispatchType);
     }
-  };
 
-  // Start editing a lead
-  const startEditing = (lead: Lead) => {
-    setEditingLead(lead.id);
-    setEditValues({
-      customerName: lead.customerName,
-      customerPhone: lead.customerPhone,
-      address: lead.address || "",
-      status: lead.status,
-      dispatchType: lead.dispatchType,
-    });
-  };
+    // Apply setter filter
+    if (filters.setterId !== "all") {
+      filtered = filtered.filter((lead) => lead.setterId === filters.setterId);
+    }
 
-  // Cancel editing
-  const cancelEditing = () => {
-    setEditingLead(null);
-    setEditValues({});
-  };
+    // Apply closer filter
+    if (filters.closerId !== "all") {
+      filtered = filtered.filter((lead) => lead.assignedCloserId === filters.closerId);
+    }
 
-  // Save changes to Firestore
-  const saveChanges = async (leadId: string) => {
-    if (!editValues || saving) return;
-    
-    setSaving(true);
-    try {
-      const leadRef = doc(db, "leads", leadId);
-      await updateDoc(leadRef, {
-        ...editValues,
-        updatedAt: serverTimestamp(),
-      });
-      
-      toast({
-        title: "Success",
-        description: "Lead information updated successfully.",
-      });
-      
-      setEditingLead(null);
-      setEditValues({});
-    } catch (error) {
-      if (typeof window !== 'undefined') {
-        console.error("Error updating lead:", error);
+    // Pagination
+    const startIndex = 0;
+    const endIndex = currentPage * LEADS_PER_PAGE;
+    const paginatedResults = filtered.slice(startIndex, endIndex);
+
+    // Update hasMore state
+    setHasMore(endIndex < filtered.length);
+
+    return {
+      leads: paginatedResults,
+      totalCount: filtered.length,
+      filteredCount: paginatedResults.length,
+    };
+  }, [allLeads, filters, currentPage]);
+
+  // Get unique setters and closers for filter dropdowns
+  const {uniqueSetters, uniqueClosers} = useMemo(() => {
+    const setters = new Map<string, string>();
+    const closers = new Map<string, string>();
+
+    allLeads.forEach((lead) => {
+      if (lead.setterId && lead.setterName) {
+        setters.set(lead.setterId, lead.setterName);
       }
-      toast({
-        title: "Error",
-        description: "Failed to update lead information.",
-        variant: "destructive",
-      });
-    } finally {
-      setSaving(false);
-    }
-  };
+      if (lead.assignedCloserId && lead.assignedCloserName) {
+        closers.set(lead.assignedCloserId, lead.assignedCloserName);
+      }
+    });
 
-  // Update edit value
-  const updateEditValue = (field: string, value: string | number) => {
-    setEditValues(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    return {
+      uniqueSetters: Array.from(setters.entries()).map(([id, name]) => ({id, name})),
+      uniqueClosers: Array.from(closers.entries()).map(([id, name]) => ({id, name})),
+    };
+  }, [allLeads]);
+
+  // Statistics
+  const stats = useMemo(() => {
+    const total = filteredAndPaginatedLeads.totalCount;
+    const sold = allLeads.filter((lead) => lead.status === "sold").length;
+    const scheduled = allLeads.filter((lead) => lead.status === "scheduled").length;
+    const pending = allLeads.filter((lead) => lead.status === "waiting_assignment").length;
+
+    return {
+      total,
+      sold,
+      scheduled,
+      pending,
+      conversionRate: total > 0 ? ((sold / total) * 100).toFixed(1) : "0.0",
+    };
+  }, [allLeads, filteredAndPaginatedLeads.totalCount]);
+
+  // Load more functionality
+  const loadMore = () => {
+    if (!hasMore || loadingMore) return;
+    setLoadingMore(true);
+    setTimeout(() => {
+      setCurrentPage((prev) => prev + 1);
+      setLoadingMore(false);
+    }, 500);
   };
 
   if (authLoading || leadsLoading) {
     return (
       <div className="flex min-h-[calc(100vh-var(--header-height,4rem))] items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <Loader2 className="h-12 w-12 animate-spin text-primary"/>
       </div>
     );
   }
@@ -293,56 +361,133 @@ export default function LeadManagementPage() {
   }
 
   return (
-    <div className="container mx-auto py-6">
-      <Card className="shadow-xl">
-        <CardHeader className="px-4 sm:px-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <CardTitle className="text-2xl sm:text-3xl font-bold font-headline flex items-center">
-              <Filter className="mr-2 sm:mr-3 h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-sm">
-                {filteredLeads.length} leads
-              </Badge>
-              <Button onClick={exportToCSV} variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
-              </Button>
-            </div>
+    <div className="container mx-auto py-8 space-y-6">
+      {/* Header with stats */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold font-headline flex items-center gap-3">
+              <History className="h-8 w-8 text-primary"/>
+              Lead History
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Comprehensive view of all team leads with advanced filtering
+            </p>
           </div>
-          
-          {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 mt-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search leads..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Filter by status" />
+        </div>
+
+        {/* Stats cards */}
+        <div className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-5"} gap-4`}>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+              <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                <FileText className="h-3 w-3"/>
+                Total Leads
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-green-600">{stats.sold}</div>
+              <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                <Award className="h-3 w-3"/>
+                Sold
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600">{stats.scheduled}</div>
+              <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                <Calendar className="h-3 w-3"/>
+                Scheduled
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+              <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                <Clock className="h-3 w-3"/>
+                Pending
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-purple-600">{stats.conversionRate}%</div>
+              <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                <TrendingUp className="h-3 w-3"/>
+                Conversion
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-5 w-5"/>
+            Filters & Search
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
+            <Input
+              placeholder="Search by customer name, phone, address, setter, or closer..."
+              value={filters.search}
+              onChange={(e) => setFilters((prev) => ({...prev, search: e.target.value}))}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Filter dropdowns */}
+          <div className={`grid ${isMobile ? "grid-cols-1" : "grid-cols-3 lg:grid-cols-6"} gap-4`}>
+            <Select
+              value={filters.dateRange}
+              onValueChange={(value) => setFilters((prev) => ({...prev, dateRange: value}))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Date Range"/>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="waiting_assignment">Waiting Assignment</SelectItem>
-                <SelectItem value="accepted">Accepted</SelectItem>
-                <SelectItem value="in_process">In Process</SelectItem>
-                <SelectItem value="scheduled">Scheduled</SelectItem>
-                <SelectItem value="sold">Sold</SelectItem>
-                <SelectItem value="no_sale">No Sale</SelectItem>
-                <SelectItem value="canceled">Canceled</SelectItem>
-                <SelectItem value="rescheduled">Rescheduled</SelectItem>
+                <SelectItem value="7d">Last 7 days</SelectItem>
+                <SelectItem value="30d">Last 30 days</SelectItem>
+                <SelectItem value="90d">Last 90 days</SelectItem>
+                <SelectItem value="6m">Last 6 months</SelectItem>
+                <SelectItem value="1y">Last year</SelectItem>
               </SelectContent>
             </Select>
 
-            <Select value={dispatchFilter} onValueChange={setDispatchFilter}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Filter by dispatch" />
+            <Select
+              value={filters.status}
+              onValueChange={(value) => setFilters((prev) => ({...prev, status: value}))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Status"/>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="sold">Sold</SelectItem>
+                <SelectItem value="no_sale">No Sale</SelectItem>
+                <SelectItem value="canceled">Canceled</SelectItem>
+                <SelectItem value="credit_fail">Credit Failed</SelectItem>
+                <SelectItem value="scheduled">Scheduled</SelectItem>
+                <SelectItem value="waiting_assignment">Waiting Assignment</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={filters.dispatchType}
+              onValueChange={(value) => setFilters((prev) => ({...prev, dispatchType: value}))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Dispatch Type"/>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
@@ -351,262 +496,112 @@ export default function LeadManagementPage() {
               </SelectContent>
             </Select>
 
-            <Select value={dateFilter} onValueChange={setDateFilter}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Filter by date" />
+            <Select
+              value={filters.setterId}
+              onValueChange={(value) => setFilters((prev) => ({...prev, setterId: value}))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Setter"/>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Time</SelectItem>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="week">Past Week</SelectItem>
-                <SelectItem value="month">Past Month</SelectItem>
+                <SelectItem value="all">All Setters</SelectItem>
+                {uniqueSetters.map((setter) => (
+                  <SelectItem key={setter.id} value={setter.id}>
+                    {setter.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
+
+            <Select
+              value={filters.closerId}
+              onValueChange={(value) => setFilters((prev) => ({...prev, closerId: value}))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Closer"/>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Closers</SelectItem>
+                {uniqueClosers.map((closer) => (
+                  <SelectItem key={closer.id} value={closer.id}>
+                    {closer.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Button
+              variant="outline"
+              onClick={() =>
+                setFilters({
+                  search: "",
+                  status: "all",
+                  dispatchType: "all",
+                  setterId: "all",
+                  closerId: "all",
+                  dateRange: "30d",
+                })
+              }
+            >
+              Clear Filters
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Results */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5"/>
+              Leads ({filteredAndPaginatedLeads.totalCount})
+            </CardTitle>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2"/>
+              Export
+            </Button>
           </div>
         </CardHeader>
-        
-        <CardContent className="px-4 sm:px-6">
-          {filteredLeads.length === 0 && !leadsLoading ? (
-            <div className="flex h-64 items-center justify-center">
+        <CardContent>
+          {filteredAndPaginatedLeads.leads.length === 0 ? (
+            <div className="text-center py-12">
+              <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4"/>
+              <h3 className="text-lg font-semibold mb-2">No leads found</h3>
               <p className="text-muted-foreground">
-                {searchTerm || statusFilter !== "all" || dispatchFilter !== "all" || dateFilter !== "all"
-                  ? "No leads match your current filters."
-                  : "No leads found for your team."}
+                Try adjusting your filters or search criteria.
               </p>
             </div>
           ) : (
-            <ScrollArea className="h-[calc(100vh-20rem)] w-full">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-48">Customer</TableHead>
-                    <TableHead className="w-32">Phone</TableHead>
-                    <TableHead className="w-64">Address</TableHead>
-                    <TableHead className="w-32">Status</TableHead>
-                    <TableHead className="w-32">Verified</TableHead>
-                    <TableHead className="w-32">Type</TableHead>
-                    <TableHead className="w-48">Assigned Closer</TableHead>
-                    <TableHead className="w-48">Setter</TableHead>
-                    <TableHead className="w-48">Created</TableHead>
-                    <TableHead className="w-48">Scheduled</TableHead>
-                    <TableHead className="w-12">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredLeads.map((lead) => (
-                    <TableRow key={lead.id} className="hover:bg-muted/50">
-                      {/* Customer Name */}
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          {editingLead === lead.id ? (
-                            <Input
-                              value={editValues.customerName || ""}
-                              onChange={(e) => updateEditValue("customerName", e.target.value)}
-                              className="h-8 text-sm"
-                              placeholder="Customer name"
-                            />
-                          ) : (
-                            <span className="font-medium">{lead.customerName}</span>
-                          )}
-                        </div>
-                      </TableCell>
-
-                      {/* Phone */}
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <Phone className="h-4 w-4 text-muted-foreground" />
-                          {editingLead === lead.id ? (
-                            <Input
-                              value={editValues.customerPhone || ""}
-                              onChange={(e) => updateEditValue("customerPhone", e.target.value)}
-                              className="h-8 text-sm font-mono"
-                              placeholder="Phone number"
-                            />
-                          ) : (
-                            <span className="font-mono text-sm">{lead.customerPhone}</span>
-                          )}
-                        </div>
-                      </TableCell>
-
-                      {/* Address */}
-                      <TableCell>
-                        {editingLead === lead.id ? (
-                          <div className="flex items-center space-x-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground" />
-                            <Input
-                              value={editValues.address || ""}
-                              onChange={(e) => updateEditValue("address", e.target.value)}
-                              className="h-8 text-sm"
-                              placeholder="Address"
-                            />
-                          </div>
-                        ) : lead.address ? (
-                          <div className="flex items-center space-x-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm truncate max-w-64" title={lead.address}>
-                              {lead.address}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">No address</span>
-                        )}
-                      </TableCell>
-
-                      {/* Status */}
-                      <TableCell>
-                        {editingLead === lead.id ? (
-                          <Select 
-                            value={String(editValues.status || "")} 
-                            onValueChange={(value) => updateEditValue("status", value)}
-                          >
-                            <SelectTrigger className="h-8 text-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="waiting_assignment">Waiting Assignment</SelectItem>
-                              <SelectItem value="accepted">Accepted</SelectItem>
-                              <SelectItem value="in_process">In Process</SelectItem>
-                              <SelectItem value="scheduled">Scheduled</SelectItem>
-                              <SelectItem value="sold">Sold</SelectItem>
-                              <SelectItem value="no_sale">No Sale</SelectItem>
-                              <SelectItem value="canceled">Canceled</SelectItem>
-                              <SelectItem value="rescheduled">Rescheduled</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Badge variant={getStatusBadgeVariant(lead.status, lead.dispatchType)}>
-                            {lead.dispatchType === "immediate" ? "N/A" : lead.status.replace("_", " ")}
-                          </Badge>
-                        )}
-                      </TableCell>
-
-                      {/* Verification */}
-                      <TableCell>
-                        <VerifiedCheckbox 
-                          leadId={lead.id} 
-                          disabled={editingLead === lead.id}
-                          className="flex justify-center"
-                        />
-                      </TableCell>
-
-                      {/* Type */}
-                      <TableCell>
-                        {editingLead === lead.id ? (
-                          <Select 
-                            value={String(editValues.dispatchType || "")} 
-                            onValueChange={(value) => updateEditValue("dispatchType", value)}
-                          >
-                            <SelectTrigger className="h-8 text-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="immediate">Immediate</SelectItem>
-                              <SelectItem value="scheduled">Scheduled</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Badge variant="outline">
-                            {lead.dispatchType}
-                          </Badge>
-                        )}
-                      </TableCell>
-
-                      {/* Assigned Closer (Read-only) */}
-                      <TableCell>
-                        {lead.assignedCloserName ? (
-                          <span className="text-sm">{lead.assignedCloserName}</span>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">Unassigned</span>
-                        )}
-                      </TableCell>
-
-                      {/* Setter (Read-only) */}
-                      <TableCell>
-                        {lead.setterName ? (
-                          <span className="text-sm">{lead.setterName}</span>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">Unknown</span>
-                        )}
-                      </TableCell>
-
-                      {/* Created (Read-only) */}
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">
-                            {format(lead.createdAt.toDate(), "MMM dd, HH:mm")}
-                          </span>
-                        </div>
-                      </TableCell>
-
-                      {/* Scheduled (Read-only) */}
-                      <TableCell>
-                        {lead.scheduledAppointmentTime ? (
-                          <div className="flex items-center space-x-2">
-                            <Clock className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">
-                              {format(lead.scheduledAppointmentTime.toDate(), "MMM dd, HH:mm")}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">Not scheduled</span>
-                        )}
-                      </TableCell>
-
-                      {/* Actions */}
-                      <TableCell>
-                        {editingLead === lead.id ? (
-                          <div className="flex items-center space-x-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => saveChanges(lead.id)}
-                              disabled={saving}
-                              className="h-8 w-8 p-0"
-                            >
-                              {saving ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <Check className="h-4 w-4 text-green-600" />
-                              )}
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={cancelEditing}
-                              disabled={saving}
-                              className="h-8 w-8 p-0"
-                            >
-                              <X className="h-4 w-4 text-red-600" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => startEditing(lead)}>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit Lead
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>View Details</DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-destructive">
-                                Delete Lead
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        )}
-                      </TableCell>
-                    </TableRow>
+            <>
+              <ScrollArea className="h-[600px]">
+                <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"}`}>
+                  {filteredAndPaginatedLeads.leads.map((lead) => (
+                    <LeadCard key={lead.id} lead={lead} isMobile={isMobile}/>
                   ))}
-                </TableBody>
-              </Table>
-            </ScrollArea>
+                </div>
+              </ScrollArea>
+
+              {/* Load more */}
+              {hasMore && (
+                <div className="text-center mt-6">
+                  <Button
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    variant="outline"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin"/>
+                        Loading...
+                      </>
+                    ) : (
+                      "Load More"
+                    )}
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
