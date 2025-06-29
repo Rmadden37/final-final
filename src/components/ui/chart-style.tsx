@@ -1,37 +1,34 @@
-// components/ui/chart-style.tsx
 "use client"
 
 import * as React from "react"
 
-export function ChartStyle({ id, config }: { id: string; config: Record<string, any> }) {
+interface ChartStyleProps {
+  id: string
+  config: Record<string, any>
+}
+
+export function ChartStyle({ id, config }: ChartStyleProps) {
   const colorConfig = React.useMemo(() => {
-    const configLookup = new Map(
-      Object.entries(config).filter(([_, config]) => config.theme || config.color)
-    )
-
-    const getColorFromConfig = (dataKey: string) => {
-      const config = configLookup.get(dataKey)
-      if (!config) return null
-      return config.theme?.light || config.color
-    }
-
-    return {
-      getColorFromConfig,
-    }
+    const colors = Object.entries(config).reduce((acc, [key, value]) => {
+      if (typeof value === 'object' && value.color) {
+        acc[`--color-${key}`] = value.color
+      }
+      return acc
+    }, {} as Record<string, string>)
+    
+    return colors
   }, [config])
 
   return (
     <style
       dangerouslySetInnerHTML={{
-        __html: Object.entries(config)
-          .map(
-            ([key, value]) => `
-          [data-chart="${id}"] [data-id="${key}"] {
-            fill: ${value.color || `hsl(var(--chart-${key}))`};
+        __html: `
+          [data-chart="${id}"] {
+            ${Object.entries(colorConfig)
+              .map(([key, value]) => `${key}: ${value};`)
+              .join('\n')}
           }
-        `
-          )
-          .join("\n"),
+        `,
       }}
     />
   )

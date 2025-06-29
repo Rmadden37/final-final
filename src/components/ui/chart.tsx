@@ -98,6 +98,27 @@ export const ChartTooltip = ({
   )
 }
 
+// Chart Tooltip Content Component (for Recharts)
+export const ChartTooltipContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    hideLabel?: boolean
+    hideIndicator?: boolean
+    indicator?: "line" | "dot" | "dashed"
+    nameKey?: string
+    labelKey?: string
+  }
+>(({ className, hideLabel, hideIndicator, indicator = "dot", nameKey, labelKey, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={className}
+      {...props}
+    />
+  )
+})
+ChartTooltipContent.displayName = "ChartTooltipContent"
+
 // Chart Legend Content Component
 export const ChartLegendContent = ({ payload }: any) => {
   if (!payload) {

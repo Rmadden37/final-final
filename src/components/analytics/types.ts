@@ -116,3 +116,74 @@ export interface AiApiResponse {
   text_response?: string;
   chart_response?: AiChart;
 }
+
+// UPDATED PERFORMANCE INTERFACES WITH ALL REQUIRED PROPERTIES
+export interface SetterPerformance {
+  uid: string;
+  name: string;
+  totalLeads: number;
+  soldLeads: number;
+  conversionRate: number;
+  immediateLeads: number;
+  scheduledLeads: number;
+  avgLeadsPerDay?: number;
+  // Additional properties expected by components
+  sitCount: number;
+  sitRate: number;
+  failedCreditCount: number;
+  failedCreditRate: number;
+  immediateDispatchCount: number;
+  immediateDispatchPercentage: number;
+  scheduledDispatchCount: number;
+  cancelNoShowCount: number;
+  cancelNoShowRate: number;
+}
+
+export interface CloserPerformance {
+  uid: string;
+  name: string;
+  totalAssigned: number;
+  totalSold: number;
+  totalNoSale: number;
+  totalFailedCredits: number;
+  closingRatio: number;
+  closingPercentage: number;
+  avgDealsPerDay?: number;
+  // Additional properties expected by components
+  soldCount: number;
+  closeRate: number;
+  noSaleCount: number;
+  failedCreditCount: number;
+  selfGenCount: number;
+  selfGenRate: number;
+  conversionRate: number;
+}
+
+export interface TeamMetrics {
+  totalLeads: number;
+  totalSold: number;
+  conversionRate: number;
+  totalSetters: number;
+  totalClosers: number;
+  activeClosers: number;
+  avgLeadsPerSetter: number;
+  avgSalesPerCloser: number;
+  // Additional properties expected by components
+  samedaySitRate?: number;
+  scheduledSitRate?: number;
+  samedaySitCloseRate?: number;
+  scheduledAppointmentCloseRate?: number;
+}
+
+export interface TrendData {
+  date: string;
+  leads: number;
+  sales: number;
+  conversionRate: number;
+  // Additional properties expected by components
+  totalLeads: number;
+  sitRate: number;
+  closeRate: number;
+  isSpecialPoint?: boolean;
+  pointType?: 'today' | 'projection';
+}
