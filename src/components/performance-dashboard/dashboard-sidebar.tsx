@@ -17,7 +17,7 @@ import {
   Menu,
   X
 } from "lucide-react";
-import AvailabilityToggle from "./availability-toggle";
+import AvailabilityToggle from "../dashboard/availability-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useState, useEffect } from "react";
 import React from "react";
